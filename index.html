@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5" />
-  <title>BarberSaaS</title>
+  <title>BarberSaaS - منصة حجوزات الحلاقة</title>
 
   <!-- Firebase Modular SDK -->
   <script type="importmap">
@@ -16,7 +16,7 @@
     }
   </script>
 
-  <!-- Chart.js (for owner dashboard) -->
+  <!-- Chart.js (اختياري للرسوم البيانية) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
   </script>
 
@@ -24,21 +24,17 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
   <style>
-    /* ── Global reset & variables ── */
+    /* ── نفس الـ CSS السابق مع بعض التحسينات ── */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     body {
       background: #0b0d10;
       color: #f0f2f5;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      padding: 0;
-      margin: 0;
     }
     :root {
       --bg: #0b0d10;
@@ -54,58 +50,37 @@
       --red: #e74c5e;
       --orange: #f39c12;
     }
-    a {
-      color: var(--accent);
-      text-decoration: none;
-    }
-    button {
-      cursor: pointer;
-      border: none;
-      outline: none;
-      background: none;
-      color: inherit;
-      font-family: inherit;
-    }
-    input,
-    select,
-    textarea {
-      font-family: inherit;
-      outline: none;
-      border: none;
-      background: none;
-      color: inherit;
-    }
-    /* ── Layout ── */
     .page {
       display: none;
       width: 100%;
       min-height: 100vh;
+      padding: 20px;
     }
     .page.active {
       display: flex;
       flex-direction: column;
+      align-items: center;
     }
     .container {
-      max-width: 1200px;
+      max-width: 800px;
       width: 100%;
       margin: 0 auto;
-      padding: 20px;
     }
-    /* ── Cards ── */
     .card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 20px;
+      padding: 24px;
       margin-bottom: 20px;
+      width: 100%;
     }
     .card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
       flex-wrap: wrap;
       gap: 10px;
+      margin-bottom: 16px;
     }
     .card-header h3 {
       font-size: 18px;
@@ -119,6 +94,8 @@
       transition: 0.2s;
       border: 1px solid var(--border);
       color: var(--text2);
+      background: transparent;
+      cursor: pointer;
     }
     .btn:hover {
       background: var(--border);
@@ -142,7 +119,10 @@
       color: #fff;
       border-color: var(--red);
     }
-    /* ── Forms ── */
+    .btn-block {
+      width: 100%;
+      padding: 12px;
+    }
     .form-group {
       margin-bottom: 16px;
     }
@@ -180,51 +160,6 @@
         grid-template-columns: 1fr;
       }
     }
-    /* ── Toast ── */
-    #toast-container {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      max-width: 400px;
-      width: 100%;
-      pointer-events: none;
-    }
-    .toast {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 14px 18px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-      pointer-events: auto;
-      animation: slideUp 0.3s ease;
-    }
-    .toast.success {
-      border-left: 4px solid var(--green);
-    }
-    .toast.error {
-      border-left: 4px solid var(--red);
-    }
-    .toast.info {
-      border-left: 4px solid var(--accent);
-    }
-    @keyframes slideUp {
-      from {
-        transform: translateY(20px);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-    /* ── Utilities ── */
     .flex {
       display: flex;
       align-items: center;
@@ -269,7 +204,6 @@
       background: var(--red);
       color: #fff;
     }
-    /* ── Tables ── */
     .table-wrap {
       overflow-x: auto;
     }
@@ -279,7 +213,7 @@
       font-size: 13px;
     }
     table th {
-      text-align: left;
+      text-align: right;
       padding: 10px 12px;
       color: var(--muted);
       font-weight: 600;
@@ -292,7 +226,6 @@
       border-bottom: 1px solid var(--border);
       color: var(--text2);
     }
-    /* ── Navigation (owner dashboard) ── */
     .dashboard-nav {
       display: flex;
       flex-wrap: wrap;
@@ -308,13 +241,58 @@
       color: var(--text2);
       transition: 0.2s;
       cursor: pointer;
+      text-decoration: none;
     }
     .dashboard-nav a:hover,
     .dashboard-nav a.active {
       background: var(--accent-dim);
       color: var(--accent);
     }
-    /* ── Public shop ── */
+    /* ── Toast ── */
+    #toast-container {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 400px;
+      width: 100%;
+      pointer-events: none;
+    }
+    .toast {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      pointer-events: auto;
+      animation: slideUp 0.3s ease;
+    }
+    .toast.success {
+      border-right: 4px solid var(--green);
+    }
+    .toast.error {
+      border-right: 4px solid var(--red);
+    }
+    .toast.info {
+      border-right: 4px solid var(--accent);
+    }
+    @keyframes slideUp {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    /* ── Public Shop ── */
     .shop-hero {
       text-align: center;
       padding: 40px 20px;
@@ -327,11 +305,6 @@
     .shop-hero h1 {
       font-size: 32px;
       margin-top: 16px;
-    }
-    .shop-hero p {
-      color: var(--text2);
-      max-width: 500px;
-      margin: 10px auto;
     }
     .service-card,
     .barber-card {
@@ -349,19 +322,44 @@
       max-width: 500px;
       margin: 0 auto;
     }
-    /* ── Responsive ── */
-    @media (max-width: 768px) {
-      .container {
-        padding: 12px;
-      }
-      .dashboard-nav a {
-        font-size: 13px;
-        padding: 6px 12px;
-      }
+    /* ── Onboarding ── */
+    #onboardingContent .step-indicator {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    #onboardingContent .step-indicator .active-step {
+      color: var(--accent);
+      font-weight: 600;
+    }
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+    }
+    .modal-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      max-width: 500px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
     }
   </style>
 </head>
-
 <body>
 
   <!-- ─── TOAST CONTAINER ─── -->
@@ -369,22 +367,22 @@
 
   <!-- ─── PAGE: LOGIN ─── -->
   <div id="page-login" class="page active">
-    <div class="container" style="max-width:400px;margin:80px auto;">
-      <div class="card" style="padding:40px;">
-        <h2 style="text-align:center;margin-bottom:8px;">✂ BarberSaaS</h2>
-        <p class="text-center text-muted" style="margin-bottom:24px;">Owner Login</p>
-        <div id="loginError" style="color:var(--red);margin-bottom:12px;display:none;"></div>
+    <div class="container" style="max-width:400px; margin-top:60px;">
+      <div class="card">
+        <h2 style="text-align:center;">✂ BarberSaaS</h2>
+        <p class="text-center text-muted">تسجيل الدخول لأصحاب المحلات</p>
+        <div id="loginError" style="color:var(--red); margin-bottom:12px; display:none;"></div>
         <div class="form-group">
-          <label>Email</label>
+          <label>البريد الإلكتروني</label>
           <input type="email" id="loginEmail" placeholder="owner@example.com" />
         </div>
         <div class="form-group">
-          <label>Password</label>
+          <label>كلمة المرور</label>
           <input type="password" id="loginPassword" placeholder="••••••••" />
         </div>
-        <button class="btn btn-primary w-full" id="loginBtn">Sign In</button>
+        <button class="btn btn-primary btn-block" id="loginBtn">دخول</button>
         <p class="text-center text-muted mt-20" style="font-size:14px;">
-          Don't have an account? <a href="#" id="goToSignup">Create one</a>
+          ليس لديك حساب؟ <a href="#" id="goToSignup">إنشاء حساب</a>
         </p>
       </div>
     </div>
@@ -392,45 +390,45 @@
 
   <!-- ─── PAGE: SIGNUP ─── -->
   <div id="page-signup" class="page">
-    <div class="container" style="max-width:400px;margin:80px auto;">
-      <div class="card" style="padding:40px;">
-        <h2 style="text-align:center;margin-bottom:8px;">Create Account</h2>
-        <p class="text-center text-muted" style="margin-bottom:24px;">Start your barber business</p>
-        <div id="signupError" style="color:var(--red);margin-bottom:12px;display:none;"></div>
+    <div class="container" style="max-width:400px; margin-top:60px;">
+      <div class="card">
+        <h2 style="text-align:center;">إنشاء حساب</h2>
+        <p class="text-center text-muted">ابدأ متجرك الآن</p>
+        <div id="signupError" style="color:var(--red); margin-bottom:12px; display:none;"></div>
         <div class="form-group">
-          <label>Full Name</label>
-          <input type="text" id="signupName" placeholder="Ahmed Mohamed" />
+          <label>الاسم الكامل</label>
+          <input type="text" id="signupName" placeholder="أحمد محمد" />
         </div>
         <div class="form-group">
-          <label>Email</label>
+          <label>البريد الإلكتروني</label>
           <input type="email" id="signupEmail" placeholder="owner@example.com" />
         </div>
         <div class="form-group">
-          <label>Password</label>
-          <input type="password" id="signupPassword" placeholder="min 6 characters" />
+          <label>كلمة المرور</label>
+          <input type="password" id="signupPassword" placeholder="حد أدنى 6 أحرف" />
         </div>
         <div class="form-group">
-          <label>Phone</label>
+          <label>رقم الهاتف</label>
           <input type="tel" id="signupPhone" placeholder="+201234567890" />
         </div>
-        <button class="btn btn-primary w-full" id="signupBtn">Sign Up</button>
+        <button class="btn btn-primary btn-block" id="signupBtn">تسجيل</button>
         <p class="text-center text-muted mt-20" style="font-size:14px;">
-          Already have an account? <a href="#" id="goToLogin">Sign In</a>
+          لديك حساب؟ <a href="#" id="goToLogin">تسجيل الدخول</a>
         </p>
       </div>
     </div>
   </div>
 
-  <!-- ─── PAGE: ONBOARDING (Shop Creation) ─── -->
+  <!-- ─── PAGE: ONBOARDING ─── -->
   <div id="page-onboarding" class="page">
-    <div class="container" style="max-width:700px;">
+    <div class="container" style="max-width:700px; padding-top:20px;">
       <div class="card">
         <div class="flex-between">
-          <h2>🏪 Create Your Shop</h2>
-          <span id="onboardingStep" class="text-muted">Step 1 / 10</span>
+          <h2>🏪 إنشاء المتجر</h2>
+          <span id="onboardingStep" class="text-muted">الخطوة 1 / 10</span>
         </div>
         <div id="onboardingContent">
-          <!-- Steps rendered dynamically -->
+          <!-- يتم عرض المحتوى ديناميكياً -->
         </div>
       </div>
     </div>
@@ -440,30 +438,30 @@
   <div id="page-dashboard" class="page">
     <div class="container">
       <div class="flex-between" style="margin-bottom:16px;">
-        <h2 id="dashboardShopName">My Shop</h2>
+        <h2 id="dashboardShopName">متجري</h2>
         <div class="flex">
-          <span id="shopStatusBadge" class="badge badge-pending">draft</span>
-          <button class="btn btn-primary" id="logoutBtn" style="margin-left:12px;">Logout</button>
+          <span id="shopStatusBadge" class="badge badge-pending">قيد الانتظار</span>
+          <button class="btn btn-primary" id="logoutBtn" style="margin-right:12px;">تسجيل خروج</button>
         </div>
       </div>
-      <!-- Navigation -->
+      <!-- شريط التنقل -->
       <nav class="dashboard-nav" id="dashboardNav">
-        <a data-section="overview" class="active">Overview</a>
-        <a data-section="services">Services</a>
-        <a data-section="barbers">Barbers</a>
-        <a data-section="bookings">Bookings</a>
-        <a data-section="customers">Customers</a>
-        <a data-section="reviews">Reviews</a>
-        <a data-section="gallery">Gallery</a>
-        <a data-section="hours">Hours</a>
-        <a data-section="holidays">Holidays</a>
-        <a data-section="subscription">Subscription</a>
-        <a data-section="qr">QR</a>
-        <a data-section="settings">Settings</a>
+        <a data-section="overview" class="active">نظرة عامة</a>
+        <a data-section="services">الخدمات</a>
+        <a data-section="barbers">الحلاقون</a>
+        <a data-section="bookings">الحجوزات</a>
+        <a data-section="customers">العملاء</a>
+        <a data-section="reviews">التقييمات</a>
+        <a data-section="gallery">معرض الصور</a>
+        <a data-section="hours">ساعات العمل</a>
+        <a data-section="holidays">العطلات</a>
+        <a data-section="subscription">الاشتراك</a>
+        <a data-section="qr">رمز QR</a>
+        <a data-section="settings">الإعدادات</a>
       </nav>
-      <!-- Sections -->
+      <!-- المحتوى -->
       <div id="dashboardContent">
-        <!-- Each section rendered dynamically -->
+        <!-- يتم عرض كل قسم ديناميكياً -->
       </div>
     </div>
   </div>
@@ -471,7 +469,7 @@
   <!-- ─── PAGE: PUBLIC SHOP ─── -->
   <div id="page-public" class="page">
     <div id="publicContent" class="container">
-      <!-- Rendered dynamically -->
+      <!-- يتم عرض المتجر العام ديناميكياً -->
     </div>
   </div>
 
@@ -547,7 +545,7 @@
       const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-circle-info' };
       const el = document.createElement('div');
       el.className = `toast ${type}`;
-      el.innerHTML = `<span><i class="fas ${icons[type]||icons.info}"></i></span><span>${msg}</span><span onclick="this.parentElement.remove()" style="margin-left:auto;cursor:pointer;">&times;</span>`;
+      el.innerHTML = `<span><i class="fas ${icons[type]||icons.info}"></i></span><span>${msg}</span><span onclick="this.parentElement.remove()" style="margin-right:auto;cursor:pointer;">&times;</span>`;
       toastContainer.appendChild(el);
       setTimeout(() => { if (el.parentNode) el.remove(); }, duration);
     }
@@ -562,16 +560,15 @@
     function formatDate(d) {
       if (!d) return 'N/A';
       if (d.toDate) d = d.toDate();
-      return d.toLocaleDateString();
+      return d.toLocaleDateString('ar-EG');
     }
 
     function formatTime(d) {
       if (!d) return 'N/A';
       if (d.toDate) d = d.toDate();
-      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      return d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
     }
 
-    // ─── Cloudinary upload ───
     async function uploadToCloudinary(file) {
       const formData = new FormData();
       formData.append('file', file);
@@ -581,14 +578,13 @@
         body: formData
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error?.message || 'Upload failed');
+      if (!res.ok) throw new Error(data.error?.message || 'فشل الرفع');
       return { url: data.secure_url, publicId: data.public_id };
     }
 
-    // ─── Slug generation ───
     function generateSlug(name) {
-      return name.toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
+      return name.trim().toLowerCase()
+        .replace(/[^\u0600-\u06FFa-z0-9]+/g, '-')
         .replace(/^-|-$/g, '')
         .substring(0, 60);
     }
@@ -597,7 +593,7 @@
     // STATE
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     let currentUser = null;
-    let currentShop = null; // shop doc data
+    let currentShop = null;
     let currentShopId = null;
     let currentRole = null;
     let unsubscribers = [];
@@ -608,24 +604,20 @@
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUser = user;
-        // fetch user doc
         try {
           const userDoc = await getDoc(doc(db, 'users', user.uid));
           if (userDoc.exists()) {
             const data = userDoc.data();
             currentRole = data.role || 'customer';
             currentShopId = data.shopId || null;
-            // if shopId, load shop
             if (currentShopId) {
               const shopSnap = await getDoc(doc(db, 'shops', currentShopId));
               if (shopSnap.exists()) {
                 currentShop = { id: shopSnap.id, ...shopSnap.data() };
               }
             }
-            // redirect
             if (currentRole === 'shop_owner') {
               if (!currentShopId) {
-                // no shop -> onboarding
                 switchPage('page-onboarding');
                 renderOnboarding();
               } else {
@@ -633,17 +625,18 @@
                 renderDashboard();
               }
             } else {
-              // not owner -> public? For now, just show message
-              showToast('You are not a shop owner.', 'error');
+              showToast('أنت لست مالك متجر.', 'error');
               switchPage('page-login');
             }
           } else {
-            // user doc missing -> create it?
-            // For simplicity, we assume it exists; but we can create on signup.
+            // في حال عدم وجود وثيقة مستخدم (نادراً)
+            showToast('بيانات المستخدم غير مكتملة، يرجى إعادة التسجيل.', 'error');
+            await signOut(auth);
+            switchPage('page-login');
           }
         } catch (e) {
           console.error(e);
-          showToast('Error loading user', 'error');
+          showToast('خطأ في تحميل بيانات المستخدم', 'error');
         }
       } else {
         currentUser = null;
@@ -662,7 +655,7 @@
       const password = $('#loginPassword').value;
       const errEl = $('#loginError');
       errEl.style.display = 'none';
-      if (!email || !password) { errEl.textContent = 'Please fill all fields.';
+      if (!email || !password) { errEl.textContent = 'يرجى ملء جميع الحقول.';
         errEl.style.display = 'block'; return; }
       try {
         await signInWithEmailAndPassword(auth, email, password);
@@ -680,13 +673,12 @@
       const phone = $('#signupPhone').value.trim();
       const errEl = $('#signupError');
       errEl.style.display = 'none';
-      if (!name || !email || !password) { errEl.textContent = 'All fields required.';
+      if (!name || !email || !password) { errEl.textContent = 'جميع الحقول مطلوبة.';
         errEl.style.display = 'block'; return; }
       try {
         const cred = await createUserWithEmailAndPassword(auth, email, password);
-        // Update profile
         await updateProfile(cred.user, { displayName: name });
-        // Create user document with role shop_owner
+        // إنشاء وثيقة المستخدم
         await setDoc(doc(db, 'users', cred.user.uid), {
           name,
           email,
@@ -695,8 +687,8 @@
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
         });
-        showToast('Account created! Starting onboarding...', 'success');
-        // onAuthStateChanged will redirect to onboarding
+        showToast('تم إنشاء الحساب! جارٍ التوجيه إلى إعداد المتجر.', 'success');
+        // onAuthStateChanged سيتولى التوجيه
       } catch (e) {
         errEl.textContent = e.message;
         errEl.style.display = 'block';
@@ -706,7 +698,7 @@
     // ─── Logout ───
     $('#logoutBtn').addEventListener('click', async () => {
       await signOut(auth);
-      showToast('Logged out', 'info');
+      showToast('تم تسجيل الخروج', 'info');
     });
 
     // ─── Toggle pages ───
@@ -719,16 +711,16 @@
     // ONBOARDING
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     const onboardingSteps = [
-      { id: 'info', label: 'Shop Info' },
-      { id: 'logo', label: 'Logo' },
-      { id: 'cover', label: 'Cover' },
-      { id: 'services', label: 'Services' },
-      { id: 'hours', label: 'Hours' },
-      { id: 'barbers', label: 'Barbers' },
-      { id: 'gallery', label: 'Gallery' },
-      { id: 'whatsapp', label: 'WhatsApp' },
-      { id: 'location', label: 'Location' },
-      { id: 'theme', label: 'Theme' },
+      { id: 'info', label: 'معلومات المتجر' },
+      { id: 'logo', label: 'شعار المتجر' },
+      { id: 'cover', label: 'صورة الغلاف' },
+      { id: 'services', label: 'الخدمات' },
+      { id: 'hours', label: 'ساعات العمل' },
+      { id: 'barbers', label: 'الحلاقون' },
+      { id: 'gallery', label: 'معرض الصور' },
+      { id: 'whatsapp', label: 'واتساب' },
+      { id: 'location', label: 'الموقع' },
+      { id: 'theme', label: 'المظهر' },
     ];
     let onboardingData = {};
     let onboardingIndex = 0;
@@ -737,112 +729,111 @@
       const container = $('#onboardingContent');
       const step = onboardingSteps[onboardingIndex];
       if (!step) {
-        // finish -> create shop
+        // انتهت الخطوات → إنشاء المتجر
         finishOnboarding();
         return;
       }
-      $('#onboardingStep').textContent = `Step ${onboardingIndex+1} / ${onboardingSteps.length}`;
-      let html = '';
+      $('#onboardingStep').textContent = `الخطوة ${onboardingIndex+1} / ${onboardingSteps.length}`;
+      let html = `<div class="step-indicator">${onboardingSteps.map((s, i) => `<span class="${i===onboardingIndex?'active-step':''}">${i+1}</span>`).join(' · ')}</div>`;
       html += `<h3>${step.label}</h3>`;
       switch (step.id) {
         case 'info':
           html += `
-            <div class="form-group"><label>Shop Name *</label><input type="text" id="onbName" placeholder="Ahmed Barber" /></div>
-            <div class="form-group"><label>Description</label><textarea id="onbDesc" placeholder="We provide premium barber services..."></textarea></div>
-            <div class="form-group"><label>Phone</label><input type="tel" id="onbPhone" placeholder="+201234567890" /></div>
-            <div class="form-group"><label>Country</label><input type="text" id="onbCountry" placeholder="Egypt" /></div>
-            <div class="form-group"><label>Currency</label><select id="onbCurrency"><option value="USD">USD</option><option value="EGP">EGP</option><option value="EUR">EUR</option></select></div>
-            <div class="form-group"><label>Timezone</label><input type="text" id="onbTz" placeholder="Africa/Cairo" value="Africa/Cairo" /></div>
+            <div class="form-group"><label>اسم المتجر *</label><input type="text" id="onbName" placeholder="محمد للحلاقة" /></div>
+            <div class="form-group"><label>وصف المتجر</label><textarea id="onbDesc" placeholder="نقدم خدمات حلاقة احترافية..."></textarea></div>
+            <div class="form-group"><label>رقم الهاتف</label><input type="tel" id="onbPhone" placeholder="+201234567890" /></div>
+            <div class="form-group"><label>الدولة</label><input type="text" id="onbCountry" placeholder="مصر" /></div>
+            <div class="form-group"><label>العملة</label><select id="onbCurrency"><option value="USD">دولار أمريكي</option><option value="EGP">جنيه مصري</option><option value="EUR">يورو</option></select></div>
+            <div class="form-group"><label>المنطقة الزمنية</label><input type="text" id="onbTz" placeholder="Africa/Cairo" value="Africa/Cairo" /></div>
           `;
           break;
         case 'logo':
           html += `
-            <p class="text-muted">Upload your shop logo (recommended: square, max 2MB)</p>
+            <p class="text-muted">ارفع شعار المتجر (مربع، الحد الأقصى 2 ميجابايت)</p>
             <input type="file" id="onbLogo" accept="image/*" />
             <div id="onbLogoPreview" style="margin-top:10px;"></div>
           `;
           break;
         case 'cover':
           html += `
-            <p class="text-muted">Upload a cover image (recommended: 1200x400, max 5MB)</p>
+            <p class="text-muted">ارفع صورة غلاف (عرض 1200×400، الحد الأقصى 5 ميجابايت)</p>
             <input type="file" id="onbCover" accept="image/*" />
             <div id="onbCoverPreview" style="margin-top:10px;"></div>
           `;
           break;
         case 'services':
           html += `
-            <p class="text-muted">Add your services (at least one)</p>
+            <p class="text-muted">أضف الخدمات التي تقدمها (خدمة واحدة على الأقل)</p>
             <div id="onbServicesList"></div>
             <div class="grid-2">
-              <div class="form-group"><label>Service Name</label><input type="text" id="onbServiceName" placeholder="Haircut" /></div>
-              <div class="form-group"><label>Price</label><input type="number" id="onbServicePrice" placeholder="15.00" step="0.01" /></div>
+              <div class="form-group"><label>اسم الخدمة</label><input type="text" id="onbServiceName" placeholder="حلاقة رجالي" /></div>
+              <div class="form-group"><label>السعر</label><input type="number" id="onbServicePrice" placeholder="50" step="0.01" /></div>
             </div>
-            <div class="form-group"><label>Duration (minutes)</label><input type="number" id="onbServiceDuration" placeholder="30" /></div>
-            <button class="btn btn-primary" id="onbAddService">+ Add Service</button>
+            <div class="form-group"><label>المدة (دقائق)</label><input type="number" id="onbServiceDuration" placeholder="30" /></div>
+            <button class="btn btn-primary" id="onbAddService">+ إضافة خدمة</button>
           `;
           break;
         case 'hours':
           html += `
-            <p class="text-muted">Set your working hours for each day</p>
+            <p class="text-muted">حدد ساعات العمل لكل يوم</p>
             <div id="onbHoursContainer"></div>
           `;
           break;
         case 'barbers':
           html += `
-            <p class="text-muted">Add your barbers (optional)</p>
+            <p class="text-muted">أضف الحلاقين (اختياري)</p>
             <div id="onbBarbersList"></div>
             <div class="grid-2">
-              <div class="form-group"><label>Barber Name</label><input type="text" id="onbBarberName" placeholder="John" /></div>
-              <div class="form-group"><label>Phone</label><input type="text" id="onbBarberPhone" placeholder="+201234567890" /></div>
+              <div class="form-group"><label>اسم الحلاق</label><input type="text" id="onbBarberName" placeholder="أحمد" /></div>
+              <div class="form-group"><label>رقم الهاتف</label><input type="text" id="onbBarberPhone" placeholder="+201234567890" /></div>
             </div>
-            <div class="form-group"><label>Bio</label><textarea id="onbBarberBio" placeholder="Experienced barber..."></textarea></div>
-            <button class="btn btn-primary" id="onbAddBarber">+ Add Barber</button>
+            <div class="form-group"><label>السيرة الذاتية</label><textarea id="onbBarberBio" placeholder="خبرة 5 سنوات..."></textarea></div>
+            <button class="btn btn-primary" id="onbAddBarber">+ إضافة حلاق</button>
           `;
           break;
         case 'gallery':
           html += `
-            <p class="text-muted">Upload gallery images (optional)</p>
+            <p class="text-muted">ارفع صوراً للمعرض (اختياري)</p>
             <input type="file" id="onbGallery" accept="image/*" multiple />
             <div id="onbGalleryPreview" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;"></div>
           `;
           break;
         case 'whatsapp':
           html += `
-            <div class="form-group"><label>WhatsApp Number (with country code)</label><input type="tel" id="onbWhatsapp" placeholder="+201234567890" /></div>
-            <p class="text-muted">Customers will contact you via WhatsApp.</p>
+            <div class="form-group"><label>رقم واتساب (مع مفتاح الدولة)</label><input type="tel" id="onbWhatsapp" placeholder="+201234567890" /></div>
+            <p class="text-muted">سيتواصل العملاء معك عبر واتساب.</p>
           `;
           break;
         case 'location':
           html += `
-            <div class="form-group"><label>Address</label><textarea id="onbAddress" placeholder="123 Main St, Cairo"></textarea></div>
-            <button class="btn btn-primary" id="onbGetLocation">Get Current Location</button>
+            <div class="form-group"><label>العنوان</label><textarea id="onbAddress" placeholder="شارع النيل، القاهرة"></textarea></div>
+            <button class="btn btn-primary" id="onbGetLocation">الحصول على الموقع الحالي</button>
             <div id="onbLocationResult" class="text-muted" style="margin-top:8px;"></div>
           `;
           break;
         case 'theme':
           html += `
-            <p class="text-muted">Choose a theme for your public website</p>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;">
-              <button class="btn" data-theme="dark">Dark Luxury</button>
-              <button class="btn" data-theme="minimal">Modern Minimal</button>
-              <button class="btn" data-theme="classic">Classic Barber</button>
-              <button class="btn" data-theme="premium">Premium Black</button>
+            <p class="text-muted">اختر مظهراً لموقعك العام</p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+              <button class="btn" data-theme="dark">داكن فاخر</button>
+              <button class="btn" data-theme="minimal">حديث بسيط</button>
+              <button class="btn" data-theme="classic">كلاسيكي</button>
+              <button class="btn" data-theme="premium">أسود مميز</button>
             </div>
-            <div class="form-group"><label>Primary Color</label><input type="color" id="onbPrimary" value="#6c8cff" /></div>
-            <div class="form-group"><label>Secondary Color</label><input type="color" id="onbSecondary" value="#1a1f27" /></div>
+            <div class="form-group"><label>اللون الأساسي</label><input type="color" id="onbPrimary" value="#6c8cff" /></div>
+            <div class="form-group"><label>اللون الثانوي</label><input type="color" id="onbSecondary" value="#1a1f27" /></div>
           `;
           break;
       }
       html += `
         <div style="display:flex;justify-content:space-between;margin-top:20px;">
-          <button class="btn" id="onbPrev" ${onboardingIndex===0?'disabled':''}>Previous</button>
-          <button class="btn btn-primary" id="onbNext">${onboardingIndex===onboardingSteps.length-1?'Finish':'Next'}</button>
+          <button class="btn" id="onbPrev" ${onboardingIndex===0?'disabled':''}>السابق</button>
+          <button class="btn btn-primary" id="onbNext">${onboardingIndex===onboardingSteps.length-1?'إنهاء':'التالي'}</button>
         </div>
       `;
       container.innerHTML = html;
-      // attach events
+      // ربط الأحداث
       document.getElementById('onbNext').addEventListener('click', () => {
-        // collect data based on step
         collectOnboardingData(step.id);
         onboardingIndex++;
         renderOnboarding();
@@ -852,7 +843,6 @@
         onboardingIndex--;
         renderOnboarding();
       });
-      // specific step handlers
       handleOnboardingStep(step.id);
     }
 
@@ -867,15 +857,15 @@
           onboardingData.timezone = $('#onbTz').value.trim();
           break;
         case 'logo':
-          // file handled separately
+          // يتم جمع البيانات عند رفع الملف
           break;
         case 'cover':
           break;
         case 'services':
-          // services array already built
+          // تم جمعها عبر الأزرار
           break;
         case 'hours':
-          // hours collected from inputs
+          // يتم جمعها عند الضغط على إنهاء
           break;
         case 'barbers':
           break;
@@ -897,7 +887,7 @@
     }
 
     function handleOnboardingStep(stepId) {
-      // service adding
+      // إدارة الخدمات
       if (stepId === 'services') {
         if (!onboardingData.services) onboardingData.services = [];
         renderOnbServices();
@@ -905,7 +895,7 @@
           const name = $('#onbServiceName').value.trim();
           const price = parseFloat($('#onbServicePrice').value);
           const duration = parseInt($('#onbServiceDuration').value);
-          if (!name || isNaN(price) || isNaN(duration)) { showToast('Fill all fields', 'error'); return; }
+          if (!name || isNaN(price) || isNaN(duration)) { showToast('املأ جميع الحقول', 'error'); return; }
           onboardingData.services.push({ name, price, duration });
           $('#onbServiceName').value = '';
           $('#onbServicePrice').value = '';
@@ -920,7 +910,7 @@
           const name = $('#onbBarberName').value.trim();
           const phone = $('#onbBarberPhone').value.trim();
           const bio = $('#onbBarberBio').value.trim();
-          if (!name) { showToast('Name is required', 'error'); return; }
+          if (!name) { showToast('الاسم مطلوب', 'error'); return; }
           onboardingData.barbers.push({ name, phone, bio });
           $('#onbBarberName').value = '';
           $('#onbBarberPhone').value = '';
@@ -929,14 +919,14 @@
         });
       }
       if (stepId === 'hours') {
-        const days = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+        const days = ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'];
         let html = '';
         days.forEach(d => {
           html += `
             <div class="flex" style="margin-bottom:8px;">
-              <span style="width:100px;">${d}</span>
+              <span style="width:80px;">${d}</span>
               <input type="checkbox" id="hour_${d}_enabled" checked />
-              <label>Open</label>
+              <label>مفتوح</label>
               <input type="time" id="hour_${d}_open" value="09:00" />
               <input type="time" id="hour_${d}_close" value="21:00" />
             </div>
@@ -953,7 +943,7 @@
             onboardingData.logoUrl = result.url;
             onboardingData.logoPublicId = result.publicId;
             document.getElementById('onbLogoPreview').innerHTML = `<img src="${result.url}" style="max-width:120px;border-radius:8px;" />`;
-          } catch (err) { showToast('Upload failed: '+err.message, 'error'); }
+          } catch (err) { showToast('فشل الرفع: '+err.message, 'error'); }
         });
       }
       if (stepId === 'cover') {
@@ -965,7 +955,7 @@
             onboardingData.coverUrl = result.url;
             onboardingData.coverPublicId = result.publicId;
             document.getElementById('onbCoverPreview').innerHTML = `<img src="${result.url}" style="max-width:200px;border-radius:8px;" />`;
-          } catch (err) { showToast('Upload failed: '+err.message, 'error'); }
+          } catch (err) { showToast('فشل الرفع: '+err.message, 'error'); }
         });
       }
       if (stepId === 'gallery') {
@@ -982,7 +972,7 @@
               img.style.maxWidth = '80px';
               img.style.borderRadius = '8px';
               preview.appendChild(img);
-            } catch (err) { showToast('Upload failed: '+err.message, 'error'); }
+            } catch (err) { showToast('فشل الرفع: '+err.message, 'error'); }
           }
         });
       }
@@ -994,18 +984,17 @@
                 onboardingData.location = { latitude: pos.coords.latitude, longitude: pos.coords.longitude };
                 document.getElementById('onbLocationResult').textContent = `📍 ${pos.coords.latitude}, ${pos.coords.longitude}`;
               },
-              () => { showToast('Location access denied', 'error'); }
+              () => { showToast('تم رفض الوصول إلى الموقع', 'error'); }
             );
           } else {
-            showToast('Geolocation not supported', 'error');
+            showToast('جهازك لا يدعم تحديد الموقع', 'error');
           }
         });
       }
       if (stepId === 'theme') {
-        document.querySelectorAll('#onbThemeOptions .btn').forEach(btn => {
+        document.querySelectorAll('[data-theme]').forEach(btn => {
           btn.addEventListener('click', () => {
             const theme = btn.dataset.theme;
-            // set default colors based on theme
             const colors = {
               dark: { primary: '#6c8cff', secondary: '#1a1f27' },
               minimal: { primary: '#2d3436', secondary: '#dfe6e9' },
@@ -1024,12 +1013,12 @@
       const container = document.getElementById('onbServicesList');
       if (!container) return;
       if (!onboardingData.services || onboardingData.services.length === 0) {
-        container.innerHTML = '<p class="text-muted">No services added yet.</p>';
+        container.innerHTML = '<p class="text-muted">لم تضف أي خدمات بعد.</p>';
         return;
       }
       let html = '';
       onboardingData.services.forEach((s, i) => {
-        html += `<div class="flex-between"><span>${s.name} - $${s.price} (${s.duration}min)</span><button class="btn btn-danger" data-idx="${i}">Remove</button></div>`;
+        html += `<div class="flex-between"><span>${s.name} - ${s.price} جنيه (${s.duration} دقيقة)</span><button class="btn btn-danger" data-idx="${i}">حذف</button></div>`;
       });
       container.innerHTML = html;
       container.querySelectorAll('[data-idx]').forEach(btn => {
@@ -1045,12 +1034,12 @@
       const container = document.getElementById('onbBarbersList');
       if (!container) return;
       if (!onboardingData.barbers || onboardingData.barbers.length === 0) {
-        container.innerHTML = '<p class="text-muted">No barbers added yet.</p>';
+        container.innerHTML = '<p class="text-muted">لم تضف أي حلاقين بعد.</p>';
         return;
       }
       let html = '';
       onboardingData.barbers.forEach((b, i) => {
-        html += `<div class="flex-between"><span>${b.name} ${b.phone ? '📞'+b.phone : ''}</span><button class="btn btn-danger" data-idx="${i}">Remove</button></div>`;
+        html += `<div class="flex-between"><span>${b.name} ${b.phone ? '📞'+b.phone : ''}</span><button class="btn btn-danger" data-idx="${i}">حذف</button></div>`;
       });
       container.innerHTML = html;
       container.querySelectorAll('[data-idx]').forEach(btn => {
@@ -1062,18 +1051,25 @@
       });
     }
 
+    // ─── الدالة الأساسية لإنهاء الإعداد وإنشاء المتجر ───
     async function finishOnboarding() {
-      // validate required fields
+      // التحقق من وجود اسم المتجر
       const name = onboardingData.name;
-      if (!name) { showToast('Shop name is required', 'error'); return; }
-      // generate slug
+      if (!name) {
+        showToast('اسم المتجر مطلوب', 'error');
+        return;
+      }
+
+      // إنشاء slug فريد
       let slug = generateSlug(name);
-      // check uniqueness
+      // التحقق من عدم التكرار
       const q = query(collection(db, 'shops'), where('slug', '==', slug));
       const snap = await getDocs(q);
       if (!snap.empty) {
         slug = `${slug}-${Date.now().toString().slice(-4)}`;
       }
+
+      // تجهيز بيانات المتجر
       const shopData = {
         ownerId: currentUser.uid,
         name: name,
@@ -1098,11 +1094,16 @@
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
+
       try {
+        // 1. إنشاء المتجر
         const shopRef = await addDoc(collection(db, 'shops'), shopData);
-        // Update user with shopId
+        currentShopId = shopRef.id;
+
+        // 2. تحديث وثيقة المستخدم بربط المتجر
         await updateDoc(doc(db, 'users', currentUser.uid), { shopId: shopRef.id });
-        // Add services
+
+        // 3. إضافة الخدمات
         if (onboardingData.services && onboardingData.services.length > 0) {
           const batch = writeBatch(db);
           onboardingData.services.forEach(s => {
@@ -1119,7 +1120,8 @@
           });
           await batch.commit();
         }
-        // Add barbers
+
+        // 4. إضافة الحلاقين
         if (onboardingData.barbers && onboardingData.barbers.length > 0) {
           const batch = writeBatch(db);
           onboardingData.barbers.forEach(b => {
@@ -1135,28 +1137,30 @@
           });
           await batch.commit();
         }
-        // Add working hours
-        const days = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-        const batch = writeBatch(db);
+
+        // 5. إضافة ساعات العمل
+        const days = ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'];
+        const batchHours = writeBatch(db);
         days.forEach(d => {
-          const ref = doc(collection(db, 'shops', shopRef.id, 'workingHours'), d);
+          const ref = doc(db, 'shops', shopRef.id, 'workingHours', d);
           const enabled = document.getElementById(`hour_${d}_enabled`)?.checked ?? true;
           const open = document.getElementById(`hour_${d}_open`)?.value || '09:00';
           const close = document.getElementById(`hour_${d}_close`)?.value || '21:00';
-          batch.set(ref, {
+          batchHours.set(ref, {
             enabled,
             openTime: open,
             closeTime: close,
             breaks: []
           });
         });
-        await batch.commit();
-        // Add gallery
+        await batchHours.commit();
+
+        // 6. إضافة معرض الصور
         if (onboardingData.gallery && onboardingData.gallery.length > 0) {
-          const batch = writeBatch(db);
+          const batchGallery = writeBatch(db);
           onboardingData.gallery.forEach(g => {
             const ref = doc(collection(db, 'shops', shopRef.id, 'gallery'));
-            batch.set(ref, {
+            batchGallery.set(ref, {
               imageUrl: g.url,
               publicId: g.publicId,
               caption: '',
@@ -1165,9 +1169,10 @@
               updatedAt: serverTimestamp()
             });
           });
-          await batch.commit();
+          await batchGallery.commit();
         }
-        // Activity log
+
+        // 7. تسجيل نشاط
         await addDoc(collection(db, 'activityLogs'), {
           actorId: currentUser.uid,
           actorRole: 'shop_owner',
@@ -1175,29 +1180,35 @@
           targetType: 'shop',
           targetId: shopRef.id,
           shopId: shopRef.id,
-          description: `Shop "${name}" created`,
+          description: `تم إنشاء متجر "${name}"`,
           timestamp: serverTimestamp()
         });
-        // Create subscription request (free trial)
+
+        // 8. إنشاء طلب اشتراك (نسخة تجريبية مجانية)
         await addDoc(collection(db, 'subscriptionRequests'), {
           userId: currentUser.uid,
           shopId: shopRef.id,
           planId: 'free_trial',
           status: 'pending',
-          message: 'Free trial request',
+          message: 'طلب اشتراك تجريبي',
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
         });
-        showToast('Shop created! Waiting for admin approval.', 'success');
-        // reload state
-        currentShopId = shopRef.id;
+
+        showToast('🎉 تم إنشاء المتجر بنجاح! في انتظار موافقة المشرف.', 'success');
+
+        // تحديث الحالة المحلية
         const shopSnap = await getDoc(doc(db, 'shops', shopRef.id));
         currentShop = { id: shopSnap.id, ...shopSnap.data() };
+
+        // التوجيه إلى لوحة التحكم
         switchPage('page-dashboard');
         renderDashboard();
+
       } catch (e) {
-        console.error(e);
-        showToast('Error creating shop: '+e.message, 'error');
+        console.error('خطأ في إنشاء المتجر:', e);
+        showToast('فشل إنشاء المتجر: ' + e.message, 'error');
+        // يمكن إعادة المحاولة أو العودة إلى الخطوة السابقة
       }
     }
 
@@ -1209,12 +1220,14 @@
 
     function renderDashboard() {
       if (!currentShop) return;
-      $('#dashboardShopName').textContent = currentShop.name || 'My Shop';
+      $('#dashboardShopName').textContent = currentShop.name || 'متجري';
       const status = currentShop.status || 'draft';
       const badge = $('#shopStatusBadge');
-      badge.textContent = status;
+      badge.textContent = status === 'active' ? 'نشط' : status === 'pending' ? 'قيد المراجعة' : status === 'suspended' ? 'موقوف' :
+        'مسودة';
       badge.className = `badge badge-${status}`;
-      // Navigation
+
+      // التنقل
       document.querySelectorAll('#dashboardNav a').forEach(a => {
         a.addEventListener('click', (e) => {
           e.preventDefault();
@@ -1225,13 +1238,12 @@
         });
       });
       renderSection(activeSection);
-      // realtime listeners
       setupRealtime();
     }
 
     function renderSection(section) {
       const container = $('#dashboardContent');
-      container.innerHTML = `<div class="section-loading">Loading...</div>`;
+      container.innerHTML = `<div class="text-center text-muted" style="padding:40px;">جارٍ التحميل...</div>`;
       switch (section) {
         case 'overview':
           renderOverview(container);
@@ -1270,19 +1282,19 @@
           renderSettings(container);
           break;
         default:
-          container.innerHTML = '<p>Section not implemented</p>';
+          container.innerHTML = '<p class="text-muted">هذا القسم قيد التطوير.</p>';
       }
     }
 
     // ─── OVERVIEW ───
     async function renderOverview(container) {
       const shopId = currentShopId;
-      // stats
       const servicesSnap = await getDocs(collection(db, 'shops', shopId, 'services'));
       const barbersSnap = await getDocs(collection(db, 'shops', shopId, 'barbers'));
       const bookingsSnap = await getDocs(collection(db, 'shops', shopId, 'bookings'));
       const customersSnap = await getDocs(collection(db, 'shops', shopId, 'customers'));
       const reviewsSnap = await getDocs(collection(db, 'shops', shopId, 'reviews'));
+
       const today = new Date();
       today.setHours(0,0,0,0);
       const todayBookings = bookingsSnap.docs.filter(d => {
@@ -1293,63 +1305,65 @@
       const confirmed = todayBookings.filter(d => d.data().status === 'confirmed').length;
       const completed = todayBookings.filter(d => d.data().status === 'completed').length;
       const cancelled = todayBookings.filter(d => d.data().status === 'cancelled').length;
+
       let avgRating = 0;
       const reviews = reviewsSnap.docs.map(d => d.data());
       if (reviews.length) {
         const sum = reviews.reduce((acc, r) => acc + (r.rating||0), 0);
         avgRating = sum / reviews.length;
       }
+
       container.innerHTML = `
-        <div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin-bottom:20px;">
-          <div class="card"><div class="text-muted">Today's Bookings</div><div style="font-size:28px;font-weight:700;">${todayBookings.length}</div></div>
-          <div class="card"><div class="text-muted">Pending</div><div style="font-size:28px;font-weight:700;color:var(--orange);">${pending}</div></div>
-          <div class="card"><div class="text-muted">Confirmed</div><div style="font-size:28px;font-weight:700;color:var(--accent);">${confirmed}</div></div>
-          <div class="card"><div class="text-muted">Completed</div><div style="font-size:28px;font-weight:700;color:var(--green);">${completed}</div></div>
-          <div class="card"><div class="text-muted">Cancelled</div><div style="font-size:28px;font-weight:700;color:var(--red);">${cancelled}</div></div>
-          <div class="card"><div class="text-muted">Total Customers</div><div style="font-size:28px;font-weight:700;">${customersSnap.size}</div></div>
-          <div class="card"><div class="text-muted">Total Services</div><div style="font-size:28px;font-weight:700;">${servicesSnap.size}</div></div>
-          <div class="card"><div class="text-muted">Avg Rating</div><div style="font-size:28px;font-weight:700;">${avgRating.toFixed(1)} ★</div></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;margin-bottom:20px;">
+          <div class="card"><div class="text-muted">حجوزات اليوم</div><div style="font-size:28px;font-weight:700;">${todayBookings.length}</div></div>
+          <div class="card"><div class="text-muted">قيد الانتظار</div><div style="font-size:28px;font-weight:700;color:var(--orange);">${pending}</div></div>
+          <div class="card"><div class="text-muted">مؤكدة</div><div style="font-size:28px;font-weight:700;color:var(--accent);">${confirmed}</div></div>
+          <div class="card"><div class="text-muted">مكتملة</div><div style="font-size:28px;font-weight:700;color:var(--green);">${completed}</div></div>
+          <div class="card"><div class="text-muted">ملغية</div><div style="font-size:28px;font-weight:700;color:var(--red);">${cancelled}</div></div>
+          <div class="card"><div class="text-muted">إجمالي العملاء</div><div style="font-size:28px;font-weight:700;">${customersSnap.size}</div></div>
+          <div class="card"><div class="text-muted">عدد الخدمات</div><div style="font-size:28px;font-weight:700;">${servicesSnap.size}</div></div>
+          <div class="card"><div class="text-muted">متوسط التقييم</div><div style="font-size:28px;font-weight:700;">${avgRating.toFixed(1)} ★</div></div>
         </div>
         <div class="card">
-          <div class="card-header"><h3>Recent Bookings</h3></div>
+          <div class="card-header"><h3>أحدث الحجوزات</h3></div>
           <div id="recentBookingsList"></div>
         </div>
       `;
-      // recent bookings
+
       const recent = bookingsSnap.docs.sort((a,b) => (b.data().createdAt?.toMillis?.()||0) - (a.data().createdAt?.toMillis?.()||0)).slice(0,5);
       const list = container.querySelector('#recentBookingsList');
       if (recent.length === 0) {
-        list.innerHTML = '<p class="text-muted">No bookings yet.</p>';
+        list.innerHTML = '<p class="text-muted">لا توجد حجوزات بعد.</p>';
       } else {
-        let html = '<div class="table-wrap"><table><thead><tr><th>Customer</th><th>Service</th><th>Date</th><th>Status</th></tr></thead><tbody>';
+        let html = '<div class="table-wrap"><table><thead><tr><th>العميل</th><th>الخدمة</th><th>التاريخ</th><th>الحالة</th></tr></thead><tbody>';
         recent.forEach(d => {
           const data = d.data();
-          html += `<tr><td>${data.customerName||'N/A'}</td><td>${data.serviceName||'N/A'}</td><td>${formatDate(data.date)} ${formatTime(data.date)}</td><td><span class="badge badge-${data.status||'pending'}">${data.status||'pending'}</span></td></tr>`;
+          html += `<tr><td>${data.customerName||'غير معروف'}</td><td>${data.serviceName||'غير معروف'}</td><td>${formatDate(data.date)} ${formatTime(data.date)}</td><td><span class="badge badge-${data.status||'pending'}">${data.status||'قيد الانتظار'}</span></td></tr>`;
         });
         html += '</tbody></table></div>';
         list.innerHTML = html;
       }
     }
 
-    // ─── SERVICES ───
+    // ─── SERVICES (مختصر) ───
     function renderServices(container) {
       container.innerHTML = `
         <div class="card">
-          <div class="card-header"><h3>Services</h3><button class="btn btn-primary" id="addServiceBtn">+ Add</button></div>
+          <div class="card-header"><h3>الخدمات</h3><button class="btn btn-primary" id="addServiceBtn">+ إضافة</button></div>
           <div id="servicesList"></div>
         </div>
       `;
       loadServices();
       document.getElementById('addServiceBtn').addEventListener('click', () => {
         const html = `
-          <div class="modal-title">Add Service</div>
-          <div class="form-group"><label>Name</label><input type="text" id="svcName" /></div>
-          <div class="form-group"><label>Price</label><input type="number" id="svcPrice" step="0.01" /></div>
-          <div class="form-group"><label>Duration (minutes)</label><input type="number" id="svcDuration" /></div>
-          <div class="form-group"><label>Description</label><textarea id="svcDesc"></textarea></div>
-          <div class="modal-actions">
-            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-            <button class="btn btn-primary" id="saveSvc">Save</button>
+          <div class="modal-title">إضافة خدمة</div>
+          <div class="form-group"><label>الاسم</label><input type="text" id="svcName" /></div>
+          <div class="form-group"><label>السعر</label><input type="number" id="svcPrice" step="0.01" /></div>
+          <div class="form-group"><label>المدة (دقائق)</label><input type="number" id="svcDuration" /></div>
+          <div class="form-group"><label>الوصف</label><textarea id="svcDesc"></textarea></div>
+          <div class="modal-actions" style="display:flex;gap:10px;margin-top:16px;">
+            <button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>
+            <button class="btn btn-primary" id="saveSvc">حفظ</button>
           </div>
         `;
         openModal(html);
@@ -1357,19 +1371,17 @@
           const name = document.getElementById('svcName').value.trim();
           const price = parseFloat(document.getElementById('svcPrice').value);
           const duration = parseInt(document.getElementById('svcDuration').value);
-          if (!name || isNaN(price) || isNaN(duration)) { showToast('Fill all fields', 'error'); return; }
+          if (!name || isNaN(price) || isNaN(duration)) { showToast('املأ جميع الحقول', 'error'); return; }
           try {
             await addDoc(collection(db, 'shops', currentShopId, 'services'), {
-              name,
-              price,
-              duration,
+              name, price, duration,
               description: document.getElementById('svcDesc').value.trim(),
               active: true,
               createdAt: serverTimestamp(),
               updatedAt: serverTimestamp()
             });
             closeModal();
-            showToast('Service added', 'success');
+            showToast('تمت الإضافة', 'success');
             loadServices();
           } catch (e) { showToast(e.message, 'error'); }
         });
@@ -1382,16 +1394,16 @@
       const snap = await getDocs(collection(db, 'shops', currentShopId, 'services'));
       const services = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       if (services.length === 0) {
-        container.innerHTML = '<p class="text-muted">No services. Add one!</p>';
+        container.innerHTML = '<p class="text-muted">لا توجد خدمات. أضف خدمة!</p>';
         return;
       }
-      let html = '<div class="table-wrap"><table><thead><tr><th>Name</th><th>Price</th><th>Duration</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+      let html = '<div class="table-wrap"><table><thead><tr><th>الاسم</th><th>السعر</th><th>المدة</th><th>الحالة</th><th>الإجراءات</th></tr></thead><tbody>';
       services.forEach(s => {
         html += `<tr>
           <td>${s.name}</td>
           <td>${s.price}</td>
-          <td>${s.duration}min</td>
-          <td><span class="badge ${s.active?'badge-active':'badge-pending'}">${s.active?'Active':'Inactive'}</span></td>
+          <td>${s.duration} دقيقة</td>
+          <td><span class="badge ${s.active?'badge-active':'badge-pending'}">${s.active?'نشطة':'غير نشطة'}</span></td>
           <td>
             <button class="btn btn-primary" onclick="editService('${s.id}')"><i class="fas fa-edit"></i></button>
             <button class="btn btn-danger" onclick="deleteService('${s.id}')"><i class="fas fa-trash"></i></button>
@@ -1407,15 +1419,15 @@
       if (!snap.exists()) return;
       const data = snap.data();
       const html = `
-        <div class="modal-title">Edit Service</div>
-        <div class="form-group"><label>Name</label><input type="text" id="editSvcName" value="${data.name||''}" /></div>
-        <div class="form-group"><label>Price</label><input type="number" id="editSvcPrice" value="${data.price||0}" step="0.01" /></div>
-        <div class="form-group"><label>Duration</label><input type="number" id="editSvcDuration" value="${data.duration||30}" /></div>
-        <div class="form-group"><label>Description</label><textarea id="editSvcDesc">${data.description||''}</textarea></div>
-        <div class="form-group"><label>Active</label><select id="editSvcActive"><option value="true" ${data.active?'selected':''}>Active</option><option value="false" ${!data.active?'selected':''}>Inactive</option></select></div>
-        <div class="modal-actions">
-          <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-          <button class="btn btn-primary" id="updateSvc">Update</button>
+        <div class="modal-title">تعديل الخدمة</div>
+        <div class="form-group"><label>الاسم</label><input type="text" id="editSvcName" value="${data.name||''}" /></div>
+        <div class="form-group"><label>السعر</label><input type="number" id="editSvcPrice" value="${data.price||0}" step="0.01" /></div>
+        <div class="form-group"><label>المدة</label><input type="number" id="editSvcDuration" value="${data.duration||30}" /></div>
+        <div class="form-group"><label>الوصف</label><textarea id="editSvcDesc">${data.description||''}</textarea></div>
+        <div class="form-group"><label>الحالة</label><select id="editSvcActive"><option value="true" ${data.active?'selected':''}>نشطة</option><option value="false" ${!data.active?'selected':''}>غير نشطة</option></select></div>
+        <div class="modal-actions" style="display:flex;gap:10px;margin-top:16px;">
+          <button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>
+          <button class="btn btn-primary" id="updateSvc">تحديث</button>
         </div>
       `;
       openModal(html);
@@ -1423,55 +1435,53 @@
         const name = document.getElementById('editSvcName').value.trim();
         const price = parseFloat(document.getElementById('editSvcPrice').value);
         const duration = parseInt(document.getElementById('editSvcDuration').value);
-        if (!name || isNaN(price) || isNaN(duration)) { showToast('Fill all fields', 'error'); return; }
+        if (!name || isNaN(price) || isNaN(duration)) { showToast('املأ جميع الحقول', 'error'); return; }
         try {
           await updateDoc(docRef, {
-            name,
-            price,
-            duration,
+            name, price, duration,
             description: document.getElementById('editSvcDesc').value.trim(),
             active: document.getElementById('editSvcActive').value === 'true',
             updatedAt: serverTimestamp()
           });
           closeModal();
-          showToast('Service updated', 'success');
+          showToast('تم التحديث', 'success');
           loadServices();
         } catch (e) { showToast(e.message, 'error'); }
       });
     };
     window.deleteService = async function(id) {
-      if (!confirm('Delete this service?')) return;
+      if (!confirm('هل أنت متأكد من حذف هذه الخدمة؟')) return;
       try {
         await deleteDoc(doc(db, 'shops', currentShopId, 'services', id));
-        showToast('Service deleted', 'info');
+        showToast('تم الحذف', 'info');
         loadServices();
       } catch (e) { showToast(e.message, 'error'); }
     };
 
-    // ─── BARBERS (similar pattern) ───
+    // ─── BARBERS (مختصر) ───
     function renderBarbers(container) {
       container.innerHTML = `
         <div class="card">
-          <div class="card-header"><h3>Barbers</h3><button class="btn btn-primary" id="addBarberBtn">+ Add</button></div>
+          <div class="card-header"><h3>الحلاقون</h3><button class="btn btn-primary" id="addBarberBtn">+ إضافة</button></div>
           <div id="barbersList"></div>
         </div>
       `;
       loadBarbers();
       document.getElementById('addBarberBtn').addEventListener('click', () => {
         const html = `
-          <div class="modal-title">Add Barber</div>
-          <div class="form-group"><label>Name</label><input type="text" id="barberName" /></div>
-          <div class="form-group"><label>Phone</label><input type="text" id="barberPhone" /></div>
-          <div class="form-group"><label>Bio</label><textarea id="barberBio"></textarea></div>
-          <div class="modal-actions">
-            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-            <button class="btn btn-primary" id="saveBarber">Save</button>
+          <div class="modal-title">إضافة حلاق</div>
+          <div class="form-group"><label>الاسم</label><input type="text" id="barberName" /></div>
+          <div class="form-group"><label>الهاتف</label><input type="text" id="barberPhone" /></div>
+          <div class="form-group"><label>السيرة</label><textarea id="barberBio"></textarea></div>
+          <div class="modal-actions" style="display:flex;gap:10px;margin-top:16px;">
+            <button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>
+            <button class="btn btn-primary" id="saveBarber">حفظ</button>
           </div>
         `;
         openModal(html);
         document.getElementById('saveBarber').addEventListener('click', async () => {
           const name = document.getElementById('barberName').value.trim();
-          if (!name) { showToast('Name required', 'error'); return; }
+          if (!name) { showToast('الاسم مطلوب', 'error'); return; }
           try {
             await addDoc(collection(db, 'shops', currentShopId, 'barbers'), {
               name,
@@ -1482,7 +1492,7 @@
               updatedAt: serverTimestamp()
             });
             closeModal();
-            showToast('Barber added', 'success');
+            showToast('تمت الإضافة', 'success');
             loadBarbers();
           } catch (e) { showToast(e.message, 'error'); }
         });
@@ -1495,15 +1505,15 @@
       const snap = await getDocs(collection(db, 'shops', currentShopId, 'barbers'));
       const barbers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       if (barbers.length === 0) {
-        container.innerHTML = '<p class="text-muted">No barbers.</p>';
+        container.innerHTML = '<p class="text-muted">لا يوجد حلاقون.</p>';
         return;
       }
-      let html = '<div class="table-wrap"><table><thead><tr><th>Name</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+      let html = '<div class="table-wrap"><table><thead><tr><th>الاسم</th><th>الهاتف</th><th>الحالة</th><th>الإجراءات</th></tr></thead><tbody>';
       barbers.forEach(b => {
         html += `<tr>
           <td>${b.name}</td>
           <td>${b.phone||'-'}</td>
-          <td><span class="badge ${b.active?'badge-active':'badge-pending'}">${b.active?'Active':'Inactive'}</span></td>
+          <td><span class="badge ${b.active?'badge-active':'badge-pending'}">${b.active?'نشط':'غير نشط'}</span></td>
           <td>
             <button class="btn btn-primary" onclick="editBarber('${b.id}')"><i class="fas fa-edit"></i></button>
             <button class="btn btn-danger" onclick="deleteBarber('${b.id}')"><i class="fas fa-trash"></i></button>
@@ -1519,20 +1529,20 @@
       if (!snap.exists()) return;
       const data = snap.data();
       const html = `
-        <div class="modal-title">Edit Barber</div>
-        <div class="form-group"><label>Name</label><input type="text" id="editBarberName" value="${data.name||''}" /></div>
-        <div class="form-group"><label>Phone</label><input type="text" id="editBarberPhone" value="${data.phone||''}" /></div>
-        <div class="form-group"><label>Bio</label><textarea id="editBarberBio">${data.bio||''}</textarea></div>
-        <div class="form-group"><label>Active</label><select id="editBarberActive"><option value="true" ${data.active?'selected':''}>Active</option><option value="false" ${!data.active?'selected':''}>Inactive</option></select></div>
-        <div class="modal-actions">
-          <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-          <button class="btn btn-primary" id="updateBarber">Update</button>
+        <div class="modal-title">تعديل حلاق</div>
+        <div class="form-group"><label>الاسم</label><input type="text" id="editBarberName" value="${data.name||''}" /></div>
+        <div class="form-group"><label>الهاتف</label><input type="text" id="editBarberPhone" value="${data.phone||''}" /></div>
+        <div class="form-group"><label>السيرة</label><textarea id="editBarberBio">${data.bio||''}</textarea></div>
+        <div class="form-group"><label>الحالة</label><select id="editBarberActive"><option value="true" ${data.active?'selected':''}>نشط</option><option value="false" ${!data.active?'selected':''}>غير نشط</option></select></div>
+        <div class="modal-actions" style="display:flex;gap:10px;margin-top:16px;">
+          <button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>
+          <button class="btn btn-primary" id="updateBarber">تحديث</button>
         </div>
       `;
       openModal(html);
       document.getElementById('updateBarber').addEventListener('click', async () => {
         const name = document.getElementById('editBarberName').value.trim();
-        if (!name) { showToast('Name required', 'error'); return; }
+        if (!name) { showToast('الاسم مطلوب', 'error'); return; }
         try {
           await updateDoc(docRef, {
             name,
@@ -1542,25 +1552,25 @@
             updatedAt: serverTimestamp()
           });
           closeModal();
-          showToast('Barber updated', 'success');
+          showToast('تم التحديث', 'success');
           loadBarbers();
         } catch (e) { showToast(e.message, 'error'); }
       });
     };
     window.deleteBarber = async function(id) {
-      if (!confirm('Delete this barber?')) return;
+      if (!confirm('هل أنت متأكد من حذف هذا الحلاق؟')) return;
       try {
         await deleteDoc(doc(db, 'shops', currentShopId, 'barbers', id));
-        showToast('Barber deleted', 'info');
+        showToast('تم الحذف', 'info');
         loadBarbers();
       } catch (e) { showToast(e.message, 'error'); }
     };
 
-    // ─── BOOKINGS ───
+    // ─── BOOKINGS (مختصر) ───
     function renderBookings(container) {
       container.innerHTML = `
         <div class="card">
-          <div class="card-header"><h3>Bookings</h3></div>
+          <div class="card-header"><h3>الحجوزات</h3></div>
           <div id="bookingsList"></div>
         </div>
       `;
@@ -1573,32 +1583,31 @@
       const snap = await getDocs(collection(db, 'shops', currentShopId, 'bookings'));
       const bookings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       if (bookings.length === 0) {
-        container.innerHTML = '<p class="text-muted">No bookings.</p>';
+        container.innerHTML = '<p class="text-muted">لا توجد حجوزات.</p>';
         return;
       }
-      let html = '<div class="table-wrap"><table><thead><tr><th>Customer</th><th>Service</th><th>Barber</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+      let html = '<div class="table-wrap"><table><thead><tr><th>العميل</th><th>الخدمة</th><th>الحلاق</th><th>التاريخ</th><th>الحالة</th><th>الإجراءات</th></tr></thead><tbody>';
       bookings.forEach(b => {
         html += `<tr>
-          <td>${b.customerName||'N/A'}</td>
-          <td>${b.serviceName||'N/A'}</td>
+          <td>${b.customerName||'غير معروف'}</td>
+          <td>${b.serviceName||'غير معروف'}</td>
           <td>${b.barberName||'-'}</td>
           <td>${formatDate(b.date)} ${formatTime(b.date)}</td>
-          <td><span class="badge badge-${b.status||'pending'}">${b.status||'pending'}</span></td>
+          <td><span class="badge badge-${b.status||'pending'}">${b.status||'قيد الانتظار'}</span></td>
           <td>
-            <button class="btn btn-primary" onclick="updateBookingStatus('${b.id}','confirmed')">Confirm</button>
-            <button class="btn btn-green" onclick="updateBookingStatus('${b.id}','completed')">Complete</button>
-            <button class="btn btn-danger" onclick="updateBookingStatus('${b.id}','cancelled')">Cancel</button>
+            <button class="btn btn-primary" onclick="updateBookingStatus('${b.id}','confirmed')">تأكيد</button>
+            <button class="btn btn-green" onclick="updateBookingStatus('${b.id}','completed')">إكمال</button>
+            <button class="btn btn-danger" onclick="updateBookingStatus('${b.id}','cancelled')">إلغاء</button>
           </td>
         </tr>`;
       });
       html += '</tbody></table></div>';
       container.innerHTML = html;
     }
-
     window.updateBookingStatus = async function(id, status) {
       try {
         await updateDoc(doc(db, 'shops', currentShopId, 'bookings', id), { status, updatedAt: serverTimestamp() });
-        showToast(`Booking ${status}`, 'success');
+        showToast(`تم تغيير الحالة إلى ${status}`, 'success');
         loadBookings();
       } catch (e) { showToast(e.message, 'error'); }
     };
@@ -1607,7 +1616,7 @@
     function renderCustomers(container) {
       container.innerHTML = `
         <div class="card">
-          <div class="card-header"><h3>Customers</h3></div>
+          <div class="card-header"><h3>العملاء</h3></div>
           <div id="customersList"></div>
         </div>
       `;
@@ -1620,12 +1629,12 @@
       const snap = await getDocs(collection(db, 'shops', currentShopId, 'customers'));
       const customers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       if (customers.length === 0) {
-        container.innerHTML = '<p class="text-muted">No customers.</p>';
+        container.innerHTML = '<p class="text-muted">لا يوجد عملاء.</p>';
         return;
       }
-      let html = '<div class="table-wrap"><table><thead><tr><th>Name</th><th>Phone</th><th>Bookings</th><th>Last</th></tr></thead><tbody>';
+      let html = '<div class="table-wrap"><table><thead><tr><th>الاسم</th><th>الهاتف</th><th>عدد الحجوزات</th><th>آخر حجز</th></tr></thead><tbody>';
       customers.forEach(c => {
-        html += `<tr><td>${c.name||'N/A'}</td><td>${c.phone||'-'}</td><td>${c.bookingCount||0}</td><td>${formatDate(c.lastBookingAt)}</td></tr>`;
+        html += `<tr><td>${c.name||'غير معروف'}</td><td>${c.phone||'-'}</td><td>${c.bookingCount||0}</td><td>${formatDate(c.lastBookingAt)}</td></tr>`;
       });
       html += '</tbody></table></div>';
       container.innerHTML = html;
@@ -1635,7 +1644,7 @@
     function renderReviews(container) {
       container.innerHTML = `
         <div class="card">
-          <div class="card-header"><h3>Reviews</h3></div>
+          <div class="card-header"><h3>التقييمات</h3></div>
           <div id="reviewsList"></div>
         </div>
       `;
@@ -1648,38 +1657,37 @@
       const snap = await getDocs(collection(db, 'shops', currentShopId, 'reviews'));
       const reviews = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       if (reviews.length === 0) {
-        container.innerHTML = '<p class="text-muted">No reviews.</p>';
+        container.innerHTML = '<p class="text-muted">لا توجد تقييمات.</p>';
         return;
       }
-      let html = '<div class="table-wrap"><table><thead><tr><th>Customer</th><th>Rating</th><th>Review</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+      let html = '<div class="table-wrap"><table><thead><tr><th>العميل</th><th>التقييم</th><th>التعليق</th><th>الحالة</th><th>الإجراءات</th></tr></thead><tbody>';
       reviews.forEach(r => {
         html += `<tr>
-          <td>${r.customerName||'Anonymous'}</td>
+          <td>${r.customerName||'مجهول'}</td>
           <td>${'★'.repeat(r.rating||0)}</td>
           <td>${r.review||''}</td>
-          <td><span class="badge badge-${r.status||'pending'}">${r.status||'pending'}</span></td>
+          <td><span class="badge badge-${r.status||'pending'}">${r.status||'قيد المراجعة'}</span></td>
           <td>
-            <button class="btn btn-primary" onclick="approveReview('${r.id}')">Approve</button>
-            <button class="btn btn-danger" onclick="deleteReview('${r.id}')">Delete</button>
+            <button class="btn btn-primary" onclick="approveReview('${r.id}')">موافقة</button>
+            <button class="btn btn-danger" onclick="deleteReview('${r.id}')">حذف</button>
           </td>
         </tr>`;
       });
       html += '</tbody></table></div>';
       container.innerHTML = html;
     }
-
     window.approveReview = async function(id) {
       try {
         await updateDoc(doc(db, 'shops', currentShopId, 'reviews', id), { status: 'approved' });
-        showToast('Review approved', 'success');
+        showToast('تمت الموافقة على التقييم', 'success');
         loadReviews();
       } catch (e) { showToast(e.message, 'error'); }
     };
     window.deleteReview = async function(id) {
-      if (!confirm('Delete this review?')) return;
+      if (!confirm('حذف هذا التقييم؟')) return;
       try {
         await deleteDoc(doc(db, 'shops', currentShopId, 'reviews', id));
-        showToast('Review deleted', 'info');
+        showToast('تم الحذف', 'info');
         loadReviews();
       } catch (e) { showToast(e.message, 'error'); }
     };
@@ -1688,7 +1696,7 @@
     function renderGallery(container) {
       container.innerHTML = `
         <div class="card">
-          <div class="card-header"><h3>Gallery</h3><button class="btn btn-primary" id="addGalleryBtn">+ Upload</button></div>
+          <div class="card-header"><h3>معرض الصور</h3><button class="btn btn-primary" id="addGalleryBtn">+ رفع</button></div>
           <div id="galleryList" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
         </div>
       `;
@@ -1711,8 +1719,8 @@
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp()
               });
-              showToast('Uploaded', 'success');
-            } catch (err) { showToast('Upload failed: '+err.message, 'error'); }
+              showToast('تم الرفع', 'success');
+            } catch (err) { showToast('فشل الرفع: '+err.message, 'error'); }
           }
           loadGallery();
         };
@@ -1726,7 +1734,7 @@
       const snap = await getDocs(collection(db, 'shops', currentShopId, 'gallery'));
       const images = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       if (images.length === 0) {
-        container.innerHTML = '<p class="text-muted">No images.</p>';
+        container.innerHTML = '<p class="text-muted">لا توجد صور.</p>';
         return;
       }
       let html = '';
@@ -1735,12 +1743,11 @@
       });
       container.innerHTML = html;
     }
-
     window.deleteGallery = async function(id) {
-      if (!confirm('Delete this image?')) return;
+      if (!confirm('حذف هذه الصورة؟')) return;
       try {
         await deleteDoc(doc(db, 'shops', currentShopId, 'gallery', id));
-        showToast('Image deleted', 'info');
+        showToast('تم الحذف', 'info');
         loadGallery();
       } catch (e) { showToast(e.message, 'error'); }
     };
@@ -1749,9 +1756,9 @@
     function renderHours(container) {
       container.innerHTML = `
         <div class="card">
-          <div class="card-header"><h3>Working Hours</h3></div>
+          <div class="card-header"><h3>ساعات العمل</h3></div>
           <div id="hoursForm"></div>
-          <button class="btn btn-primary" id="saveHours">Save Hours</button>
+          <button class="btn btn-primary" id="saveHours">حفظ الساعات</button>
         </div>
       `;
       loadHours();
@@ -1760,7 +1767,7 @@
     async function loadHours() {
       const container = document.getElementById('hoursForm');
       if (!container) return;
-      const days = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+      const days = ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'];
       let html = '';
       for (const d of days) {
         const docRef = doc(db, 'shops', currentShopId, 'workingHours', d);
@@ -1768,9 +1775,9 @@
         const data = snap.exists() ? snap.data() : { enabled: true, openTime: '09:00', closeTime: '21:00' };
         html += `
           <div class="flex" style="margin-bottom:8px;">
-            <span style="width:100px;">${d}</span>
+            <span style="width:80px;">${d}</span>
             <input type="checkbox" id="hour_${d}_enabled" ${data.enabled?'checked':''} />
-            <label>Open</label>
+            <label>مفتوح</label>
             <input type="time" id="hour_${d}_open" value="${data.openTime||'09:00'}" />
             <input type="time" id="hour_${d}_close" value="${data.closeTime||'21:00'}" />
           </div>
@@ -1787,7 +1794,7 @@
           batch.set(ref, { enabled, openTime: open, closeTime: close, breaks: [] }, { merge: true });
         }
         await batch.commit();
-        showToast('Working hours saved!', 'success');
+        showToast('تم حفظ ساعات العمل', 'success');
       });
     }
 
@@ -1795,34 +1802,34 @@
     function renderHolidays(container) {
       container.innerHTML = `
         <div class="card">
-          <div class="card-header"><h3>Holidays</h3><button class="btn btn-primary" id="addHolidayBtn">+ Add</button></div>
+          <div class="card-header"><h3>العطلات</h3><button class="btn btn-primary" id="addHolidayBtn">+ إضافة</button></div>
           <div id="holidaysList"></div>
         </div>
       `;
       loadHolidays();
       document.getElementById('addHolidayBtn').addEventListener('click', () => {
         const html = `
-          <div class="modal-title">Add Holiday</div>
-          <div class="form-group"><label>Date</label><input type="date" id="holidayDate" /></div>
-          <div class="form-group"><label>Reason</label><input type="text" id="holidayReason" placeholder="National Day" /></div>
-          <div class="modal-actions">
-            <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-            <button class="btn btn-primary" id="saveHoliday">Save</button>
+          <div class="modal-title">إضافة عطلة</div>
+          <div class="form-group"><label>التاريخ</label><input type="date" id="holidayDate" /></div>
+          <div class="form-group"><label>السبب</label><input type="text" id="holidayReason" placeholder="عيد وطني" /></div>
+          <div class="modal-actions" style="display:flex;gap:10px;margin-top:16px;">
+            <button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>
+            <button class="btn btn-primary" id="saveHoliday">حفظ</button>
           </div>
         `;
         openModal(html);
         document.getElementById('saveHoliday').addEventListener('click', async () => {
           const date = document.getElementById('holidayDate').value;
           const reason = document.getElementById('holidayReason').value.trim();
-          if (!date) { showToast('Date required', 'error'); return; }
+          if (!date) { showToast('التاريخ مطلوب', 'error'); return; }
           try {
             await addDoc(collection(db, 'shops', currentShopId, 'holidays'), {
               date: Timestamp.fromDate(new Date(date)),
-              reason: reason || 'Holiday',
+              reason: reason || 'عطلة',
               createdAt: serverTimestamp()
             });
             closeModal();
-            showToast('Holiday added', 'success');
+            showToast('تمت الإضافة', 'success');
             loadHolidays();
           } catch (e) { showToast(e.message, 'error'); }
         });
@@ -1835,22 +1842,21 @@
       const snap = await getDocs(collection(db, 'shops', currentShopId, 'holidays'));
       const holidays = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       if (holidays.length === 0) {
-        container.innerHTML = '<p class="text-muted">No holidays.</p>';
+        container.innerHTML = '<p class="text-muted">لا توجد عطلات.</p>';
         return;
       }
-      let html = '<div class="table-wrap"><table><thead><tr><th>Date</th><th>Reason</th><th>Actions</th></tr></thead><tbody>';
+      let html = '<div class="table-wrap"><table><thead><tr><th>التاريخ</th><th>السبب</th><th>الإجراءات</th></tr></thead><tbody>';
       holidays.forEach(h => {
-        html += `<tr><td>${formatDate(h.date)}</td><td>${h.reason||''}</td><td><button class="btn btn-danger" onclick="deleteHoliday('${h.id}')">Delete</button></td></tr>`;
+        html += `<tr><td>${formatDate(h.date)}</td><td>${h.reason||''}</td><td><button class="btn btn-danger" onclick="deleteHoliday('${h.id}')">حذف</button></td></tr>`;
       });
       html += '</tbody></table></div>';
       container.innerHTML = html;
     }
-
     window.deleteHoliday = async function(id) {
-      if (!confirm('Delete this holiday?')) return;
+      if (!confirm('حذف هذه العطلة؟')) return;
       try {
         await deleteDoc(doc(db, 'shops', currentShopId, 'holidays', id));
-        showToast('Holiday deleted', 'info');
+        showToast('تم الحذف', 'info');
         loadHolidays();
       } catch (e) { showToast(e.message, 'error'); }
     };
@@ -1859,7 +1865,7 @@
     function renderSubscription(container) {
       container.innerHTML = `
         <div class="card">
-          <div class="card-header"><h3>Subscription</h3></div>
+          <div class="card-header"><h3>الاشتراك</h3></div>
           <div id="subInfo"></div>
         </div>
       `;
@@ -1869,7 +1875,6 @@
     async function loadSubscription() {
       const container = document.getElementById('subInfo');
       if (!container) return;
-      // get subscription for this shop
       const q = query(collection(db, 'subscriptions'), where('shopId', '==', currentShopId), orderBy('createdAt', 'desc'), limit(1));
       const snap = await getDocs(q);
       let sub = null;
@@ -1877,17 +1882,16 @@
         sub = { id: snap.docs[0].id, ...snap.docs[0].data() };
       }
       if (!sub) {
-        container.innerHTML = `<p class="text-muted">No subscription found. Please request a plan.</p>
-          <button class="btn btn-primary" id="requestSubBtn">Request Subscription</button>`;
+        container.innerHTML = `<p class="text-muted">لا يوجد اشتراك. يرجى طلب خطة.</p>
+          <button class="btn btn-primary" id="requestSubBtn">طلب اشتراك</button>`;
         document.getElementById('requestSubBtn').addEventListener('click', () => {
-          // simple request
           const html = `
-            <div class="modal-title">Request Subscription</div>
-            <div class="form-group"><label>Plan</label><select id="reqPlan"><option value="free_trial">Free Trial</option><option value="basic">Basic</option><option value="pro">Pro</option></select></div>
-            <div class="form-group"><label>Message</label><textarea id="reqMsg"></textarea></div>
-            <div class="modal-actions">
-              <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-              <button class="btn btn-primary" id="submitReq">Submit</button>
+            <div class="modal-title">طلب اشتراك</div>
+            <div class="form-group"><label>الخطة</label><select id="reqPlan"><option value="free_trial">نسخة تجريبية</option><option value="basic">أساسية</option><option value="pro">احترافية</option></select></div>
+            <div class="form-group"><label>رسالة</label><textarea id="reqMsg"></textarea></div>
+            <div class="modal-actions" style="display:flex;gap:10px;margin-top:16px;">
+              <button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>
+              <button class="btn btn-primary" id="submitReq">إرسال</button>
             </div>
           `;
           openModal(html);
@@ -1899,13 +1903,13 @@
                 userId: currentUser.uid,
                 shopId: currentShopId,
                 planId: plan,
-                message: msg || 'Request',
+                message: msg || 'طلب اشتراك',
                 status: 'pending',
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp()
               });
               closeModal();
-              showToast('Request submitted!', 'success');
+              showToast('تم إرسال الطلب!', 'success');
               loadSubscription();
             } catch (e) { showToast(e.message, 'error'); }
           });
@@ -1913,11 +1917,11 @@
         return;
       }
       container.innerHTML = `
-        <div><strong>Plan:</strong> ${sub.planName || sub.planId || 'N/A'}</div>
-        <div><strong>Status:</strong> <span class="badge badge-${sub.status||'pending'}">${sub.status||'pending'}</span></div>
-        <div><strong>Started:</strong> ${formatDate(sub.startedAt)}</div>
-        <div><strong>Expires:</strong> ${formatDate(sub.expiresAt)}</div>
-        <div><strong>Payment:</strong> ${sub.paymentStatus||'N/A'}</div>
+        <div><strong>الخطة:</strong> ${sub.planName || sub.planId || 'غير محددة'}</div>
+        <div><strong>الحالة:</strong> <span class="badge badge-${sub.status||'pending'}">${sub.status||'قيد الانتظار'}</span></div>
+        <div><strong>تاريخ البدء:</strong> ${formatDate(sub.startedAt)}</div>
+        <div><strong>تاريخ الانتهاء:</strong> ${formatDate(sub.expiresAt)}</div>
+        <div><strong>حالة الدفع:</strong> ${sub.paymentStatus||'غير مدفوع'}</div>
       `;
     }
 
@@ -1926,25 +1930,22 @@
       const url = `${window.location.origin}/s/${currentShop.slug}`;
       container.innerHTML = `
         <div class="card">
-          <div class="card-header"><h3>QR Code</h3></div>
+          <div class="card-header"><h3>رمز QR</h3></div>
           <div style="text-align:center;padding:20px;">
             <div id="qrContainer"></div>
-            <p class="text-muted">Scan to visit: ${url}</p>
-            <button class="btn btn-primary" id="copyLinkBtn">Copy Link</button>
-            <button class="btn btn-primary" id="downloadQRBtn">Download QR</button>
+            <p class="text-muted">امسح للزيارة: ${url}</p>
+            <button class="btn btn-primary" id="copyLinkBtn">نسخ الرابط</button>
+            <button class="btn btn-primary" id="downloadQRBtn">تحميل QR</button>
           </div>
         </div>
       `;
-      // Generate QR using a simple library (or inline)
-      // We'll use a QR code generation library from CDN (or just use a canvas-based one)
-      // For simplicity, we'll use a placeholder QR code using a free API
       const img = document.createElement('img');
       img.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}`;
       img.alt = 'QR Code';
       document.getElementById('qrContainer').appendChild(img);
 
       document.getElementById('copyLinkBtn').addEventListener('click', () => {
-        navigator.clipboard.writeText(url).then(() => showToast('Link copied!', 'success'));
+        navigator.clipboard.writeText(url).then(() => showToast('تم نسخ الرابط!', 'success'));
       });
       document.getElementById('downloadQRBtn').addEventListener('click', () => {
         const link = document.createElement('a');
@@ -1958,13 +1959,13 @@
     function renderSettings(container) {
       container.innerHTML = `
         <div class="card">
-          <div class="card-header"><h3>Shop Settings</h3></div>
-          <div class="form-group"><label>Shop Name</label><input type="text" id="setName" value="${currentShop.name||''}" /></div>
-          <div class="form-group"><label>Description</label><textarea id="setDesc">${currentShop.description||''}</textarea></div>
-          <div class="form-group"><label>Phone</label><input type="tel" id="setPhone" value="${currentShop.phone||''}" /></div>
-          <div class="form-group"><label>WhatsApp</label><input type="tel" id="setWhatsapp" value="${currentShop.whatsapp||''}" /></div>
-          <div class="form-group"><label>Address</label><textarea id="setAddress">${currentShop.address||''}</textarea></div>
-          <button class="btn btn-primary" id="saveSettingsBtn">Save Settings</button>
+          <div class="card-header"><h3>إعدادات المتجر</h3></div>
+          <div class="form-group"><label>اسم المتجر</label><input type="text" id="setName" value="${currentShop.name||''}" /></div>
+          <div class="form-group"><label>الوصف</label><textarea id="setDesc">${currentShop.description||''}</textarea></div>
+          <div class="form-group"><label>الهاتف</label><input type="tel" id="setPhone" value="${currentShop.phone||''}" /></div>
+          <div class="form-group"><label>واتساب</label><input type="tel" id="setWhatsapp" value="${currentShop.whatsapp||''}" /></div>
+          <div class="form-group"><label>العنوان</label><textarea id="setAddress">${currentShop.address||''}</textarea></div>
+          <button class="btn btn-primary" id="saveSettingsBtn">حفظ الإعدادات</button>
         </div>
       `;
       document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
@@ -1973,18 +1974,13 @@
         const phone = document.getElementById('setPhone').value.trim();
         const whatsapp = document.getElementById('setWhatsapp').value.trim();
         const address = document.getElementById('setAddress').value.trim();
-        if (!name) { showToast('Name is required', 'error'); return; }
+        if (!name) { showToast('الاسم مطلوب', 'error'); return; }
         try {
           await updateDoc(doc(db, 'shops', currentShopId), {
-            name,
-            description: desc,
-            phone,
-            whatsapp,
-            address,
+            name, description: desc, phone, whatsapp, address,
             updatedAt: serverTimestamp()
           });
-          showToast('Settings saved!', 'success');
-          // update local shop
+          showToast('تم حفظ الإعدادات!', 'success');
           currentShop.name = name;
           currentShop.description = desc;
           currentShop.phone = phone;
@@ -1997,7 +1993,6 @@
 
     // ─── REALTIME LISTENERS ───
     function setupRealtime() {
-      // Listen for bookings changes (for overview)
       const unsub = onSnapshot(collection(db, 'shops', currentShopId, 'bookings'), () => {
         if (activeSection === 'overview') renderOverview(document.getElementById('dashboardContent'));
         if (activeSection === 'bookings') loadBookings();
@@ -2009,14 +2004,11 @@
     function openModal(html) {
       const overlay = document.createElement('div');
       overlay.className = 'modal-overlay';
-      overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px;';
       const box = document.createElement('div');
       box.className = 'modal-box';
-      box.style.cssText = 'background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px;max-width:500px;width:100%;max-height:90vh;overflow-y:auto;';
       box.innerHTML = html;
       overlay.appendChild(box);
       document.body.appendChild(overlay);
-      // close on overlay click
       overlay.addEventListener('click', (e) => {
         if (e.target === overlay) closeModal();
       });
@@ -2030,7 +2022,6 @@
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     // PUBLIC SHOP ROUTE
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // Detect if URL contains /s/slug
     async function loadPublicShop() {
       const path = window.location.pathname;
       const match = path.match(/^\/s\/([^\/]+)/);
@@ -2043,21 +2034,20 @@
 
     async function renderPublicShop(slug) {
       const container = document.getElementById('publicContent');
-      container.innerHTML = '<div style="text-align:center;padding:40px;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+      container.innerHTML = '<div style="text-align:center;padding:40px;"><i class="fas fa-spinner fa-spin"></i> جارٍ التحميل...</div>';
       try {
         const q = query(collection(db, 'shops'), where('slug', '==', slug), limit(1));
         const snap = await getDocs(q);
         if (snap.empty) {
-          container.innerHTML = '<div style="text-align:center;padding:40px;"><h2>Shop not found</h2></div>';
+          container.innerHTML = '<div style="text-align:center;padding:40px;"><h2>المتجر غير موجود</h2></div>';
           return;
         }
         const shop = { id: snap.docs[0].id, ...snap.docs[0].data() };
-        // Check status
         if (shop.status !== 'active' || shop.subscriptionStatus !== 'active') {
-          container.innerHTML = `<div style="text-align:center;padding:40px;"><h2>This shop is currently unavailable</h2><p class="text-muted">Please check back later.</p></div>`;
+          container.innerHTML = `<div style="text-align:center;padding:40px;"><h2>هذا المتجر غير متاح حالياً</h2><p class="text-muted">يرجى المحاولة لاحقاً.</p></div>`;
           return;
         }
-        // Load services, barbers, gallery, reviews, hours
+        // جلب البيانات
         const servicesSnap = await getDocs(collection(db, 'shops', shop.id, 'services'));
         const services = servicesSnap.docs.map(d => d.data());
         const barbersSnap = await getDocs(collection(db, 'shops', shop.id, 'barbers'));
@@ -2067,46 +2057,46 @@
         const reviewsSnap = await getDocs(collection(db, 'shops', shop.id, 'reviews'));
         const reviews = reviewsSnap.docs.map(d => d.data()).filter(r => r.status === 'approved');
         const hours = {};
-        const days = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+        const days = ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'];
         for (const d of days) {
           const docRef = doc(db, 'shops', shop.id, 'workingHours', d);
           const snap = await getDoc(docRef);
           if (snap.exists()) hours[d] = snap.data();
         }
-        // Render
+
         let html = `
           <div class="shop-hero">
             ${shop.logoUrl ? `<img src="${shop.logoUrl}" alt="Logo" />` : ''}
             <h1>${shop.name}</h1>
             <p>${shop.description||''}</p>
             ${shop.phone ? `<p><i class="fas fa-phone"></i> ${shop.phone}</p>` : ''}
-            ${shop.whatsapp ? `<p><i class="fab fa-whatsapp"></i> <a href="https://wa.me/${shop.whatsapp.replace(/\D/g,'')}" target="_blank">Contact on WhatsApp</a></p>` : ''}
+            ${shop.whatsapp ? `<p><i class="fab fa-whatsapp"></i> <a href="https://wa.me/${shop.whatsapp.replace(/\D/g,'')}" target="_blank">تواصل عبر واتساب</a></p>` : ''}
           </div>
           <div style="max-width:700px;margin:0 auto;">
-            <h3>Our Services</h3>
-            ${services.map(s => `<div class="service-card"><div class="flex-between"><span><strong>${s.name}</strong></span><span class="price">${shop.currency||'$'}${s.price}</span></div><div class="text-muted">${s.duration||0} min</div></div>`).join('')}
-            <h3>Barbers</h3>
+            <h3>خدماتنا</h3>
+            ${services.map(s => `<div class="service-card"><div class="flex-between"><span><strong>${s.name}</strong></span><span class="price">${shop.currency||'$'}${s.price}</span></div><div class="text-muted">${s.duration||0} دقيقة</div></div>`).join('')}
+            <h3>الحلاقون</h3>
             ${barbers.filter(b=>b.active).map(b => `<div class="barber-card"><strong>${b.name}</strong><p>${b.bio||''}</p></div>`).join('')}
-            <h3>Reviews</h3>
-            ${reviews.map(r => `<div><strong>${r.customerName||'Anonymous'}</strong> ${'★'.repeat(r.rating||0)}<p>${r.review||''}</p></div>`).join('')}
-            <h3>Working Hours</h3>
-            ${days.map(d => `<div class="flex-between"><span>${d}</span><span>${hours[d]?.enabled ? (hours[d].openTime + ' - ' + hours[d].closeTime) : 'Closed'}</span></div>`).join('')}
-            <h3>Book an Appointment</h3>
+            <h3>التقييمات</h3>
+            ${reviews.map(r => `<div><strong>${r.customerName||'مجهول'}</strong> ${'★'.repeat(r.rating||0)}<p>${r.review||''}</p></div>`).join('')}
+            <h3>ساعات العمل</h3>
+            ${days.map(d => `<div class="flex-between"><span>${d}</span><span>${hours[d]?.enabled ? (hours[d].openTime + ' - ' + hours[d].closeTime) : 'مغلق'}</span></div>`).join('')}
+            <h3>احجز موعداً</h3>
             <div class="booking-form">
-              <div class="form-group"><label>Service</label><select id="bookService">${services.map((s,i) => `<option value="${i}">${s.name} - ${shop.currency}${s.price}</option>`).join('')}</select></div>
-              <div class="form-group"><label>Barber</label><select id="bookBarber"><option value="">Any</option>${barbers.filter(b=>b.active).map(b => `<option value="${b.id}">${b.name}</option>`).join('')}</select></div>
-              <div class="form-group"><label>Date</label><input type="date" id="bookDate" /></div>
-              <div class="form-group"><label>Time</label><input type="time" id="bookTime" /></div>
-              <div class="form-group"><label>Your Name</label><input type="text" id="bookName" /></div>
-              <div class="form-group"><label>Phone</label><input type="tel" id="bookPhone" /></div>
-              <div class="form-group"><label>Email (optional)</label><input type="email" id="bookEmail" /></div>
-              <button class="btn btn-primary w-full" id="bookNowBtn">Book Now</button>
+              <div class="form-group"><label>الخدمة</label><select id="bookService">${services.map((s,i) => `<option value="${i}">${s.name} - ${shop.currency}${s.price}</option>`).join('')}</select></div>
+              <div class="form-group"><label>الحلاق</label><select id="bookBarber"><option value="">أي</option>${barbers.filter(b=>b.active).map(b => `<option value="${b.id}">${b.name}</option>`).join('')}</select></div>
+              <div class="form-group"><label>التاريخ</label><input type="date" id="bookDate" /></div>
+              <div class="form-group"><label>الوقت</label><input type="time" id="bookTime" /></div>
+              <div class="form-group"><label>الاسم</label><input type="text" id="bookName" /></div>
+              <div class="form-group"><label>الهاتف</label><input type="tel" id="bookPhone" /></div>
+              <div class="form-group"><label>البريد الإلكتروني (اختياري)</label><input type="email" id="bookEmail" /></div>
+              <button class="btn btn-primary btn-block" id="bookNowBtn">احجز الآن</button>
             </div>
           </div>
         `;
         container.innerHTML = html;
 
-        // Booking logic
+        // منطق الحجز
         document.getElementById('bookNowBtn').addEventListener('click', async () => {
           const serviceIdx = parseInt(document.getElementById('bookService').value);
           const service = services[serviceIdx];
@@ -2117,22 +2107,19 @@
           const phone = document.getElementById('bookPhone').value.trim();
           const email = document.getElementById('bookEmail').value.trim();
           if (!date || !time || !name || !phone) {
-            showToast('Please fill all required fields', 'error');
+            showToast('يرجى ملء جميع الحقول المطلوبة', 'error');
             return;
           }
-          // Combine date and time
           const bookingDateTime = new Date(`${date}T${time}`);
           if (isNaN(bookingDateTime.getTime())) {
-            showToast('Invalid date/time', 'error');
+            showToast('تاريخ/وقت غير صحيح', 'error');
             return;
           }
-          // Check availability via Firestore transaction
           try {
             await runTransaction(db, async (transaction) => {
-              // Check for existing bookings at that time
               const start = Timestamp.fromDate(bookingDateTime);
               const end = Timestamp.fromDate(new Date(bookingDateTime.getTime() + (service.duration||30)*60000));
-              // Query for overlapping bookings
+              // التحقق من الحجوزات المتداخلة
               const q = query(
                 collection(db, 'shops', shop.id, 'bookings'),
                 where('date', '>=', start),
@@ -2141,15 +2128,15 @@
               );
               const snap = await getDocs(q);
               if (!snap.empty) {
-                throw new Error('Time slot already booked. Please choose another.');
+                throw new Error('هذا الموعد محجوز بالفعل. يرجى اختيار وقت آخر.');
               }
-              // Also check holidays
+              // التحقق من العطلات
               const holidayQ = query(collection(db, 'shops', shop.id, 'holidays'), where('date', '==', start));
               const holidaySnap = await getDocs(holidayQ);
               if (!holidaySnap.empty) {
-                throw new Error('This date is a holiday.');
+                throw new Error('هذا التاريخ عطلة رسمية.');
               }
-              // Create booking
+              // إنشاء الحجز
               const bookingRef = doc(collection(db, 'shops', shop.id, 'bookings'));
               transaction.set(bookingRef, {
                 shopId: shop.id,
@@ -2170,16 +2157,13 @@
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp()
               });
-              // Update or create customer
-              const customerRef = doc(collection(db, 'shops', shop.id, 'customers'));
-              // find existing customer by phone (simplified)
+              // تحديث/إنشاء العميل
               const custQ = query(collection(db, 'shops', shop.id, 'customers'), where('phone', '==', phone));
               const custSnap = await getDocs(custQ);
               if (custSnap.empty) {
+                const customerRef = doc(collection(db, 'shops', shop.id, 'customers'));
                 transaction.set(customerRef, {
-                  name: name,
-                  phone: phone,
-                  email: email || '',
+                  name, phone, email: email || '',
                   bookingCount: 1,
                   lastBookingAt: start,
                   createdAt: serverTimestamp(),
@@ -2194,14 +2178,13 @@
                 });
               }
             });
-            showToast('Booking confirmed!', 'success');
-            // Optionally reload page to update
+            showToast('✅ تم تأكيد الحجز!', 'success');
           } catch (e) {
-            showToast(e.message || 'Booking failed', 'error');
+            showToast(e.message || 'فشل الحجز', 'error');
           }
         });
       } catch (e) {
-        container.innerHTML = `<div style="text-align:center;padding:40px;"><h2>Error loading shop</h2><p class="text-muted">${e.message}</p></div>`;
+        container.innerHTML = `<div style="text-align:center;padding:40px;"><h2>خطأ في تحميل المتجر</h2><p class="text-muted">${e.message}</p></div>`;
       }
     }
 
@@ -2214,7 +2197,6 @@
         loadPublicShop();
         return;
       }
-      // default: dashboard or login based on auth
       if (currentUser) {
         if (currentRole === 'shop_owner') {
           if (!currentShopId) {
@@ -2234,19 +2216,14 @@
 
     // ─── INIT ───
     window.addEventListener('popstate', handleRoute);
-    // Also handle initial load
-    // Wait for auth to settle
-    setTimeout(() => {
-      handleRoute();
-    }, 500);
+    setTimeout(handleRoute, 500);
 
-    // expose some functions globally
     window.currentShopId = () => currentShopId;
     window.currentShop = () => currentShop;
     window.db = db;
     window.auth = auth;
 
-    console.log('🚀 BarberSaaS loaded.');
+    console.log('🚀 BarberSaaS جاهز.');
   </script>
 </body>
 </html>
