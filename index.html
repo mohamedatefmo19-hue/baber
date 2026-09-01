@@ -699,7 +699,7 @@
       switchPage('page-login'); });
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // ONBOARDING (المعدل)
+    // ONBOARDING (المعدل لحفظ البيانات)
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     const onboardingSteps = [
       { id: 'info', label: 'معلومات المتجر' },
@@ -713,14 +713,19 @@
       { id: 'location', label: 'الموقع' },
       { id: 'theme', label: 'المظهر' },
     ];
-    let onboardingData = {};
+    let onboardingData = {
+      services: [],
+      barbers: [],
+      gallery: [],
+      theme: { primary: '#6c8cff', secondary: '#1a1f27' }
+    };
     let onboardingIndex = 0;
 
     function renderOnboarding() {
       const container = $('#onboardingContent');
       const step = onboardingSteps[onboardingIndex];
       if (!step) {
-        // هذا لن يحدث لأننا نستدعي finishOnboarding قبل تجاوز الخطوات
+        // انتهت الخطوات (لن يحدث)
         return;
       }
       $('#onboardingStep').textContent = `الخطوة ${onboardingIndex+1} / ${onboardingSteps.length}`;
@@ -729,26 +734,26 @@
       switch (step.id) {
         case 'info':
           html += `
-            <div class="form-group"><label>اسم المتجر *</label><input type="text" id="onbName" placeholder="محمد للحلاقة" /></div>
-            <div class="form-group"><label>وصف المتجر</label><textarea id="onbDesc" placeholder="نقدم خدمات حلاقة احترافية..."></textarea></div>
-            <div class="form-group"><label>رقم الهاتف</label><input type="tel" id="onbPhone" placeholder="+201234567890" /></div>
-            <div class="form-group"><label>الدولة</label><input type="text" id="onbCountry" placeholder="مصر" /></div>
-            <div class="form-group"><label>العملة</label><select id="onbCurrency"><option value="USD">دولار أمريكي</option><option value="EGP" selected>جنيه مصري</option><option value="EUR">يورو</option></select></div>
-            <div class="form-group"><label>المنطقة الزمنية</label><input type="text" id="onbTz" placeholder="Africa/Cairo" value="Africa/Cairo" /></div>
+            <div class="form-group"><label>اسم المتجر *</label><input type="text" id="onbName" placeholder="محمد للحلاقة" value="${onboardingData.name||''}" /></div>
+            <div class="form-group"><label>وصف المتجر</label><textarea id="onbDesc" placeholder="نقدم خدمات حلاقة احترافية...">${onboardingData.description||''}</textarea></div>
+            <div class="form-group"><label>رقم الهاتف</label><input type="tel" id="onbPhone" placeholder="+201234567890" value="${onboardingData.phone||''}" /></div>
+            <div class="form-group"><label>الدولة</label><input type="text" id="onbCountry" placeholder="مصر" value="${onboardingData.country||''}" /></div>
+            <div class="form-group"><label>العملة</label><select id="onbCurrency"><option value="USD" ${onboardingData.currency==='USD'?'selected':''}>دولار أمريكي</option><option value="EGP" ${onboardingData.currency==='EGP'?'selected':''}>جنيه مصري</option><option value="EUR" ${onboardingData.currency==='EUR'?'selected':''}>يورو</option></select></div>
+            <div class="form-group"><label>المنطقة الزمنية</label><input type="text" id="onbTz" placeholder="Africa/Cairo" value="${onboardingData.timezone||'Africa/Cairo'}" /></div>
           `;
           break;
         case 'logo':
           html += `
             <p class="text-muted">ارفع شعار المتجر (مربع، الحد الأقصى 2 ميجابايت)</p>
             <input type="file" id="onbLogo" accept="image/*" />
-            <div id="onbLogoPreview" style="margin-top:10px;"></div>
+            <div id="onbLogoPreview" style="margin-top:10px;">${onboardingData.logoUrl ? `<img src="${onboardingData.logoUrl}" style="max-width:120px;border-radius:8px;" />` : ''}</div>
           `;
           break;
         case 'cover':
           html += `
             <p class="text-muted">ارفع صورة غلاف (عرض 1200×400، الحد الأقصى 5 ميجابايت)</p>
             <input type="file" id="onbCover" accept="image/*" />
-            <div id="onbCoverPreview" style="margin-top:10px;"></div>
+            <div id="onbCoverPreview" style="margin-top:10px;">${onboardingData.coverUrl ? `<img src="${onboardingData.coverUrl}" style="max-width:200px;border-radius:8px;" />` : ''}</div>
           `;
           break;
         case 'services':
@@ -785,20 +790,20 @@
           html += `
             <p class="text-muted">ارفع صوراً للمعرض (اختياري)</p>
             <input type="file" id="onbGallery" accept="image/*" multiple />
-            <div id="onbGalleryPreview" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;"></div>
+            <div id="onbGalleryPreview" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">${(onboardingData.gallery||[]).map(g => `<img src="${g.url}" style="max-width:80px;border-radius:8px;" />`).join('')}</div>
           `;
           break;
         case 'whatsapp':
           html += `
-            <div class="form-group"><label>رقم واتساب (مع مفتاح الدولة)</label><input type="tel" id="onbWhatsapp" placeholder="+201234567890" /></div>
+            <div class="form-group"><label>رقم واتساب (مع مفتاح الدولة)</label><input type="tel" id="onbWhatsapp" placeholder="+201234567890" value="${onboardingData.whatsapp||''}" /></div>
             <p class="text-muted">سيتواصل العملاء معك عبر واتساب.</p>
           `;
           break;
         case 'location':
           html += `
-            <div class="form-group"><label>العنوان</label><textarea id="onbAddress" placeholder="شارع النيل، القاهرة"></textarea></div>
+            <div class="form-group"><label>العنوان</label><textarea id="onbAddress" placeholder="شارع النيل، القاهرة">${onboardingData.address||''}</textarea></div>
             <button class="btn btn-primary" id="onbGetLocation">الحصول على الموقع الحالي</button>
-            <div id="onbLocationResult" class="text-muted" style="margin-top:8px;"></div>
+            <div id="onbLocationResult" class="text-muted" style="margin-top:8px;">${onboardingData.location ? `📍 ${onboardingData.location.latitude}, ${onboardingData.location.longitude}` : ''}</div>
           `;
           break;
         case 'theme':
@@ -810,8 +815,8 @@
               <button class="btn" data-theme="classic">كلاسيكي</button>
               <button class="btn" data-theme="premium">أسود مميز</button>
             </div>
-            <div class="form-group"><label>اللون الأساسي</label><input type="color" id="onbPrimary" value="#6c8cff" /></div>
-            <div class="form-group"><label>اللون الثانوي</label><input type="color" id="onbSecondary" value="#1a1f27" /></div>
+            <div class="form-group"><label>اللون الأساسي</label><input type="color" id="onbPrimary" value="${onboardingData.theme?.primary||'#6c8cff'}" /></div>
+            <div class="form-group"><label>اللون الثانوي</label><input type="color" id="onbSecondary" value="${onboardingData.theme?.secondary||'#1a1f27'}" /></div>
           `;
           break;
       }
@@ -827,7 +832,6 @@
       document.getElementById('onbNext').addEventListener('click', () => {
         // جمع بيانات الخطوة الحالية
         collectOnboardingData(step.id);
-        // إذا كانت هذه هي الخطوة الأخيرة، قم بإنهاء الإعداد مباشرة
         if (onboardingIndex === onboardingSteps.length - 1) {
           finishOnboarding();
         } else {
@@ -839,6 +843,8 @@
       const prevBtn = document.getElementById('onbPrev');
       if (prevBtn) {
         prevBtn.addEventListener('click', () => {
+          // حفظ البيانات قبل الرجوع
+          collectOnboardingData(step.id);
           onboardingIndex--;
           renderOnboarding();
         });
@@ -852,15 +858,15 @@
     function collectOnboardingData(stepId) {
       switch (stepId) {
         case 'info':
-          onboardingData.name = $('#onbName').value.trim();
-          onboardingData.description = $('#onbDesc').value.trim();
-          onboardingData.phone = $('#onbPhone').value.trim();
-          onboardingData.country = $('#onbCountry').value.trim();
-          onboardingData.currency = $('#onbCurrency').value;
-          onboardingData.timezone = $('#onbTz').value.trim();
+          onboardingData.name = $('#onbName')?.value.trim() || '';
+          onboardingData.description = $('#onbDesc')?.value.trim() || '';
+          onboardingData.phone = $('#onbPhone')?.value.trim() || '';
+          onboardingData.country = $('#onbCountry')?.value.trim() || '';
+          onboardingData.currency = $('#onbCurrency')?.value || 'USD';
+          onboardingData.timezone = $('#onbTz')?.value.trim() || 'Africa/Cairo';
           break;
         case 'logo':
-          // يتم جمعها عند رفع الملف
+          // الصورة ترفع بشكل منفصل
           break;
         case 'cover':
           break;
@@ -868,22 +874,22 @@
           // تم جمعها عبر الأزرار
           break;
         case 'hours':
-          // يتم جمعها في finishOnboarding
+          // تجمع عند finish
           break;
         case 'barbers':
           break;
         case 'gallery':
           break;
         case 'whatsapp':
-          onboardingData.whatsapp = $('#onbWhatsapp').value.trim();
+          onboardingData.whatsapp = $('#onbWhatsapp')?.value.trim() || '';
           break;
         case 'location':
-          onboardingData.address = $('#onbAddress').value.trim();
+          onboardingData.address = $('#onbAddress')?.value.trim() || '';
           break;
         case 'theme':
           onboardingData.theme = {
-            primary: $('#onbPrimary').value,
-            secondary: $('#onbSecondary').value
+            primary: $('#onbPrimary')?.value || '#6c8cff',
+            secondary: $('#onbSecondary')?.value || '#1a1f27'
           };
           break;
       }
@@ -925,17 +931,46 @@
         const days = ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'];
         let html = '';
         days.forEach(d => {
+          const saved = onboardingData.hours?.[d] || { enabled: true, open: '09:00', close: '21:00' };
           html += `
             <div class="flex" style="margin-bottom:8px;">
               <span style="width:80px;">${d}</span>
-              <input type="checkbox" id="hour_${d}_enabled" checked />
+              <input type="checkbox" id="hour_${d}_enabled" ${saved.enabled?'checked':''} />
               <label>مفتوح</label>
-              <input type="time" id="hour_${d}_open" value="09:00" />
-              <input type="time" id="hour_${d}_close" value="21:00" />
+              <input type="time" id="hour_${d}_open" value="${saved.open||'09:00'}" />
+              <input type="time" id="hour_${d}_close" value="${saved.close||'21:00'}" />
             </div>
           `;
         });
         document.getElementById('onbHoursContainer').innerHTML = html;
+        // حفظ الساعات عند الضغط على التالي أو finish
+        // سيتم جمعها في collectOnboardingData ولكننا نضيف مستمع لحفظها فوراً
+        days.forEach(d => {
+          document.getElementById(`hour_${d}_enabled`).addEventListener('change', () => {
+            if (!onboardingData.hours) onboardingData.hours = {};
+            onboardingData.hours[d] = {
+              enabled: document.getElementById(`hour_${d}_enabled`).checked,
+              open: document.getElementById(`hour_${d}_open`).value,
+              close: document.getElementById(`hour_${d}_close`).value
+            };
+          });
+          document.getElementById(`hour_${d}_open`).addEventListener('change', () => {
+            if (!onboardingData.hours) onboardingData.hours = {};
+            onboardingData.hours[d] = {
+              enabled: document.getElementById(`hour_${d}_enabled`).checked,
+              open: document.getElementById(`hour_${d}_open`).value,
+              close: document.getElementById(`hour_${d}_close`).value
+            };
+          });
+          document.getElementById(`hour_${d}_close`).addEventListener('change', () => {
+            if (!onboardingData.hours) onboardingData.hours = {};
+            onboardingData.hours[d] = {
+              enabled: document.getElementById(`hour_${d}_enabled`).checked,
+              open: document.getElementById(`hour_${d}_open`).value,
+              close: document.getElementById(`hour_${d}_close`).value
+            };
+          });
+        });
       }
       if (stepId === 'logo') {
         document.getElementById('onbLogo').addEventListener('change', async (e) => {
@@ -1007,6 +1042,7 @@
             const c = colors[theme] || colors.dark;
             document.getElementById('onbPrimary').value = c.primary;
             document.getElementById('onbSecondary').value = c.secondary;
+            onboardingData.theme = c;
           });
         });
       }
@@ -1054,11 +1090,21 @@
       });
     }
 
-    // ─── دالة إنهاء الإعداد (المعدلة) ───
+    // ─── دالة إنهاء الإعداد ───
     async function finishOnboarding() {
       console.log('🚀 بدء إنشاء المتجر...');
 
-      // التحقق من وجود اسم المتجر
+      // جمع بيانات ساعات العمل من الحقول الحالية
+      const days = ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'];
+      if (!onboardingData.hours) onboardingData.hours = {};
+      days.forEach(d => {
+        const enabled = document.getElementById(`hour_${d}_enabled`)?.checked ?? true;
+        const open = document.getElementById(`hour_${d}_open`)?.value || '09:00';
+        const close = document.getElementById(`hour_${d}_close`)?.value || '21:00';
+        onboardingData.hours[d] = { enabled, open, close };
+      });
+
+      // التحقق من اسم المتجر
       const name = onboardingData.name;
       if (!name) {
         showToast('⚠️ اسم المتجر مطلوب!', 'error');
@@ -1146,17 +1192,14 @@
         }
 
         // 5. إضافة ساعات العمل
-        const days = ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'];
         const batchHours = writeBatch(db);
         days.forEach(d => {
           const ref = doc(db, 'shops', shopRef.id, 'workingHours', d);
-          const enabled = document.getElementById(`hour_${d}_enabled`)?.checked ?? true;
-          const open = document.getElementById(`hour_${d}_open`)?.value || '09:00';
-          const close = document.getElementById(`hour_${d}_close`)?.value || '21:00';
+          const h = onboardingData.hours[d] || { enabled: true, open: '09:00', close: '21:00' };
           batchHours.set(ref, {
-            enabled,
-            openTime: open,
-            closeTime: close,
+            enabled: h.enabled,
+            openTime: h.open,
+            closeTime: h.close,
             breaks: []
           });
         });
@@ -1221,7 +1264,7 @@
     }
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // DASHBOARD (مختصر)
+    // DASHBOARD (نفس الكود السابق - تم اختصاره هنا)
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     let activeSection = 'overview';
 
@@ -1351,7 +1394,7 @@
       }
     }
 
-    // ─── SERVICES ───
+    // ─── SERVICES ─── (يتبع نفس النمط، تم اختصاره)
     function renderServices(container) {
       container.innerHTML = `
         <div class="card">
@@ -1464,7 +1507,7 @@
       } catch (e) { showToast(e.message, 'error'); }
     };
 
-    // ─── BARBERS ───
+    // ─── BARBERS ─── (مختصر)
     function renderBarbers(container) {
       container.innerHTML = `
         <div class="card">
@@ -1572,7 +1615,7 @@
       } catch (e) { showToast(e.message, 'error'); }
     };
 
-    // ─── BOOKINGS ───
+    // ─── BOOKINGS ─── (مختصر)
     function renderBookings(container) {
       container.innerHTML = `
         <div class="card">
