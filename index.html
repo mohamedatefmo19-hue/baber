@@ -898,43 +898,29 @@
   <!-- ============================================================ -->
   <script>
     // ================================================================
-    //  1. FIREBASE CONFIG (⚠️ IMPORTANT: Replace with YOUR actual keys)
+    //  1. FIREBASE CONFIG (تم التحديث بالمفتاح الجديد)
     // ================================================================
-    // 🔥 ادخل هنا مفاتيح مشروعك الفعلي من Firebase Console
-    // يجب تفعيل Email/Password في Authentication
-    // يجب تفعيل Firestore في وضع Test أو مع القواعد المرفقة
     const firebaseConfig = {
-      apiKey: "AIzaSyA0IWiY-tI30LX2PSG2T2gEiBAEd4GqzU", // ⚠️ استبدل هذا بالمفتاح الصحيح من مشروعك
-      authDomain: "salons-feee4.firebaseapp.com", // ⚠️ استبدل بنطاق مشروعك
-      projectId: "salons-feee4", // ⚠️ استبدل بمعرف مشروعك
+      apiKey: "AIzaSyA0IWiY-tI30LX2PS9G2T2gEiBAEd4GqzU",  // ✅ المفتاح الجديد
+      authDomain: "salons-feee4.firebaseapp.com",
+      projectId: "salons-feee4",
       storageBucket: "salons-feee4.firebasestorage.app",
       messagingSenderId: "601094041409",
       appId: "1:601094041409:web:d03a02de993fbb203cbbc0",
       measurementId: "G-GP53GSCW0C"
     };
 
-    // التحقق من صحة المفتاح (تنبيه للمطور)
-    if (firebaseConfig.apiKey === "AIzaSyA0IWiY-tI30LX2PSG2T2gEiBAEd4GqzU") {
-      console.warn(
-        "⚠️ أنت تستخدم مفتاح API افتراضي غير صالح. يرجى استبداله بمفتاح مشروع Firebase الفعلي في الكود (firebaseConfig.apiKey).");
-      alert(
-        "⚠️ تنبيه: مفتاح Firebase المستخدم غير صالح. يرجى تعديله في الكود (سطر firebaseConfig) بمفتاح مشروعك الفعلي.");
-    }
-
     // تهيئة Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-
-    // إذا كان المشروع جديداً، قد تحتاج إلى تمكين Firestore
-    // لا حاجة لإنشاء مجموعات يدوياً، الكود سينشئها تلقائياً.
 
     // ================================================================
     //  2. GLOBALS
     // ================================================================
     const toastContainer = document.getElementById('toastContainer');
     let currentUser = null;
-    let currentShop = null; // { id, ...data }
+    let currentShop = null;
     let currentPage = 'login';
     let allServices = [];
     let allBarbers = [];
@@ -946,7 +932,6 @@
     let workingHours = {};
     let plans = [];
     let unsubscribers = [];
-    let isPublicMode = false;
 
     // ================================================================
     //  3. UTILITY FUNCTIONS
@@ -1169,7 +1154,6 @@
       if (user) {
         currentUser = user;
         try {
-          // تحقق من وجود وثيقة المستخدم
           const userDoc = await db.collection('users').doc(user.uid).get();
           if (!userDoc.exists) {
             await db.collection('users').doc(user.uid).set({
@@ -1181,13 +1165,11 @@
               updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             });
           }
-          // البحث عن متجر المالك
           const shopsSnap = await db.collection('shops').where('ownerId', '==', user.uid).limit(1).get();
           if (!shopsSnap.empty) {
             const doc = shopsSnap.docs[0];
             currentShop = { id: doc.id, ...doc.data() };
             buildDrawer(currentShop);
-            // إلغاء الاشتراكات القديمة
             unsubscribers.forEach(u => u());
             unsubscribers = [];
             setupRealtimeListeners();
@@ -1213,7 +1195,6 @@
         currentShop = null;
         unsubscribers.forEach(u => u());
         unsubscribers = [];
-        // التحقق من الصفحة العامة
         const path = window.location.pathname;
         if (path.startsWith('/s/')) {
           const slug = path.split('/s/')[1];
@@ -2072,7 +2053,7 @@
     //  24. INIT
     // ================================================================
     console.log('💈 SalonHub SaaS v2 (Production Ready)');
-    console.log('✅ تأكد من استبدال firebaseConfig بمفاتيح مشروعك الفعلي.');
+    console.log('✅ تم استخدام مفتاح API الجديد.');
     console.log('✅ تأكد من تفعيل Email/Password في Firebase Authentication.');
     console.log('✅ تأكد من تفعيل Firestore في مشروعك.');
   </script>
