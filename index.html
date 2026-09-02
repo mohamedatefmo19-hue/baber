@@ -1,2123 +1,2015 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
-    <title>صالونات — منصة إدارة محلات الحلاقة</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>منصة الحلاقة – SaaS</title>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js">
+  </script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js">
+  </script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js">
+  </script>
+  <style>
+    /* ========== RESET & BASE ========== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: #0b0b12;
+      color: #f0f0f0;
+      min-height: 100vh;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background 0.3s;
+    }
+    #app {
+      width: 100%;
+      max-width: 480px;
+      background: #14141f;
+      border-radius: 32px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+      overflow: hidden;
+      min-height: 100vh;
+      position: relative;
+    }
+    @media (min-width: 768px) {
+      #app {
+        max-width: 720px;
+        border-radius: 40px;
+        margin: 20px auto;
+        min-height: auto;
+      }
+    }
+    @media (min-width: 1024px) {
+      #app {
+        max-width: 960px;
+      }
+    }
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+    /* ========== TYPOGRAPHY & COLORS ========== */
+    .text-center {
+      text-align: center;
+    }
+    .text-muted {
+      color: #8a8a9a;
+    }
+    .text-success {
+      color: #2ecc71;
+    }
+    .text-warning {
+      color: #f1c40f;
+    }
+    .text-danger {
+      color: #e74c3c;
+    }
+    .text-primary {
+      color: #6c5ce7;
+    }
+    .bg-dark {
+      background: #1a1a2e;
+    }
+    .bg-card {
+      background: #1f1f30;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 16px;
+      border: 1px solid #2a2a40;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #2a2a40;
+      color: #ccc;
+    }
+    .badge-success {
+      background: #1e7e34;
+      color: #fff;
+    }
+    .badge-warning {
+      background: #b7950b;
+      color: #fff;
+    }
+    .badge-danger {
+      background: #a93226;
+      color: #fff;
+    }
+    .badge-info {
+      background: #1a5276;
+      color: #fff;
+    }
 
-    <!-- Font Awesome 6 (Free) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    /* ========== BUTTONS ========== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 100%;
+      background: #2a2a40;
+      color: #f0f0f0;
+    }
+    .btn-primary {
+      background: #6c5ce7;
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: #5a4bd1;
+      transform: scale(0.98);
+    }
+    .btn-success {
+      background: #27ae60;
+      color: #fff;
+    }
+    .btn-danger {
+      background: #c0392b;
+      color: #fff;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 2px solid #6c5ce7;
+      color: #6c5ce7;
+    }
+    .btn-sm {
+      padding: 8px 16px;
+      font-size: 14px;
+    }
+    .btn-block {
+      width: 100%;
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="css/app.css" />
-    <link rel="stylesheet" href="css/responsive.css" />
+    /* ========== FORM ========== */
+    .form-group {
+      margin-bottom: 18px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: #b0b0c0;
+      font-size: 14px;
+    }
+    .form-control {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 40px;
+      border: 2px solid #2a2a40;
+      background: #1a1a2e;
+      color: #f0f0f0;
+      font-size: 16px;
+      transition: 0.2s;
+    }
+    .form-control:focus {
+      border-color: #6c5ce7;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.3);
+    }
+    .form-control::placeholder {
+      color: #6a6a7a;
+    }
+    select.form-control {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a8a9a' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: left 16px center;
+    }
 
-    <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✂️</text></svg>" />
+    /* ========== CARDS & GRID ========== */
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .col-6 {
+      flex: 0 0 calc(50% - 6px);
+    }
+    .col-12 {
+      flex: 0 0 100%;
+    }
+    .stat-card {
+      background: #1a1a2e;
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      border: 1px solid #2a2a40;
+    }
+    .stat-number {
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      margin-top: 4px;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: #8a8a9a;
+    }
 
-    <!-- Firebase SDKs (modular v9+) -->
-    <script type="importmap">
-        {
-            "imports": {
-                "firebase/app": "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js",
-                "firebase/auth": "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js",
-                "firebase/firestore": "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js"
-            }
-        }
-    </script>
+    /* ========== NAVIGATION ========== */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: #14141f;
+      border-bottom: 1px solid #2a2a40;
+    }
+    .topbar-brand {
+      font-weight: 700;
+      font-size: 20px;
+      color: #fff;
+    }
+    .topbar-brand span {
+      color: #6c5ce7;
+    }
+    .menu-toggle {
+      background: transparent;
+      border: none;
+      color: #f0f0f0;
+      font-size: 28px;
+      cursor: pointer;
+    }
+
+    /* Drawer */
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: -280px;
+      width: 280px;
+      height: 100%;
+      background: #1a1a2e;
+      border-left: 1px solid #2a2a40;
+      transition: right 0.3s;
+      z-index: 1000;
+      padding: 24px 16px;
+      overflow-y: auto;
+    }
+    .drawer.open {
+      right: 0;
+    }
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      display: none;
+    }
+    .drawer-backdrop.show {
+      display: block;
+    }
+    .drawer .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      color: #b0b0c0;
+      font-weight: 500;
+      transition: 0.2s;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .drawer .nav-item:hover,
+    .drawer .nav-item.active {
+      background: #2a2a40;
+      color: #fff;
+    }
+    .drawer .nav-item .icon {
+      font-size: 22px;
+      width: 30px;
+      text-align: center;
+    }
+
+    /* ========== PAGES ========== */
+    .page {
+      display: none;
+      padding: 20px;
+      animation: fadeIn 0.25s ease;
+    }
+    .page.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ========== TOAST ========== */
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      width: 90%;
+      max-width: 400px;
+    }
+    .toast {
+      background: #2a2a40;
+      color: #f0f0f0;
+      padding: 16px 20px;
+      border-radius: 40px;
+      margin-bottom: 10px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+      border-left: 5px solid #6c5ce7;
+      font-weight: 500;
+      text-align: center;
+      animation: slideUp 0.3s ease;
+    }
+    .toast-success {
+      border-color: #2ecc71;
+    }
+    .toast-error {
+      border-color: #e74c3c;
+    }
+    .toast-info {
+      border-color: #3498db;
+    }
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ========== EMPTY STATE ========== */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #8a8a9a;
+    }
+    .empty-state .icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+    }
+    .empty-state h3 {
+      color: #f0f0f0;
+      margin-bottom: 8px;
+    }
+
+    /* ========== SCROLL ========== */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #14141f;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2a2a40;
+      border-radius: 10px;
+    }
+
+    /* ========== MISC ========== */
+    .flex {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .flex-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .gap-8 {
+      gap: 8px;
+    }
+    .mt-8 {
+      margin-top: 8px;
+    }
+    .mt-16 {
+      margin-top: 16px;
+    }
+    .mb-16 {
+      margin-bottom: 16px;
+    }
+    .w-100 {
+      width: 100%;
+    }
+    .hidden {
+      display: none !important;
+    }
+    .pointer {
+      cursor: pointer;
+    }
+
+    /* ========== PUBLIC SITE (s/) ========== */
+    .public-site {
+      background: #0b0b12;
+      padding: 20px;
+    }
+    .public-site .hero {
+      text-align: center;
+      padding: 30px 0;
+    }
+    .public-site .hero img {
+      max-width: 120px;
+      border-radius: 50%;
+      margin-bottom: 16px;
+      border: 3px solid #6c5ce7;
+    }
+    .public-site .hero h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+    .public-site .service-item,
+    .public-site .barber-item {
+      background: #1a1a2e;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+      border: 1px solid #2a2a40;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .public-site .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .public-site .gallery-grid img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-radius: 12px;
+    }
+  </style>
 </head>
 <body>
 
-    <!-- ========== TOP BAR ========== -->
-    <header class="topbar" id="topbar">
-        <div class="topbar-inner">
-            <button class="topbar-menu-btn" id="menuToggle" aria-label="فتح القائمة">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="topbar-brand">
-                <i class="fas fa-scissors"></i>
-                <span>صالونات</span>
-            </div>
-            <div class="topbar-actions">
-                <button class="topbar-notif-btn" id="notifBtn" aria-label="الإشعارات">
-                    <i class="fas fa-bell"></i>
-                    <span class="notif-badge" id="notifBadge">0</span>
-                </button>
-                <div class="topbar-user" id="topbarUser">
-                    <img id="userAvatar" src="https://ui-avatars.com/api/?name=U&background=1a1a2e&color=fff&size=32" alt="صورة المستخدم" />
-                    <span id="userNameShort">مستخدم</span>
-                </div>
-            </div>
-        </div>
-    </header>
+  <!-- ===== TOAST CONTAINER ===== -->
+  <div class="toast-container" id="toastContainer"></div>
 
-    <!-- ========== SIDE DRAWER ========== -->
-    <nav class="drawer" id="drawer" role="navigation" aria-label="القائمة الرئيسية">
-        <div class="drawer-header">
-            <div class="drawer-brand">
-                <i class="fas fa-scissors"></i>
-                <span>صالونات</span>
-            </div>
-            <button class="drawer-close" id="drawerClose" aria-label="إغلاق القائمة">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="drawer-user">
-            <img id="drawerAvatar" src="https://ui-avatars.com/api/?name=U&background=1a1a2e&color=fff&size=48" alt="صورة المستخدم" />
-            <div>
-                <div class="drawer-user-name" id="drawerUserName">مستخدم</div>
-                <div class="drawer-user-email" id="drawerUserEmail">user@email.com</div>
-            </div>
-        </div>
-        <ul class="drawer-nav">
-            <li><a href="dashboard.html" data-page="dashboard"><i class="fas fa-chart-pie"></i> نظرة عامة</a></li>
-            <li><a href="shop.html" data-page="shop"><i class="fas fa-store"></i> متجري</a></li>
-            <li><a href="builder.html" data-page="builder"><i class="fas fa-paint-brush"></i> منشئ الموقع</a></li>
-            <li><a href="services.html" data-page="services"><i class="fas fa-cut"></i> الخدمات</a></li>
-            <li><a href="barbers.html" data-page="barbers"><i class="fas fa-users"></i> الحلاقون</a></li>
-            <li><a href="bookings.html" data-page="bookings"><i class="fas fa-calendar-check"></i> الحجوزات</a></li>
-            <li><a href="customers.html" data-page="customers"><i class="fas fa-user-friends"></i> العملاء</a></li>
-            <li><a href="reviews.html" data-page="reviews"><i class="fas fa-star"></i> التقييمات</a></li>
-            <li><a href="working-hours.html" data-page="working-hours"><i class="fas fa-clock"></i> ساعات العمل</a></li>
-            <li><a href="holidays.html" data-page="holidays"><i class="fas fa-calendar-times"></i> العطلات</a></li>
-            <li><a href="gallery.html" data-page="gallery"><i class="fas fa-images"></i> المعرض</a></li>
-            <li><a href="subscription.html" data-page="subscription"><i class="fas fa-crown"></i> الاشتراك</a></li>
-            <li><a href="notifications.html" data-page="notifications"><i class="fas fa-bell"></i> الإشعارات</a></li>
-            <li><a href="profile.html" data-page="profile"><i class="fas fa-user-cog"></i> الملف الشخصي</a></li>
-            <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a></li>
-        </ul>
-        <div class="drawer-footer">
-            <small>v1.0.0</small>
-        </div>
-    </nav>
+  <!-- ===== DRAWER BACKDROP ===== -->
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
 
-    <!-- ========== OVERLAY ========== -->
-    <div class="drawer-overlay" id="drawerOverlay"></div>
+  <!-- ===== DRAWER ===== -->
+  <div class="drawer" id="drawer">
+    <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
+      <span style="font-size: 20px; font-weight: 700; color:#fff;">القائمة</span>
+      <button class="menu-toggle" id="closeDrawerBtn" style="font-size:24px;">✕</button>
+    </div>
+    <div id="drawerNav">
+      <!-- سيتم تعبئتها ديناميكياً -->
+    </div>
+  </div>
 
-    <!-- ========== MAIN CONTENT ========== -->
-    <main class="main-content" id="mainContent">
+  <!-- ===== APP ===== -->
+  <div id="app">
 
-        <!-- PAGE: DASHBOARD -->
-        <section class="page-section active" id="page-dashboard">
-            <div class="page-header">
-                <h1>نظرة عامة</h1>
-                <p>مرحباً بك في لوحة التحكم</p>
-            </div>
-            <div class="stats-grid" id="statsGrid">
-                <div class="stat-card"><div class="stat-icon"><i class="fas fa-calendar-day"></i></div><div><div class="stat-value" id="statToday">0</div><div class="stat-label">حجوزات اليوم</div></div></div>
-                <div class="stat-card"><div class="stat-icon"><i class="fas fa-hourglass-half"></i></div><div><div class="stat-value" id="statPending">0</div><div class="stat-label">معلقة</div></div></div>
-                <div class="stat-card"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div><div class="stat-value" id="statConfirmed">0</div><div class="stat-label">مؤكدة</div></div></div>
-                <div class="stat-card"><div class="stat-icon"><i class="fas fa-check-double"></i></div><div><div class="stat-value" id="statCompleted">0</div><div class="stat-label">مكتملة</div></div></div>
-                <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div><div class="stat-value" id="statCustomers">0</div><div class="stat-label">العملاء</div></div></div>
-                <div class="stat-card"><div class="stat-icon"><i class="fas fa-cut"></i></div><div><div class="stat-value" id="statServices">0</div><div class="stat-label">الخدمات</div></div></div>
-                <div class="stat-card"><div class="stat-icon"><i class="fas fa-star"></i></div><div><div class="stat-value" id="statRating">0.0</div><div class="stat-label">متوسط التقييم</div></div></div>
-                <div class="stat-card"><div class="stat-icon"><i class="fas fa-crown"></i></div><div><div class="stat-value" id="statSubscription">—</div><div class="stat-label">حالة الاشتراك</div></div></div>
-            </div>
-            <div class="dashboard-grid">
-                <div class="card"><div class="card-header"><h3>آخر الحجوزات</h3></div><div class="card-body" id="recentBookings"><div class="empty-state"><i class="fas fa-calendar-plus"></i><p>لا توجد حجوزات حالياً</p></div></div></div>
-                <div class="card"><div class="card-header"><h3>أحدث العملاء</h3></div><div class="card-body" id="recentCustomers"><div class="empty-state"><i class="fas fa-user-plus"></i><p>لا يوجد عملاء حتى الآن</p></div></div></div>
-            </div>
-        </section>
-
-        <!-- PAGE: SHOP -->
-        <section class="page-section" id="page-shop">
-            <div class="page-header"><h1>متجري</h1><p>إعدادات المتجر والملف العام</p></div>
-            <form id="shopForm" class="form-grid">
-                <div class="form-group"><label>اسم المتجر <span class="required">*</span></label><input type="text" id="shopName" required placeholder="مثال: حلاقة الأندلس" /></div>
-                <div class="form-group"><label>الوصف</label><textarea id="shopDesc" rows="3" placeholder="وصف مختصر لمتجرك"></textarea></div>
-                <div class="form-group"><label>رقم الهاتف <span class="required">*</span></label><input type="tel" id="shopPhone" required placeholder="+966 50 000 0000" /></div>
-                <div class="form-group"><label>واتساب</label><input type="tel" id="shopWhatsapp" placeholder="+966 50 000 0000" /></div>
-                <div class="form-group"><label>الدولة</label><input type="text" id="shopCountry" placeholder="السعودية" /></div>
-                <div class="form-group"><label>العملة</label><input type="text" id="shopCurrency" placeholder="SAR" value="SAR" /></div>
-                <div class="form-group"><label>المنطقة الزمنية</label><input type="text" id="shopTimezone" placeholder="Asia/Riyadh" value="Asia/Riyadh" /></div>
-                <div class="form-group"><label>العنوان</label><input type="text" id="shopAddress" placeholder="العنوان الكامل" /></div>
-                <div class="form-group"><label>إنستغرام</label><input type="text" id="shopInstagram" placeholder="@username" /></div>
-                <div class="form-group"><label>فيسبوك</label><input type="text" id="shopFacebook" placeholder="facebook.com/username" /></div>
-                <div class="form-group full-width"><label>رابط المتجر (slug)</label><input type="text" id="shopSlug" placeholder="ahmed-barber" /><small>سيكون عنوان متجرك: /s/ahmed-barber</small></div>
-                <div class="form-group full-width"><button type="submit" class="btn btn-primary" id="saveShopBtn"><i class="fas fa-save"></i> حفظ المتجر</button></div>
-            </form>
-            <div id="shopStatus" class="shop-status-box"></div>
-        </section>
-
-        <!-- PAGE: BUILDER -->
-        <section class="page-section" id="page-builder">
-            <div class="page-header"><h1>منشئ الموقع</h1><p>خصص شكل موقعك العام</p></div>
-            <div class="builder-layout">
-                <div class="builder-controls">
-                    <div class="form-group"><label>القالب</label><select id="builderTemplate"><option value="luxury">فاخر</option><option value="minimal">بسيط</option><option value="modern">حديث</option><option value="classic">كلاسيكي</option></select></div>
-                    <div class="form-group"><label>اللون الأساسي</label><input type="color" id="builderPrimary" value="#c9a84c" /></div>
-                    <div class="form-group"><label>اللون الثانوي</label><input type="color" id="builderSecondary" value="#1a1a2e" /></div>
-                    <div class="form-group"><label>لون الإبراز</label><input type="color" id="builderAccent" value="#e8c86a" /></div>
-                    <button class="btn btn-primary" id="previewBtn"><i class="fas fa-eye"></i> معاينة</button>
-                    <button class="btn btn-success" id="saveDraftBtn"><i class="fas fa-save"></i> حفظ المسودة</button>
-                    <button class="btn btn-warning" id="publishBtn"><i class="fas fa-globe"></i> نشر الموقع</button>
-                    <div id="publishStatus" class="publish-status"></div>
-                </div>
-                <div class="builder-preview" id="builderPreview">
-                    <div class="preview-iframe-wrapper">
-                        <iframe id="previewIframe" src="about:blank" title="معاينة الموقع"></iframe>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- PAGE: SERVICES -->
-        <section class="page-section" id="page-services">
-            <div class="page-header"><h1>الخدمات</h1><p>إدارة الخدمات المقدمة</p><button class="btn btn-primary" id="addServiceBtn"><i class="fas fa-plus"></i> إضافة خدمة</button></div>
-            <div id="servicesList"><div class="empty-state"><i class="fas fa-cut"></i><p>لا توجد خدمات. أضف خدمتك الأولى!</p></div></div>
-        </section>
-
-        <!-- PAGE: BARBERS -->
-        <section class="page-section" id="page-barbers">
-            <div class="page-header"><h1>الحلاقون</h1><p>إدارة فريق العمل</p><button class="btn btn-primary" id="addBarberBtn"><i class="fas fa-plus"></i> إضافة حلاق</button></div>
-            <div id="barbersList"><div class="empty-state"><i class="fas fa-user-plus"></i><p>لا يوجد حلاقون. أضف حلاقك الأول!</p></div></div>
-        </section>
-
-        <!-- PAGE: BOOKINGS -->
-        <section class="page-section" id="page-bookings">
-            <div class="page-header"><h1>الحجوزات</h1><p>إدارة جميع الحجوزات</p></div>
-            <div class="filter-bar"><input type="text" id="bookingSearch" placeholder="بحث..." /><select id="bookingStatusFilter"><option value="all">الكل</option><option value="pending">معلقة</option><option value="confirmed">مؤكدة</option><option value="completed">مكتملة</option><option value="cancelled">ملغية</option><option value="no_show">لم يحضر</option></select></div>
-            <div id="bookingsList"><div class="empty-state"><i class="fas fa-calendar-plus"></i><p>لا توجد حجوزات</p></div></div>
-        </section>
-
-        <!-- PAGE: CUSTOMERS -->
-        <section class="page-section" id="page-customers">
-            <div class="page-header"><h1>العملاء</h1><p>قاعدة بيانات العملاء</p></div>
-            <div class="filter-bar"><input type="text" id="customerSearch" placeholder="بحث بالاسم أو الهاتف..." /></div>
-            <div id="customersList"><div class="empty-state"><i class="fas fa-user-friends"></i><p>لا يوجد عملاء</p></div></div>
-        </section>
-
-        <!-- PAGE: REVIEWS -->
-        <section class="page-section" id="page-reviews">
-            <div class="page-header"><h1>التقييمات</h1><p>إدارة تقييمات العملاء</p></div>
-            <div id="reviewsList"><div class="empty-state"><i class="fas fa-star"></i><p>لا توجد تقييمات</p></div></div>
-        </section>
-
-        <!-- PAGE: WORKING HOURS -->
-        <section class="page-section" id="page-working-hours">
-            <div class="page-header"><h1>ساعات العمل</h1><p>تحديد أوقات العمل لكل يوم</p></div>
-            <div id="workingHoursList"></div>
-        </section>
-
-        <!-- PAGE: HOLIDAYS -->
-        <section class="page-section" id="page-holidays">
-            <div class="page-header"><h1>العطلات</h1><p>إدارة أيام الإجازة</p><button class="btn btn-primary" id="addHolidayBtn"><i class="fas fa-plus"></i> إضافة عطلة</button></div>
-            <div id="holidaysList"><div class="empty-state"><i class="fas fa-calendar-times"></i><p>لا توجد عطلات مسجلة</p></div></div>
-        </section>
-
-        <!-- PAGE: GALLERY -->
-        <section class="page-section" id="page-gallery">
-            <div class="page-header"><h1>المعرض</h1><p>صور أعمالك</p><button class="btn btn-primary" id="uploadGalleryBtn"><i class="fas fa-upload"></i> رفع صورة</button></div>
-            <div id="galleryGrid"><div class="empty-state"><i class="fas fa-images"></i><p>لا توجد صور في المعرض</p></div></div>
-        </section>
-
-        <!-- PAGE: SUBSCRIPTION -->
-        <section class="page-section" id="page-subscription">
-            <div class="page-header"><h1>الاشتراك</h1><p>خطط الأسعار والاشتراك</p></div>
-            <div id="subscriptionPlans" class="plans-grid"></div>
-            <div id="subscriptionStatus" class="subscription-status-box"></div>
-            <div id="subscriptionRequestStatus"></div>
-        </section>
-
-        <!-- PAGE: NOTIFICATIONS -->
-        <section class="page-section" id="page-notifications">
-            <div class="page-header"><h1>الإشعارات</h1><p>آخر التحديثات والتنبيهات</p></div>
-            <div id="notificationsList"><div class="empty-state"><i class="fas fa-bell-slash"></i><p>لا توجد إشعارات</p></div></div>
-        </section>
-
-        <!-- PAGE: PROFILE -->
-        <section class="page-section" id="page-profile">
-            <div class="page-header"><h1>الملف الشخصي</h1><p>إدارة حسابك</p></div>
-            <form id="profileForm" class="form-grid">
-                <div class="form-group"><label>الاسم</label><input type="text" id="profileName" required /></div>
-                <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="profileEmail" disabled /></div>
-                <div class="form-group"><label>رقم الهاتف</label><input type="tel" id="profilePhone" /></div>
-                <div class="form-group"><label>صورة الملف الشخصي</label><input type="file" id="profileImageInput" accept="image/*" /></div>
-                <div class="form-group full-width"><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> حفظ الملف</button></div>
-            </form>
-        </section>
-
-    </main>
-
-    <!-- ========== MODAL ========== -->
-    <div class="modal" id="modal" role="dialog" aria-modal="true">
-        <div class="modal-overlay" id="modalOverlay"></div>
-        <div class="modal-content" id="modalContent">
-            <button class="modal-close" id="modalClose" aria-label="إغلاق"><i class="fas fa-times"></i></button>
-            <div id="modalBody"></div>
-        </div>
+    <!-- TOPBAR -->
+    <div class="topbar" id="topbar">
+      <div class="topbar-brand">💈 <span>Salon</span>Hub</div>
+      <button class="menu-toggle" id="openDrawerBtn">☰</button>
     </div>
 
-    <!-- ========== TOAST CONTAINER ========== -->
-    <div id="toastContainer" class="toast-container"></div>
-
-    <!-- ========== JS MODULES ========== -->
-    <script type="module">
-        // ---- Imports ----
-        import { initializeApp } from 'firebase/app';
-        import {
-            getAuth,
-            onAuthStateChanged,
-            signOut,
-            updateProfile,
-            sendPasswordResetEmail
-        } from 'firebase/auth';
-        import {
-            getFirestore,
-            doc,
-            getDoc,
-            setDoc,
-            updateDoc,
-            deleteDoc,
-            collection,
-            query,
-            where,
-            getDocs,
-            addDoc,
-            serverTimestamp,
-            onSnapshot,
-            runTransaction,
-            limit,
-            orderBy,
-            writeBatch,
-            increment,
-            arrayUnion,
-            arrayRemove,
-            Timestamp
-        } from 'firebase/firestore';
-
-        // ---- Config ----
-        const firebaseConfig = {
-            apiKey: "AIzaSyA0IWiY-tI30LX2PSG2T2gEiBAEd4GqzU",
-            authDomain: "salons-feee4.firebaseapp.com",
-            projectId: "salons-feee4",
-            storageBucket: "salons-feee4.firebasestorage.app",
-            messagingSenderId: "601094041409",
-            appId: "1:601094041409:web:d03a02de993fbb203cbbc0",
-            measurementId: "G-GP53GSCW0C"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        // Cloudinary config
-        const CLOUDINARY = {
-            cloudName: 'deaevfmvm',
-            uploadPreset: 'salons1',
-            apiKey: '988396617763781'
-        };
-
-        // ---- DOM refs ----
-        const $ = (sel) => document.querySelector(sel);
-        const $$ = (sel) => document.querySelectorAll(sel);
-
-        const drawer = $('#drawer');
-        const overlay = $('#drawerOverlay');
-        const menuToggle = $('#menuToggle');
-        const drawerClose = $('#drawerClose');
-        const mainContent = $('#mainContent');
-        const modal = $('#modal');
-        const modalOverlay = $('#modalOverlay');
-        const modalClose = $('#modalClose');
-        const modalBody = $('#modalBody');
-        const toastContainer = $('#toastContainer');
-
-        // ---- State ----
-        let currentUser = null;
-        let currentShop = null;
-        let currentShopId = null;
-        let currentPage = 'dashboard';
-
-        // ---- Utilities ----
-        function slugify(text) {
-            return text
-                .toString()
-                .toLowerCase()
-                .trim()
-                .replace(/\s+/g, '-')
-                .replace(/[^\w\-]+/g, '')
-                .replace(/\-\-+/g, '-')
-                .replace(/^-+/, '')
-                .replace(/-+$/, '');
-        }
-
-        function generateSlug(name) {
-            let base = slugify(name);
-            if (!base) base = 'shop';
-            return base;
-        }
-
-        function formatDate(ts) {
-            if (!ts) return '—';
-            const d = ts.toDate ? ts.toDate() : new Date(ts);
-            return d.toLocaleDateString('ar-SA', { year: 'numeric', month: 'short', day: 'numeric' });
-        }
-
-        function formatTime(ts) {
-            if (!ts) return '—';
-            const d = ts.toDate ? ts.toDate() : new Date(ts);
-            return d.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
-        }
-
-        function formatDateTime(ts) {
-            if (!ts) return '—';
-            const d = ts.toDate ? ts.toDate() : new Date(ts);
-            return d.toLocaleString('ar-SA', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit',
-                minute: '2-digit' });
-        }
-
-        function getStatusBadge(status) {
-            const map = {
-                pending: '<span class="badge badge-warning">معلقة</span>',
-                confirmed: '<span class="badge badge-success">مؤكدة</span>',
-                completed: '<span class="badge badge-info">مكتملة</span>',
-                cancelled: '<span class="badge badge-danger">ملغية</span>',
-                no_show: '<span class="badge badge-secondary">لم يحضر</span>',
-                draft: '<span class="badge badge-secondary">مسودة</span>',
-                active: '<span class="badge badge-success">نشط</span>',
-                inactive: '<span class="badge badge-danger">غير نشط</span>',
-                pending_approval: '<span class="badge badge-warning">قيد المراجعة</span>',
-                approved: '<span class="badge badge-success">مقبول</span>',
-                rejected: '<span class="badge badge-danger">مرفوض</span>'
-            };
-            return map[status] || `<span class="badge badge-secondary">${status}</span>`;
-        }
-
-        function getStatusText(status) {
-            const map = {
-                pending: 'معلقة',
-                confirmed: 'مؤكدة',
-                completed: 'مكتملة',
-                cancelled: 'ملغية',
-                no_show: 'لم يحضر',
-                draft: 'مسودة',
-                active: 'نشط',
-                inactive: 'غير نشط',
-                pending_approval: 'قيد المراجعة',
-                approved: 'مقبول',
-                rejected: 'مرفوض'
-            };
-            return map[status] || status;
-        }
-
-        function showToast(message, type = 'info', duration = 4000) {
-            const el = document.createElement('div');
-            el.className = `toast toast-${type}`;
-            el.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : type === 'warning' ? 'fa-triangle-exclamation' : 'fa-info-circle'}"></i> ${message}`;
-            toastContainer.appendChild(el);
-            setTimeout(() => {
-                el.classList.add('toast-out');
-                setTimeout(() => el.remove(), 400);
-            }, duration);
-        }
-
-        function showModal(html) {
-            modalBody.innerHTML = html;
-            modal.classList.add('active');
-        }
-
-        function closeModal() {
-            modal.classList.remove('active');
-        }
-
-        function loadingSpinner() {
-            return '<div class="spinner"><i class="fas fa-spinner fa-spin"></i> جار التحميل...</div>';
-        }
-
-        function emptyState(icon, text) {
-            return `<div class="empty-state"><i class="fas ${icon}"></i><p>${text}</p></div>`;
-        }
-
-        // ---- Cloudinary upload ----
-        async function uploadToCloudinary(file) {
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('upload_preset', CLOUDINARY.uploadPreset);
-            formData.append('api_key', CLOUDINARY.apiKey);
-
-            const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY.cloudName}/image/upload`;
-
-            try {
-                const res = await fetch(url, { method: 'POST', body: formData });
-                const data = await res.json();
-                if (data.error) throw new Error(data.error.message);
-                return { url: data.secure_url, publicId: data.public_id };
-            } catch (err) {
-                throw new Error('فشل الرفع إلى Cloudinary: ' + err.message);
-            }
-        }
-
-        // ---- Navigation ----
-        function navigateTo(page) {
-            // Hide all pages
-            $$('.page-section').forEach(el => el.classList.remove('active'));
-            // Show target
-            const target = $(`#page-${page}`);
-            if (target) target.classList.add('active');
-            currentPage = page;
-            // Update active nav
-            $$('.drawer-nav a').forEach(el => el.classList.remove('active'));
-            const navLink = document.querySelector(`.drawer-nav a[data-page="${page}"]`);
-            if (navLink) navLink.classList.add('active');
-            // Close drawer on mobile
-            closeDrawer();
-            // Load page data
-            loadPageData(page);
-        }
-
-        function closeDrawer() {
-            drawer.classList.remove('open');
-            overlay.classList.remove('open');
-        }
-
-        function openDrawer() {
-            drawer.classList.add('open');
-            overlay.classList.add('open');
-        }
-
-        // ---- Auth ----
-        async function logoutUser() {
-            try {
-                await signOut(auth);
-                window.location.href = 'login.html';
-            } catch (err) {
-                showToast('خطأ في تسجيل الخروج: ' + err.message, 'error');
-            }
-        }
-
-        // ---- Load user profile ----
-        async function loadUserProfile(uid) {
-            try {
-                const ref = doc(db, 'users', uid);
-                const snap = await getDoc(ref);
-                if (snap.exists()) {
-                    const data = snap.data();
-                    currentUser = { uid, ...data };
-                    updateUIUser(data);
-                    return data;
-                } else {
-                    // Create user doc if missing
-                    const user = auth.currentUser;
-                    const newData = {
-                        name: user.displayName || 'مستخدم',
-                        email: user.email,
-                        phone: user.phoneNumber || '',
-                        role: 'shop_owner',
-                        createdAt: serverTimestamp(),
-                        updatedAt: serverTimestamp()
-                    };
-                    await setDoc(ref, newData);
-                    currentUser = { uid, ...newData };
-                    updateUIUser(newData);
-                    return newData;
-                }
-            } catch (err) {
-                console.error('loadUserProfile error:', err);
-                return null;
-            }
-        }
-
-        function updateUIUser(data) {
-            const name = data.name || 'مستخدم';
-            const email = data.email || '';
-            const avatarUrl = data.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=1a1a2e&color=fff&size=48`;
-
-            $('#userNameShort').textContent = name.split(' ')[0] || 'مستخدم';
-            $('#drawerUserName').textContent = name;
-            $('#drawerUserEmail').textContent = email;
-            $('#userAvatar').src = avatarUrl;
-            $('#drawerAvatar').src = avatarUrl;
-            $('#profileName').value = name;
-            $('#profileEmail').value = email;
-            $('#profilePhone').value = data.phone || '';
-        }
-
-        // ---- Load shop ----
-        async function loadShop(uid) {
-            try {
-                const q = query(collection(db, 'shops'), where('ownerId', '==', uid), limit(1));
-                const snap = await getDocs(q);
-                if (!snap.empty) {
-                    const docSnap = snap.docs[0];
-                    currentShopId = docSnap.id;
-                    currentShop = { id: docSnap.id, ...docSnap.data() };
-                    updateUIShop(currentShop);
-                    return currentShop;
-                } else {
-                    currentShop = null;
-                    currentShopId = null;
-                    updateUIShop(null);
-                    return null;
-                }
-            } catch (err) {
-                console.error('loadShop error:', err);
-                return null;
-            }
-        }
-
-        function updateUIShop(shop) {
-            if (!shop) {
-                $('#shopName').value = '';
-                $('#shopDesc').value = '';
-                $('#shopPhone').value = '';
-                $('#shopWhatsapp').value = '';
-                $('#shopCountry').value = '';
-                $('#shopCurrency').value = 'SAR';
-                $('#shopTimezone').value = 'Asia/Riyadh';
-                $('#shopAddress').value = '';
-                $('#shopInstagram').value = '';
-                $('#shopFacebook').value = '';
-                $('#shopSlug').value = '';
-                $('#shopStatus').innerHTML = '<div class="alert alert-info">لم يتم إنشاء متجر بعد. قم بإنشاء متجرك الآن!</div>';
-                return;
-            }
-
-            $('#shopName').value = shop.name || '';
-            $('#shopDesc').value = shop.description || '';
-            $('#shopPhone').value = shop.phone || '';
-            $('#shopWhatsapp').value = shop.whatsapp || '';
-            $('#shopCountry').value = shop.country || '';
-            $('#shopCurrency').value = shop.currency || 'SAR';
-            $('#shopTimezone').value = shop.timezone || 'Asia/Riyadh';
-            $('#shopAddress').value = shop.address || '';
-            $('#shopInstagram').value = shop.instagram || '';
-            $('#shopFacebook').value = shop.facebook || '';
-            $('#shopSlug').value = shop.slug || '';
-
-            const status = shop.status || 'draft';
-            const subStatus = shop.subscriptionStatus || 'pending';
-            const paymentStatus = shop.paymentStatus || 'pending';
-
-            let html = `
-                <div class="shop-status">
-                    <div><strong>حالة المتجر:</strong> ${getStatusBadge(status)}</div>
-                    <div><strong>حالة الاشتراك:</strong> ${getStatusBadge(subStatus)}</div>
-                    <div><strong>حالة الدفع:</strong> ${getStatusBadge(paymentStatus)}</div>
-                    <div><strong>الرابط العام:</strong> <a href="/s/${shop.slug}" target="_blank">/s/${shop.slug}</a></div>
-                    ${shop.logoUrl ? `<div><img src="${shop.logoUrl}" alt="شعار المتجر" style="max-width:100px;max-height:60px;border-radius:8px;" /></div>` : ''}
-                    ${shop.coverUrl ? `<div><img src="${shop.coverUrl}" alt="غلاف المتجر" style="max-width:200px;max-height:80px;border-radius:8px;object-fit:cover;" /></div>` : ''}
-                </div>
-            `;
-            $('#shopStatus').innerHTML = html;
-        }
-
-        // ---- Page data loader ----
-        async function loadPageData(page) {
-            if (!currentUser) return;
-            switch (page) {
-                case 'dashboard':
-                    loadDashboard();
-                    break;
-                case 'shop':
-                    // already loaded
-                    break;
-                case 'builder':
-                    loadBuilder();
-                    break;
-                case 'services':
-                    loadServices();
-                    break;
-                case 'barbers':
-                    loadBarbers();
-                    break;
-                case 'bookings':
-                    loadBookings();
-                    break;
-                case 'customers':
-                    loadCustomers();
-                    break;
-                case 'reviews':
-                    loadReviews();
-                    break;
-                case 'working-hours':
-                    loadWorkingHours();
-                    break;
-                case 'holidays':
-                    loadHolidays();
-                    break;
-                case 'gallery':
-                    loadGallery();
-                    break;
-                case 'subscription':
-                    loadSubscription();
-                    break;
-                case 'notifications':
-                    loadNotifications();
-                    break;
-                case 'profile':
-                    // already loaded
-                    break;
-            }
-        }
-
-        // ---- DASHBOARD ----
-        async function loadDashboard() {
-            if (!currentShopId) {
-                $('#statsGrid').innerHTML = emptyState('fa-store', 'أنشئ متجرك أولاً لعرض الإحصائيات');
-                $('#recentBookings').innerHTML = emptyState('fa-calendar-plus', 'أنشئ متجرك أولاً');
-                $('#recentCustomers').innerHTML = emptyState('fa-user-plus', 'أنشئ متجرك أولاً');
-                return;
-            }
-
-            try {
-                // Today's date range
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                const tomorrow = new Date(today);
-                tomorrow.setDate(tomorrow.getDate() + 1);
-
-                // Bookings query
-                const bookingsRef = collection(db, 'shops', currentShopId, 'bookings');
-                const qAll = query(bookingsRef, limit(100));
-                const snap = await getDocs(qAll);
-
-                let total = 0,
-                    pending = 0,
-                    confirmed = 0,
-                    completed = 0,
-                    todayBookings = 0;
-
-                const bookings = [];
-                snap.forEach(doc => {
-                    const data = doc.data();
-                    bookings.push({ id: doc.id, ...data });
-                    total++;
-                    if (data.status === 'pending') pending++;
-                    if (data.status === 'confirmed') confirmed++;
-                    if (data.status === 'completed') completed++;
-
-                    // Check if booking is today
-                    if (data.createdAt) {
-                        const d = data.createdAt.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
-                        if (d >= today && d < tomorrow) todayBookings++;
-                    }
-                });
-
-                // Customers count
-                const custRef = collection(db, 'shops', currentShopId, 'customers');
-                const custSnap = await getDocs(query(custRef, limit(100)));
-                const customerCount = custSnap.size;
-
-                // Services count
-                const servRef = collection(db, 'shops', currentShopId, 'services');
-                const servSnap = await getDocs(query(servRef, limit(100)));
-                const serviceCount = servSnap.size;
-
-                // Reviews
-                const revRef = collection(db, 'shops', currentShopId, 'reviews');
-                const revSnap = await getDocs(query(revRef, limit(100)));
-                let avgRating = 0;
-                let totalRating = 0;
-                let reviewCount = 0;
-                revSnap.forEach(doc => {
-                    const data = doc.data();
-                    if (data.status === 'approved' && data.rating) {
-                        totalRating += data.rating;
-                        reviewCount++;
-                    }
-                });
-                avgRating = reviewCount > 0 ? (totalRating / reviewCount) : 0;
-
-                // Subscription status
-                const subStatus = currentShop?.subscriptionStatus || 'pending';
-
-                // Update stats
-                $('#statToday').textContent = todayBookings;
-                $('#statPending').textContent = pending;
-                $('#statConfirmed').textContent = confirmed;
-                $('#statCompleted').textContent = completed;
-                $('#statCustomers').textContent = customerCount;
-                $('#statServices').textContent = serviceCount;
-                $('#statRating').textContent = avgRating.toFixed(1);
-                $('#statSubscription').textContent = getStatusText(subStatus);
-
-                // Recent bookings (last 5)
-                const sorted = bookings.sort((a, b) => {
-                    const da = a.createdAt?.toDate?.() || new Date(0);
-                    const db2 = b.createdAt?.toDate?.() || new Date(0);
-                    return db2 - da;
-                }).slice(0, 5);
-
-                if (sorted.length === 0) {
-                    $('#recentBookings').innerHTML = emptyState('fa-calendar-plus', 'لا توجد حجوزات حالياً');
-                } else {
-                    let html = '<div class="list-items">';
-                    sorted.forEach(b => {
-                        html += `
-                            <div class="list-item">
-                                <div class="list-item-main">
-                                    <strong>${b.customerName || 'عميل'}</strong>
-                                    <span>${b.serviceName || 'خدمة'}</span>
-                                    <small>${formatDate(b.date)} ${formatTime(b.date)}</small>
-                                </div>
-                                ${getStatusBadge(b.status)}
-                            </div>
-                        `;
-                    });
-                    html += '</div>';
-                    $('#recentBookings').innerHTML = html;
-                }
-
-                // Recent customers
-                const custSnap2 = await getDocs(query(custRef, orderBy('createdAt', 'desc'), limit(5)));
-                if (custSnap2.empty) {
-                    $('#recentCustomers').innerHTML = emptyState('fa-user-plus', 'لا يوجد عملاء حتى الآن');
-                } else {
-                    let html = '<div class="list-items">';
-                    custSnap2.forEach(doc => {
-                        const c = doc.data();
-                        html += `
-                            <div class="list-item">
-                                <div class="list-item-main">
-                                    <strong>${c.name || 'عميل'}</strong>
-                                    <span>${c.phone || ''}</span>
-                                    <small>${c.bookingCount || 0} حجز</small>
-                                </div>
-                            </div>
-                        `;
-                    });
-                    html += '</div>';
-                    $('#recentCustomers').innerHTML = html;
-                }
-
-            } catch (err) {
-                console.error('loadDashboard error:', err);
-                showToast('خطأ في تحميل لوحة التحكم', 'error');
-            }
-        }
-
-        // ---- SHOP ----
-        async function saveShop(e) {
-            e.preventDefault();
-            if (!currentUser) return;
-
-            const name = $('#shopName').value.trim();
-            const slug = $('#shopSlug').value.trim() || generateSlug(name);
-
-            if (!name) {
-                showToast('الرجاء إدخال اسم المتجر', 'error');
-                return;
-            }
-
-            // Check slug uniqueness
-            try {
-                const q = query(collection(db, 'shops'), where('slug', '==', slug));
-                const snap = await getDocs(q);
-                let existing = false;
-                snap.forEach(doc => {
-                    if (doc.id !== currentShopId) existing = true;
-                });
-                if (existing) {
-                    showToast('هذا الرابط مستخدم بالفعل. الرجاء اختيار رابط آخر.', 'error');
-                    return;
-                }
-            } catch (err) {
-                console.error('slug check error:', err);
-            }
-
-            const data = {
-                ownerId: currentUser.uid,
-                name,
-                slug,
-                description: $('#shopDesc').value.trim(),
-                phone: $('#shopPhone').value.trim(),
-                whatsapp: $('#shopWhatsapp').value.trim(),
-                country: $('#shopCountry').value.trim(),
-                currency: $('#shopCurrency').value.trim() || 'SAR',
-                timezone: $('#shopTimezone').value.trim() || 'Asia/Riyadh',
-                address: $('#shopAddress').value.trim(),
-                instagram: $('#shopInstagram').value.trim(),
-                facebook: $('#shopFacebook').value.trim(),
-                updatedAt: serverTimestamp()
-            };
-
-            try {
-                if (currentShopId) {
-                    await updateDoc(doc(db, 'shops', currentShopId), data);
-                    showToast('تم تحديث المتجر بنجاح', 'success');
-                } else {
-                    // Create new shop
-                    data.status = 'draft';
-                    data.subscriptionStatus = 'pending';
-                    data.paymentStatus = 'pending';
-                    data.createdAt = serverTimestamp();
-                    data.theme = { template: 'luxury', primaryColor: '#c9a84c', secondaryColor: '#1a1a2e',
-                        accentColor: '#e8c86a' };
-                    const ref = await addDoc(collection(db, 'shops'), data);
-                    currentShopId = ref.id;
-                    showToast('تم إنشاء المتجر بنجاح', 'success');
-                }
-                // Reload shop
-                await loadShop(currentUser.uid);
-                loadPageData('shop');
-            } catch (err) {
-                console.error('saveShop error:', err);
-                showToast('خطأ في حفظ المتجر: ' + err.message, 'error');
-            }
-        }
-
-        // ---- BUILDER ----
-        function loadBuilder() {
-            if (!currentShop) {
-                $('#builderPreview').innerHTML = emptyState('fa-store', 'أنشئ متجرك أولاً');
-                return;
-            }
-            const theme = currentShop.theme || { template: 'luxury', primaryColor: '#c9a84c', secondaryColor: '#1a1a2e',
-                accentColor: '#e8c86a' };
-            $('#builderTemplate').value = theme.template || 'luxury';
-            $('#builderPrimary').value = theme.primaryColor || '#c9a84c';
-            $('#builderSecondary').value = theme.secondaryColor || '#1a1a2e';
-            $('#builderAccent').value = theme.accentColor || '#e8c86a';
-            updatePreview();
-        }
-
-        function updatePreview() {
-            const template = $('#builderTemplate').value;
-            const primary = $('#builderPrimary').value;
-            const secondary = $('#builderSecondary').value;
-            const accent = $('#builderAccent').value;
-
-            // Build preview HTML
-            const shop = currentShop || {};
-            const name = shop.name || 'متجري';
-            const desc = shop.description || 'وصف المتجر';
-            const logo = shop.logoUrl || '';
-            const cover = shop.coverUrl || '';
-
-            let previewHtml = `
-                <!DOCTYPE html>
-                <html>
-                <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <style>
-                    * { margin:0; padding:0; box-sizing:border-box; }
-                    body { font-family:'Cairo',sans-serif; background:#0a0a12; color:#fff; direction:rtl; }
-                    .preview-container { max-width:420px; margin:0 auto; padding:20px; }
-                    .cover { width:100%; height:180px; background:${secondary}; border-radius:16px; overflow:hidden; }
-                    .cover img { width:100%; height:100%; object-fit:cover; }
-                    .logo { width:80px; height:80px; border-radius:50%; background:${primary}; margin:-40px auto 10px; border:4px solid ${secondary}; overflow:hidden; display:flex; align-items:center; justify-content:center; }
-                    .logo img { width:100%; height:100%; object-fit:cover; }
-                    .logo-placeholder { font-size:32px; color:#fff; }
-                    .shop-name { text-align:center; font-size:24px; font-weight:800; color:${primary}; margin-top:6px; }
-                    .shop-desc { text-align:center; color:#aaa; font-size:14px; margin:4px 0 16px; }
-                    .btn-primary { display:inline-block; background:${primary}; color:#fff; border:none; padding:12px 28px; border-radius:12px; font-size:16px; font-weight:700; cursor:pointer; width:100%; text-align:center; }
-                    .service-item { background:#1a1a2e; border-radius:12px; padding:12px 16px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; border-right:4px solid ${primary}; }
-                    .service-name { font-weight:600; }
-                    .service-price { color:${primary}; font-weight:700; }
-                    .barber-item { background:#1a1a2e; border-radius:12px; padding:12px 16px; margin-bottom:10px; display:flex; align-items:center; gap:12px; }
-                    .barber-avatar { width:44px; height:44px; border-radius:50%; background:${secondary}; display:flex; align-items:center; justify-content:center; color:${primary}; font-weight:700; font-size:18px; }
-                    .section-title { font-size:18px; font-weight:700; margin:20px 0 12px; color:${primary}; }
-                    .gallery-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
-                    .gallery-grid img { width:100%; height:100px; object-fit:cover; border-radius:8px; background:${secondary}; }
-                    .footer { text-align:center; padding:20px 0; color:#666; font-size:12px; border-top:1px solid #1a1a2e; margin-top:20px; }
-                    .whatsapp-btn { display:inline-flex; align-items:center; gap:8px; background:#25D366; color:#fff; padding:10px 20px; border-radius:50px; text-decoration:none; font-weight:600; margin-top:10px; }
-                    .rating { color:${accent}; }
-                </style>
-                </head>
-                <body>
-                <div class="preview-container">
-                    <div class="cover">${cover ? `<img src="${cover}" alt="غلاف" />` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#666;">غلاف المتجر</div>`}</div>
-                    <div class="logo">${logo ? `<img src="${logo}" alt="شعار" />` : `<span class="logo-placeholder">✂️</span>`}</div>
-                    <div class="shop-name">${name}</div>
-                    <div class="shop-desc">${desc}</div>
-
-                    <div class="section-title">الخدمات</div>
-                    <div class="service-item"><span class="service-name">قص شعر</span><span class="service-price">50 SAR</span></div>
-                    <div class="service-item"><span class="service-name">حلاقة لحية</span><span class="service-price">30 SAR</span></div>
-
-                    <div class="section-title">الحلاقون</div>
-                    <div class="barber-item"><div class="barber-avatar">أ</div><div><strong>أحمد</strong><div style="font-size:12px;color:#aaa;">حلاق محترف</div></div></div>
-
-                    <button class="btn-primary"><i class="fas fa-calendar-plus"></i> احجز الآن</button>
-
-                    <div style="margin-top:16px;display:flex;justify-content:center;">
-                        <a href="#" class="whatsapp-btn"><i class="fab fa-whatsapp"></i> واتساب</a>
-                    </div>
-
-                    <div class="footer">© ${new Date().getFullYear()} ${name}</div>
-                </div>
-                </body>
-                </html>
-            `;
-
-            const iframe = $('#previewIframe');
-            iframe.srcdoc = previewHtml;
-        }
-
-        async function saveDraft() {
-            if (!currentShopId) {
-                showToast('أنشئ متجرك أولاً', 'error');
-                return;
-            }
-            const theme = {
-                template: $('#builderTemplate').value,
-                primaryColor: $('#builderPrimary').value,
-                secondaryColor: $('#builderSecondary').value,
-                accentColor: $('#builderAccent').value
-            };
-            try {
-                await updateDoc(doc(db, 'shops', currentShopId), {
-                    theme,
-                    updatedAt: serverTimestamp()
-                });
-                showToast('تم حفظ المسودة بنجاح', 'success');
-                await loadShop(currentUser.uid);
-            } catch (err) {
-                showToast('خطأ في الحفظ: ' + err.message, 'error');
-            }
-        }
-
-        async function publishWebsite() {
-            if (!currentShopId) {
-                showToast('أنشئ متجرك أولاً', 'error');
-                return;
-            }
-            const shop = currentShop;
-            if (shop.status === 'active' && shop.subscriptionStatus === 'active') {
-                showToast('موقعك منشور بالفعل', 'info');
-                return;
-            }
-            // Check if subscription is active
-            if (shop.subscriptionStatus !== 'active') {
-                showToast('الاشتراك غير نشط. الرجاء التواصل معنا لتفعيل الاشتراك.', 'warning');
-                $('#publishStatus').innerHTML = `
-                    <div class="alert alert-warning">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        اشتراكك غير نشط. للتفعيل، تواصل معنا عبر واتساب.
-                        <br><br>
-                        <a href="https://wa.me/966500000000?text=${encodeURIComponent('الرجاء تفعيل اشتراكي للمتجر: ' + shop.name)}" target="_blank" class="btn btn-success" style="display:inline-flex;align-items:center;gap:8px;">
-                            <i class="fab fa-whatsapp"></i> تواصل عبر واتساب
-                        </a>
-                    </div>
-                `;
-                return;
-            }
-            // If subscription is active but status is draft, activate
-            try {
-                await updateDoc(doc(db, 'shops', currentShopId), {
-                    status: 'active',
-                    updatedAt: serverTimestamp()
-                });
-                showToast('تم نشر الموقع بنجاح! 🎉', 'success');
-                await loadShop(currentUser.uid);
-                $('#publishStatus').innerHTML = `
-                    <div class="alert alert-success">
-                        <i class="fas fa-check-circle"></i>
-                        موقعك منشور الآن! <a href="/s/${shop.slug}" target="_blank">/s/${shop.slug}</a>
-                    </div>
-                `;
-            } catch (err) {
-                showToast('خطأ في النشر: ' + err.message, 'error');
-            }
-        }
-
-        // ---- SERVICES ----
-        async function loadServices() {
-            if (!currentShopId) {
-                $('#servicesList').innerHTML = emptyState('fa-store', 'أنشئ متجرك أولاً');
-                return;
-            }
-            try {
-                const ref = collection(db, 'shops', currentShopId, 'services');
-                const q = query(ref, limit(50));
-                const snap = await getDocs(q);
-                if (snap.empty) {
-                    $('#servicesList').innerHTML = emptyState('fa-cut', 'لا توجد خدمات. أضف خدمتك الأولى!');
-                    return;
-                }
-                let html = '<div class="list-items">';
-                snap.forEach(doc => {
-                    const s = doc.data();
-                    html += `
-                        <div class="list-item" data-id="${doc.id}">
-                            <div class="list-item-main">
-                                <strong>${s.name || 'خدمة'}</strong>
-                                <span>${s.price || 0} ${currentShop?.currency || 'SAR'}</span>
-                                <small>${s.duration || 0} دقيقة</small>
-                                ${s.imageUrl ? `<img src="${s.imageUrl}" alt="${s.name}" style="width:40px;height:40px;border-radius:8px;object-fit:cover;" />` : ''}
-                            </div>
-                            <div class="list-item-actions">
-                                ${getStatusBadge(s.status || 'active')}
-                                <button class="btn-sm btn-edit-service" data-id="${doc.id}"><i class="fas fa-edit"></i></button>
-                                <button class="btn-sm btn-delete-service" data-id="${doc.id}"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </div>
-                    `;
-                });
-                html += '</div>';
-                $('#servicesList').innerHTML = html;
-
-                // Attach events
-                $$('.btn-edit-service').forEach(btn => {
-                    btn.addEventListener('click', () => editService(btn.dataset.id));
-                });
-                $$('.btn-delete-service').forEach(btn => {
-                    btn.addEventListener('click', () => deleteService(btn.dataset.id));
-                });
-            } catch (err) {
-                console.error('loadServices error:', err);
-                $('#servicesList').innerHTML = emptyState('fa-exclamation-triangle', 'خطأ في تحميل الخدمات');
-            }
-        }
-
-        function showAddServiceModal() {
-            showModal(`
-                <h2>إضافة خدمة جديدة</h2>
-                <form id="serviceForm" class="form-grid">
-                    <div class="form-group"><label>اسم الخدمة <span class="required">*</span></label><input type="text" id="serviceName" required placeholder="مثال: قص شعر" /></div>
-                    <div class="form-group"><label>الوصف</label><textarea id="serviceDesc" rows="2" placeholder="وصف الخدمة"></textarea></div>
-                    <div class="form-group"><label>السعر <span class="required">*</span></label><input type="number" id="servicePrice" required placeholder="50" step="0.01" /></div>
-                    <div class="form-group"><label>المدة (دقائق) <span class="required">*</span></label><input type="number" id="serviceDuration" required placeholder="30" /></div>
-                    <div class="form-group"><label>صورة الخدمة</label><input type="file" id="serviceImage" accept="image/*" /></div>
-                    <div class="form-group full-width"><button type="submit" class="btn btn-primary">إضافة الخدمة</button></div>
-                </form>
-            `);
-            const form = $('#serviceForm');
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const name = $('#serviceName').value.trim();
-                const price = parseFloat($('#servicePrice').value);
-                const duration = parseInt($('#serviceDuration').value);
-                if (!name || !price || !duration) {
-                    showToast('الرجاء ملء جميع الحقول المطلوبة', 'error');
-                    return;
-                }
-                const data = {
-                    name,
-                    description: $('#serviceDesc').value.trim(),
-                    price,
-                    duration,
-                    status: 'active',
-                    createdAt: serverTimestamp(),
-                    updatedAt: serverTimestamp()
-                };
-
-                // Upload image if any
-                const file = $('#serviceImage').files[0];
-                if (file) {
-                    try {
-                        const result = await uploadToCloudinary(file);
-                        data.imageUrl = result.url;
-                        data.imagePublicId = result.publicId;
-                    } catch (err) {
-                        showToast('فشل رفع الصورة: ' + err.message, 'error');
-                        return;
-                    }
-                }
-
-                try {
-                    await addDoc(collection(db, 'shops', currentShopId, 'services'), data);
-                    showToast('تم إضافة الخدمة بنجاح', 'success');
-                    closeModal();
-                    loadServices();
-                } catch (err) {
-                    showToast('خطأ: ' + err.message, 'error');
-                }
-            });
-        }
-
-        async function editService(id) {
-            try {
-                const ref = doc(db, 'shops', currentShopId, 'services', id);
-                const snap = await getDoc(ref);
-                if (!snap.exists()) { showToast('الخدمة غير موجودة', 'error'); return; }
-                const s = snap.data();
-                showModal(`
-                    <h2>تعديل الخدمة</h2>
-                    <form id="serviceForm" class="form-grid">
-                        <div class="form-group"><label>اسم الخدمة <span class="required">*</span></label><input type="text" id="serviceName" required value="${s.name || ''}" /></div>
-                        <div class="form-group"><label>الوصف</label><textarea id="serviceDesc" rows="2">${s.description || ''}</textarea></div>
-                        <div class="form-group"><label>السعر <span class="required">*</span></label><input type="number" id="servicePrice" required value="${s.price || 0}" step="0.01" /></div>
-                        <div class="form-group"><label>المدة (دقائق) <span class="required">*</span></label><input type="number" id="serviceDuration" required value="${s.duration || 30}" /></div>
-                        <div class="form-group"><label>الحالة</label><select id="serviceStatus"><option value="active" ${s.status === 'active' ? 'selected' : ''}>نشط</option><option value="inactive" ${s.status === 'inactive' ? 'selected' : ''}>غير نشط</option></select></div>
-                        <div class="form-group"><label>تغيير الصورة</label><input type="file" id="serviceImage" accept="image/*" /></div>
-                        <div class="form-group full-width"><button type="submit" class="btn btn-primary">تحديث الخدمة</button></div>
-                    </form>
-                `);
-                const form = $('#serviceForm');
-                form.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const name = $('#serviceName').value.trim();
-                    const price = parseFloat($('#servicePrice').value);
-                    const duration = parseInt($('#serviceDuration').value);
-                    if (!name || !price || !duration) {
-                        showToast('الرجاء ملء جميع الحقول المطلوبة', 'error');
-                        return;
-                    }
-                    const data = {
-                        name,
-                        description: $('#serviceDesc').value.trim(),
-                        price,
-                        duration,
-                        status: $('#serviceStatus').value,
-                        updatedAt: serverTimestamp()
-                    };
-
-                    const file = $('#serviceImage').files[0];
-                    if (file) {
-                        try {
-                            const result = await uploadToCloudinary(file);
-                            data.imageUrl = result.url;
-                            data.imagePublicId = result.publicId;
-                        } catch (err) {
-                            showToast('فشل رفع الصورة: ' + err.message, 'error');
-                            return;
-                        }
-                    }
-
-                    try {
-                        await updateDoc(ref, data);
-                        showToast('تم تحديث الخدمة بنجاح', 'success');
-                        closeModal();
-                        loadServices();
-                    } catch (err) {
-                        showToast('خطأ: ' + err.message, 'error');
-                    }
-                });
-            } catch (err) {
-                showToast('خطأ: ' + err.message, 'error');
-            }
-        }
-
-        async function deleteService(id) {
-            if (!confirm('هل أنت متأكد من حذف هذه الخدمة؟')) return;
-            try {
-                await deleteDoc(doc(db, 'shops', currentShopId, 'services', id));
-                showToast('تم حذف الخدمة', 'success');
-                loadServices();
-            } catch (err) {
-                showToast('خطأ في الحذف: ' + err.message, 'error');
-            }
-        }
-
-        // ---- BARBERS ----
-        async function loadBarbers() {
-            if (!currentShopId) {
-                $('#barbersList').innerHTML = emptyState('fa-store', 'أنشئ متجرك أولاً');
-                return;
-            }
-            try {
-                const ref = collection(db, 'shops', currentShopId, 'barbers');
-                const q = query(ref, limit(50));
-                const snap = await getDocs(q);
-                if (snap.empty) {
-                    $('#barbersList').innerHTML = emptyState('fa-user-plus', 'لا يوجد حلاقون. أضف حلاقك الأول!');
-                    return;
-                }
-                let html = '<div class="list-items">';
-                snap.forEach(doc => {
-                    const b = doc.data();
-                    html += `
-                        <div class="list-item" data-id="${doc.id}">
-                            <div class="list-item-main">
-                                ${b.photoUrl ? `<img src="${b.photoUrl}" alt="${b.name}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;" />` : `<div style="width:44px;height:44px;border-radius:50%;background:#1a1a2e;display:flex;align-items:center;justify-content:center;color:#c9a84c;font-weight:700;">${(b.name || 'ح')[0]}</div>`}
-                                <div>
-                                    <strong>${b.name || 'حلاق'}</strong>
-                                    <span>${b.specialties || ''}</span>
-                                    <small>${b.bio || ''}</small>
-                                </div>
-                            </div>
-                            <div class="list-item-actions">
-                                ${getStatusBadge(b.status || 'active')}
-                                <button class="btn-sm btn-edit-barber" data-id="${doc.id}"><i class="fas fa-edit"></i></button>
-                                <button class="btn-sm btn-delete-barber" data-id="${doc.id}"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </div>
-                    `;
-                });
-                html += '</div>';
-                $('#barbersList').innerHTML = html;
-
-                $$('.btn-edit-barber').forEach(btn => {
-                    btn.addEventListener('click', () => editBarber(btn.dataset.id));
-                });
-                $$('.btn-delete-barber').forEach(btn => {
-                    btn.addEventListener('click', () => deleteBarber(btn.dataset.id));
-                });
-            } catch (err) {
-                console.error('loadBarbers error:', err);
-                $('#barbersList').innerHTML = emptyState('fa-exclamation-triangle', 'خطأ في تحميل الحلاقين');
-            }
-        }
-
-        function showAddBarberModal() {
-            showModal(`
-                <h2>إضافة حلاق جديد</h2>
-                <form id="barberForm" class="form-grid">
-                    <div class="form-group"><label>الاسم <span class="required">*</span></label><input type="text" id="barberName" required placeholder="أحمد" /></div>
-                    <div class="form-group"><label>السيرة الذاتية</label><textarea id="barberBio" rows="2" placeholder="خبرة 5 سنوات في الحلاقة"></textarea></div>
-                    <div class="form-group"><label>التخصصات</label><input type="text" id="barberSpecialties" placeholder="قص شعر, لحية, تصفيف" /></div>
-                    <div class="form-group"><label>الصورة</label><input type="file" id="barberPhoto" accept="image/*" /></div>
-                    <div class="form-group full-width"><button type="submit" class="btn btn-primary">إضافة الحلاق</button></div>
-                </form>
-            `);
-            const form = $('#barberForm');
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const name = $('#barberName').value.trim();
-                if (!name) { showToast('الرجاء إدخال اسم الحلاق', 'error'); return; }
-                const data = {
-                    name,
-                    bio: $('#barberBio').value.trim(),
-                    specialties: $('#barberSpecialties').value.trim(),
-                    status: 'active',
-                    createdAt: serverTimestamp(),
-                    updatedAt: serverTimestamp()
-                };
-
-                const file = $('#barberPhoto').files[0];
-                if (file) {
-                    try {
-                        const result = await uploadToCloudinary(file);
-                        data.photoUrl = result.url;
-                        data.photoPublicId = result.publicId;
-                    } catch (err) {
-                        showToast('فشل رفع الصورة: ' + err.message, 'error');
-                        return;
-                    }
-                }
-
-                try {
-                    await addDoc(collection(db, 'shops', currentShopId, 'barbers'), data);
-                    showToast('تم إضافة الحلاق بنجاح', 'success');
-                    closeModal();
-                    loadBarbers();
-                } catch (err) {
-                    showToast('خطأ: ' + err.message, 'error');
-                }
-            });
-        }
-
-        async function editBarber(id) {
-            try {
-                const ref = doc(db, 'shops', currentShopId, 'barbers', id);
-                const snap = await getDoc(ref);
-                if (!snap.exists()) { showToast('الحلاق غير موجود', 'error'); return; }
-                const b = snap.data();
-                showModal(`
-                    <h2>تعديل الحلاق</h2>
-                    <form id="barberForm" class="form-grid">
-                        <div class="form-group"><label>الاسم <span class="required">*</span></label><input type="text" id="barberName" required value="${b.name || ''}" /></div>
-                        <div class="form-group"><label>السيرة الذاتية</label><textarea id="barberBio" rows="2">${b.bio || ''}</textarea></div>
-                        <div class="form-group"><label>التخصصات</label><input type="text" id="barberSpecialties" value="${b.specialties || ''}" /></div>
-                        <div class="form-group"><label>الحالة</label><select id="barberStatus"><option value="active" ${b.status === 'active' ? 'selected' : ''}>نشط</option><option value="inactive" ${b.status === 'inactive' ? 'selected' : ''}>غير نشط</option></select></div>
-                        <div class="form-group"><label>تغيير الصورة</label><input type="file" id="barberPhoto" accept="image/*" /></div>
-                        <div class="form-group full-width"><button type="submit" class="btn btn-primary">تحديث الحلاق</button></div>
-                    </form>
-                `);
-                const form = $('#barberForm');
-                form.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const name = $('#barberName').value.trim();
-                    if (!name) { showToast('الرجاء إدخال اسم الحلاق', 'error'); return; }
-                    const data = {
-                        name,
-                        bio: $('#barberBio').value.trim(),
-                        specialties: $('#barberSpecialties').value.trim(),
-                        status: $('#barberStatus').value,
-                        updatedAt: serverTimestamp()
-                    };
-
-                    const file = $('#barberPhoto').files[0];
-                    if (file) {
-                        try {
-                            const result = await uploadToCloudinary(file);
-                            data.photoUrl = result.url;
-                            data.photoPublicId = result.publicId;
-                        } catch (err) {
-                            showToast('فشل رفع الصورة: ' + err.message, 'error');
-                            return;
-                        }
-                    }
-
-                    try {
-                        await updateDoc(ref, data);
-                        showToast('تم تحديث الحلاق بنجاح', 'success');
-                        closeModal();
-                        loadBarbers();
-                    } catch (err) {
-                        showToast('خطأ: ' + err.message, 'error');
-                    }
-                });
-            } catch (err) {
-                showToast('خطأ: ' + err.message, 'error');
-            }
-        }
-
-        async function deleteBarber(id) {
-            if (!confirm('هل أنت متأكد من حذف هذا الحلاق؟')) return;
-            try {
-                await deleteDoc(doc(db, 'shops', currentShopId, 'barbers', id));
-                showToast('تم حذف الحلاق', 'success');
-                loadBarbers();
-            } catch (err) {
-                showToast('خطأ في الحذف: ' + err.message, 'error');
-            }
-        }
-
-        // ---- BOOKINGS ----
-        async function loadBookings() {
-            if (!currentShopId) {
-                $('#bookingsList').innerHTML = emptyState('fa-store', 'أنشئ متجرك أولاً');
-                return;
-            }
-            try {
-                const ref = collection(db, 'shops', currentShopId, 'bookings');
-                const q = query(ref, orderBy('createdAt', 'desc'), limit(100));
-                const snap = await getDocs(q);
-                if (snap.empty) {
-                    $('#bookingsList').innerHTML = emptyState('fa-calendar-plus', 'لا توجد حجوزات');
-                    return;
-                }
-                let html = '<div class="list-items">';
-                snap.forEach(doc => {
-                    const b = doc.data();
-                    html += `
-                        <div class="list-item" data-id="${doc.id}">
-                            <div class="list-item-main">
-                                <strong>${b.customerName || 'عميل'}</strong>
-                                <span>${b.serviceName || 'خدمة'}</span>
-                                <span>${b.barberName || ''}</span>
-                                <small>${formatDate(b.date)} ${formatTime(b.date)}</small>
-                            </div>
-                            <div class="list-item-actions">
-                                ${getStatusBadge(b.status || 'pending')}
-                                <button class="btn-sm btn-booking-action" data-id="${doc.id}" data-action="confirm"><i class="fas fa-check" style="color:#4CAF50;"></i></button>
-                                <button class="btn-sm btn-booking-action" data-id="${doc.id}" data-action="complete"><i class="fas fa-check-double" style="color:#2196F3;"></i></button>
-                                <button class="btn-sm btn-booking-action" data-id="${doc.id}" data-action="cancel"><i class="fas fa-times" style="color:#f44336;"></i></button>
-                                <button class="btn-sm btn-booking-action" data-id="${doc.id}" data-action="no_show"><i class="fas fa-user-slash" style="color:#FF9800;"></i></button>
-                            </div>
-                        </div>
-                    `;
-                });
-                html += '</div>';
-                $('#bookingsList').innerHTML = html;
-
-                $$('.btn-booking-action').forEach(btn => {
-                    btn.addEventListener('click', () => updateBookingStatus(btn.dataset.id, btn.dataset.action));
-                });
-            } catch (err) {
-                console.error('loadBookings error:', err);
-                $('#bookingsList').innerHTML = emptyState('fa-exclamation-triangle', 'خطأ في تحميل الحجوزات');
-            }
-        }
-
-        async function updateBookingStatus(id, action) {
-            if (!confirm(`هل أنت متأكد من ${action === 'confirm' ? 'تأكيد' : action === 'complete' ? 'إكمال' : action === 'cancel' ? 'إلغاء' : 'تحديد عدم حضور'} هذه الحجز؟`)) return;
-            try {
-                const ref = doc(db, 'shops', currentShopId, 'bookings', id);
-                await updateDoc(ref, {
-                    status: action,
-                    updatedAt: serverTimestamp()
-                });
-                showToast(`تم ${action === 'confirm' ? 'تأكيد' : action === 'complete' ? 'إكمال' : action === 'cancel' ? 'إلغاء' : 'تحديد عدم حضور'} الحجز`, 'success');
-                loadBookings();
-            } catch (err) {
-                showToast('خطأ: ' + err.message, 'error');
-            }
-        }
-
-        // ---- CUSTOMERS ----
-        async function loadCustomers() {
-            if (!currentShopId) {
-                $('#customersList').innerHTML = emptyState('fa-store', 'أنشئ متجرك أولاً');
-                return;
-            }
-            try {
-                const ref = collection(db, 'shops', currentShopId, 'customers');
-                const q = query(ref, orderBy('createdAt', 'desc'), limit(100));
-                const snap = await getDocs(q);
-                if (snap.empty) {
-                    $('#customersList').innerHTML = emptyState('fa-user-friends', 'لا يوجد عملاء');
-                    return;
-                }
-                let html = '<div class="list-items">';
-                snap.forEach(doc => {
-                    const c = doc.data();
-                    html += `
-                        <div class="list-item">
-                            <div class="list-item-main">
-                                <strong>${c.name || 'عميل'}</strong>
-                                <span>${c.phone || ''}</span>
-                                <small>${c.bookingCount || 0} حجز • آخر زيارة: ${formatDate(c.lastBookingAt)}</small>
-                            </div>
-                        </div>
-                    `;
-                });
-                html += '</div>';
-                $('#customersList').innerHTML = html;
-            } catch (err) {
-                console.error('loadCustomers error:', err);
-                $('#customersList').innerHTML = emptyState('fa-exclamation-triangle', 'خطأ في تحميل العملاء');
-            }
-        }
-
-        // ---- REVIEWS ----
-        async function loadReviews() {
-            if (!currentShopId) {
-                $('#reviewsList').innerHTML = emptyState('fa-store', 'أنشئ متجرك أولاً');
-                return;
-            }
-            try {
-                const ref = collection(db, 'shops', currentShopId, 'reviews');
-                const q = query(ref, orderBy('createdAt', 'desc'), limit(100));
-                const snap = await getDocs(q);
-                if (snap.empty) {
-                    $('#reviewsList').innerHTML = emptyState('fa-star', 'لا توجد تقييمات');
-                    return;
-                }
-                let html = '<div class="list-items">';
-                snap.forEach(doc => {
-                    const r = doc.data();
-                    const stars = '⭐'.repeat(Math.round(r.rating || 0));
-                    html += `
-                        <div class="list-item">
-                            <div class="list-item-main">
-                                <strong>${r.customerName || 'عميل'}</strong>
-                                <span>${stars} ${r.rating || 0}</span>
-                                <small>${r.review || ''}</small>
-                                <small>${formatDate(r.createdAt)}</small>
-                            </div>
-                            ${getStatusBadge(r.status || 'pending')}
-                        </div>
-                    `;
-                });
-                html += '</div>';
-                $('#reviewsList').innerHTML = html;
-            } catch (err) {
-                console.error('loadReviews error:', err);
-                $('#reviewsList').innerHTML = emptyState('fa-exclamation-triangle', 'خطأ في تحميل التقييمات');
-            }
-        }
-
-        // ---- WORKING HOURS ----
-        async function loadWorkingHours() {
-            if (!currentShopId) {
-                $('#workingHoursList').innerHTML = emptyState('fa-store', 'أنشئ متجرك أولاً');
-                return;
-            }
-            try {
-                const ref = collection(db, 'shops', currentShopId, 'workingHours');
-                const snap = await getDocs(ref);
-                const days = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-                const dayMap = {};
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    dayMap[d.day] = { id: doc.id, ...d };
-                });
-
-                let html = '<div class="form-grid">';
-                days.forEach(day => {
-                    const info = dayMap[day] || { isOpen: false, openTime: '09:00', closeTime: '18:00' };
-                    html += `
-                        <div class="working-hour-item" style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #1a1a2e;">
-                            <span style="font-weight:600;min-width:100px;">${day}</span>
-                            <label><input type="checkbox" class="wh-open" data-day="${day}" ${info.isOpen ? 'checked' : ''} /> مفتوح</label>
-                            <input type="time" class="wh-open-time" data-day="${day}" value="${info.openTime || '09:00'}" ${info.isOpen ? '' : 'disabled'} />
-                            <span>إلى</span>
-                            <input type="time" class="wh-close-time" data-day="${day}" value="${info.closeTime || '18:00'}" ${info.isOpen ? '' : 'disabled'} />
-                            <button class="btn-sm btn-save-wh" data-day="${day}"><i class="fas fa-save"></i></button>
-                        </div>
-                    `;
-                });
-                html += '</div>';
-                $('#workingHoursList').innerHTML = html;
-
-                // Toggle time inputs
-                $$('.wh-open').forEach(el => {
-                    el.addEventListener('change', function() {
-                        const day = this.dataset.day;
-                        const openTime = document.querySelector(`.wh-open-time[data-day="${day}"]`);
-                        const closeTime = document.querySelector(`.wh-close-time[data-day="${day}"]`);
-                        if (this.checked) {
-                            openTime.disabled = false;
-                            closeTime.disabled = false;
-                        } else {
-                            openTime.disabled = true;
-                            closeTime.disabled = true;
-                        }
-                    });
-                });
-
-                // Save working hours
-                $$('.btn-save-wh').forEach(btn => {
-                    btn.addEventListener('click', async function() {
-                        const day = this.dataset.day;
-                        const isOpen = document.querySelector(`.wh-open[data-day="${day}"]`).checked;
-                        const openTime = document.querySelector(`.wh-open-time[data-day="${day}"]`).value;
-                        const closeTime = document.querySelector(`.wh-close-time[data-day="${day}"]`).value;
-                        try {
-                            const data = { day, isOpen, openTime, closeTime, updatedAt: serverTimestamp() };
-                            const existing = dayMap[day];
-                            if (existing && existing.id) {
-                                await updateDoc(doc(db, 'shops', currentShopId, 'workingHours', existing.id), data);
-                            } else {
-                                data.createdAt = serverTimestamp();
-                                await addDoc(collection(db, 'shops', currentShopId, 'workingHours'), data);
-                            }
-                            showToast(`تم حفظ ساعات عمل ${day}`, 'success');
-                            loadWorkingHours();
-                        } catch (err) {
-                            showToast('خطأ: ' + err.message, 'error');
-                        }
-                    });
-                });
-            } catch (err) {
-                console.error('loadWorkingHours error:', err);
-                $('#workingHoursList').innerHTML = emptyState('fa-exclamation-triangle', 'خطأ في تحميل ساعات العمل');
-            }
-        }
-
-        // ---- HOLIDAYS ----
-        async function loadHolidays() {
-            if (!currentShopId) {
-                $('#holidaysList').innerHTML = emptyState('fa-store', 'أنشئ متجرك أولاً');
-                return;
-            }
-            try {
-                const ref = collection(db, 'shops', currentShopId, 'holidays');
-                const q = query(ref, orderBy('date', 'asc'), limit(50));
-                const snap = await getDocs(q);
-                if (snap.empty) {
-                    $('#holidaysList').innerHTML = emptyState('fa-calendar-times', 'لا توجد عطلات مسجلة');
-                    return;
-                }
-                let html = '<div class="list-items">';
-                snap.forEach(doc => {
-                    const h = doc.data();
-                    const dateStr = h.date?.toDate?.()?.toISOString?.()?.split('T')[0] || h.date || '';
-                    html += `
-                        <div class="list-item">
-                            <div class="list-item-main">
-                                <strong>${dateStr}</strong>
-                                <span>${h.reason || 'عطلة'}</span>
-                            </div>
-                            <button class="btn-sm btn-delete-holiday" data-id="${doc.id}"><i class="fas fa-trash"></i></button>
-                        </div>
-                    `;
-                });
-                html += '</div>';
-                $('#holidaysList').innerHTML = html;
-
-                $$('.btn-delete-holiday').forEach(btn => {
-                    btn.addEventListener('click', async () => {
-                        if (!confirm('حذف هذه العطلة؟')) return;
-                        try {
-                            await deleteDoc(doc(db, 'shops', currentShopId, 'holidays', btn.dataset.id));
-                            showToast('تم حذف العطلة', 'success');
-                            loadHolidays();
-                        } catch (err) {
-                            showToast('خطأ: ' + err.message, 'error');
-                        }
-                    });
-                });
-            } catch (err) {
-                console.error('loadHolidays error:', err);
-                $('#holidaysList').innerHTML = emptyState('fa-exclamation-triangle', 'خطأ في تحميل العطلات');
-            }
-        }
-
-        function showAddHolidayModal() {
-            showModal(`
-                <h2>إضافة عطلة جديدة</h2>
-                <form id="holidayForm" class="form-grid">
-                    <div class="form-group"><label>التاريخ <span class="required">*</span></label><input type="date" id="holidayDate" required /></div>
-                    <div class="form-group"><label>السبب</label><input type="text" id="holidayReason" placeholder="مثال: إجازة رسمية" /></div>
-                    <div class="form-group full-width"><button type="submit" class="btn btn-primary">إضافة العطلة</button></div>
-                </form>
-            `);
-            const form = $('#holidayForm');
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const date = $('#holidayDate').value;
-                if (!date) { showToast('الرجاء اختيار التاريخ', 'error'); return; }
-                try {
-                    await addDoc(collection(db, 'shops', currentShopId, 'holidays'), {
-                        date: Timestamp.fromDate(new Date(date + 'T00:00:00')),
-                        reason: $('#holidayReason').value.trim() || 'عطلة',
-                        createdAt: serverTimestamp()
-                    });
-                    showToast('تم إضافة العطلة بنجاح', 'success');
-                    closeModal();
-                    loadHolidays();
-                } catch (err) {
-                    showToast('خطأ: ' + err.message, 'error');
-                }
-            });
-        }
-
-        // ---- GALLERY ----
-        async function loadGallery() {
-            if (!currentShopId) {
-                $('#galleryGrid').innerHTML = emptyState('fa-store', 'أنشئ متجرك أولاً');
-                return;
-            }
-            try {
-                const ref = collection(db, 'shops', currentShopId, 'gallery');
-                const q = query(ref, orderBy('sortOrder', 'asc'), limit(50));
-                const snap = await getDocs(q);
-                if (snap.empty) {
-                    $('#galleryGrid').innerHTML = emptyState('fa-images', 'لا توجد صور في المعرض');
-                    return;
-                }
-                let html = '<div class="gallery-grid">';
-                snap.forEach(doc => {
-                    const g = doc.data();
-                    html += `
-                        <div class="gallery-item" style="position:relative;">
-                            <img src="${g.imageUrl}" alt="${g.title || 'صورة'}" style="width:100%;height:150px;object-fit:cover;border-radius:12px;" />
-                            <button class="btn-sm btn-delete-gallery" data-id="${doc.id}" style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.7);border:none;color:#fff;border-radius:50%;width:30px;height:30px;cursor:pointer;"><i class="fas fa-times"></i></button>
-                        </div>
-                    `;
-                });
-                html += '</div>';
-                $('#galleryGrid').innerHTML = html;
-
-                $$('.btn-delete-gallery').forEach(btn => {
-                    btn.addEventListener('click', async () => {
-                        if (!confirm('حذف هذه الصورة؟')) return;
-                        try {
-                            await deleteDoc(doc(db, 'shops', currentShopId, 'gallery', btn.dataset.id));
-                            showToast('تم حذف الصورة', 'success');
-                            loadGallery();
-                        } catch (err) {
-                            showToast('خطأ: ' + err.message, 'error');
-                        }
-                    });
-                });
-            } catch (err) {
-                console.error('loadGallery error:', err);
-                $('#galleryGrid').innerHTML = emptyState('fa-exclamation-triangle', 'خطأ في تحميل المعرض');
-            }
-        }
-
-        async function uploadGalleryImage() {
-            if (!currentShopId) { showToast('أنشئ متجرك أولاً', 'error'); return; }
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.multiple = true;
-            input.onchange = async function() {
-                const files = this.files;
-                if (!files.length) return;
-                for (const file of files) {
-                    try {
-                        const result = await uploadToCloudinary(file);
-                        const count = (await getDocs(query(collection(db, 'shops', currentShopId, 'gallery'), limit(1)))).size;
-                        await addDoc(collection(db, 'shops', currentShopId, 'gallery'), {
-                            imageUrl: result.url,
-                            publicId: result.publicId,
-                            title: file.name.split('.')[0] || 'صورة',
-                            sortOrder: count,
-                            status: 'active',
-                            createdAt: serverTimestamp()
-                        });
-                        showToast(`تم رفع ${file.name}`, 'success');
-                    } catch (err) {
-                        showToast('فشل رفع ' + file.name + ': ' + err.message, 'error');
-                    }
-                }
-                loadGallery();
-            };
-            input.click();
-        }
-
-        // ---- SUBSCRIPTION ----
-        async function loadSubscription() {
-            if (!currentShopId) {
-                $('#subscriptionPlans').innerHTML = emptyState('fa-store', 'أنشئ متجرك أولاً');
-                return;
-            }
-            try {
-                // Load plans from Firestore
-                const plansRef = collection(db, 'plans');
-                const plansSnap = await getDocs(plansRef);
-
-                let plansHtml = '';
-                if (plansSnap.empty) {
-                    plansHtml = `
-                        <div class="plan-card" style="background:#1a1a2e;border-radius:16px;padding:24px;text-align:center;border:2px solid #c9a84c;">
-                            <h3>الخطة الأساسية</h3>
-                            <div style="font-size:32px;font-weight:800;color:#c9a84c;">99 SAR</div>
-                            <div style="color:#aaa;">شهرياً</div>
-                            <ul style="list-style:none;padding:0;margin:16px 0;text-align:right;">
-                                <li>✅ موقع كامل للمتجر</li>
-                                <li>✅ نظام حجوزات متكامل</li>
-                                <li>✅ إدارة العملاء والخدمات</li>
-                                <li>✅ دعم فني 24/7</li>
-                            </ul>
-                            <button class="btn btn-primary request-sub-btn" data-plan="basic" data-price="99">طلب الاشتراك</button>
-                        </div>
-                    `;
-                } else {
-                    plansSnap.forEach(doc => {
-                        const p = doc.data();
-                        plansHtml += `
-                            <div class="plan-card" style="background:#1a1a2e;border-radius:16px;padding:24px;text-align:center;border:2px solid ${p.featured ? '#c9a84c' : '#2a2a3e'};">
-                                <h3>${p.name || 'خطة'}</h3>
-                                <div style="font-size:32px;font-weight:800;color:#c9a84c;">${p.price || 0} ${p.currency || 'SAR'}</div>
-                                <div style="color:#aaa;">${p.interval || 'شهرياً'}</div>
-                                <ul style="list-style:none;padding:0;margin:16px 0;text-align:right;">
-                                    ${(p.features || []).map(f => `<li>✅ ${f}</li>`).join('')}
-                                </ul>
-                                <button class="btn btn-primary request-sub-btn" data-plan="${doc.id}" data-price="${p.price || 0}" data-name="${p.name || 'خطة'}">طلب الاشتراك</button>
-                            </div>
-                        `;
-                    });
-                }
-
-                $('#subscriptionPlans').innerHTML = plansHtml;
-
-                // Current subscription status
-                const shop = currentShop;
-                const subStatus = shop.subscriptionStatus || 'pending';
-                const paymentStatus = shop.paymentStatus || 'pending';
-                let statusHtml = `
-                    <div class="subscription-status-box" style="margin-top:24px;padding:16px;background:#1a1a2e;border-radius:12px;">
-                        <h3>حالة الاشتراك الحالي</h3>
-                        <div><strong>الحالة:</strong> ${getStatusBadge(subStatus)}</div>
-                        <div><strong>حالة الدفع:</strong> ${getStatusBadge(paymentStatus)}</div>
-                        ${shop.planId ? `<div><strong>الخطة:</strong> ${shop.planName || 'غير محدد'}</div>` : ''}
-                        ${shop.subscriptionExpires ? `<div><strong>ينتهي في:</strong> ${formatDate(shop.subscriptionExpires)}</div>` : ''}
-                    </div>
-                `;
-                $('#subscriptionStatus').innerHTML = statusHtml;
-
-                // Request subscription buttons
-                $$('.request-sub-btn').forEach(btn => {
-                    btn.addEventListener('click', () => requestSubscription(btn.dataset.plan, btn.dataset.price, btn
-                        .dataset.name));
-                });
-
-                // Check for existing request
-                const reqRef = collection(db, 'subscriptionRequests');
-                const reqQ = query(reqRef, where('shopId', '==', currentShopId), where('status', '==', 'pending'),
-                    limit(1));
-                const reqSnap = await getDocs(reqQ);
-                if (!reqSnap.empty) {
-                    const req = reqSnap.docs[0].data();
-                    $('#subscriptionRequestStatus').innerHTML = `
-                        <div class="alert alert-warning" style="margin-top:16px;">
-                            <i class="fas fa-hourglass-half"></i>
-                            طلب اشتراك قيد المراجعة: ${req.planName || ''} (${req.price || 0} ${req.currency || 'SAR'})
-                            <br><small>تم الإرسال: ${formatDate(req.createdAt)}</small>
-                        </div>
-                    `;
-                } else {
-                    $('#subscriptionRequestStatus').innerHTML = '';
-                }
-
-            } catch (err) {
-                console.error('loadSubscription error:', err);
-                $('#subscriptionPlans').innerHTML = emptyState('fa-exclamation-triangle', 'خطأ في تحميل الخطط');
-            }
-        }
-
-        async function requestSubscription(planId, price, planName) {
-            if (!currentShopId || !currentUser) {
-                showToast('الرجاء تسجيل الدخول وإنشاء متجر', 'error');
-                return;
-            }
-
-            // Check if already has pending request
-            try {
-                const reqRef = collection(db, 'subscriptionRequests');
-                const reqQ = query(reqRef, where('shopId', '==', currentShopId), where('status', '==', 'pending'),
-                limit(1));
-                const reqSnap = await getDocs(reqQ);
-                if (!reqSnap.empty) {
-                    showToast('يوجد طلب اشتراك قيد المراجعة بالفعل', 'warning');
-                    return;
-                }
-            } catch (err) { /* ignore */ }
-
-            const shop = currentShop;
-            const data = {
-                userId: currentUser.uid,
-                shopId: currentShopId,
-                shopName: shop.name || 'متجر',
-                planId: planId,
-                planName: planName || 'خطة',
-                price: parseFloat(price) || 0,
-                currency: shop.currency || 'SAR',
-                message: `طلب اشتراك من ${shop.name || 'المتجر'}`,
-                status: 'pending',
-                createdAt: serverTimestamp(),
-                updatedAt: serverTimestamp()
-            };
-
-            try {
-                await addDoc(collection(db, 'subscriptionRequests'), data);
-                showToast('تم إرسال طلب الاشتراك بنجاح! سيتم مراجعته قريباً.', 'success');
-
-                // WhatsApp message
-                const waMsg = `مرحباً، أرغب في تفعيل الاشتراك لمتجري:
-    المتجر: ${shop.name || 'متجري'}
-    المالك: ${currentUser.displayName || currentUser.email || ''}
-    الخطة: ${planName || 'خطة'}
-    السعر: ${price || 0} ${shop.currency || 'SAR'}
-    الرجاء تفعيل الاشتراك.`;
-
-                const waUrl = `https://wa.me/966500000000?text=${encodeURIComponent(waMsg)}`;
-                $('#subscriptionRequestStatus').innerHTML = `
-                    <div class="alert alert-success" style="margin-top:16px;">
-                        <i class="fas fa-check-circle"></i>
-                        تم إرسال طلب الاشتراك بنجاح!
-                        <br><br>
-                        <a href="${waUrl}" target="_blank" class="btn btn-success" style="display:inline-flex;align-items:center;gap:8px;">
-                            <i class="fab fa-whatsapp"></i> تواصل معنا عبر واتساب
-                        </a>
-                        <br><br>
-                        <small>سيتم تفعيل اشتراكك بعد مراجعة الطلب والدفع.</small>
-                    </div>
-                `;
-                loadSubscription();
-            } catch (err) {
-                showToast('خطأ في إرسال الطلب: ' + err.message, 'error');
-            }
-        }
-
-        // ---- NOTIFICATIONS ----
-        async function loadNotifications() {
-            if (!currentUser) return;
-            try {
-                const ref = collection(db, 'notifications');
-                const q = query(ref, where('userId', '==', currentUser.uid), orderBy('createdAt', 'desc'), limit(50));
-                const snap = await getDocs(q);
-                if (snap.empty) {
-                    $('#notificationsList').innerHTML = emptyState('fa-bell-slash', 'لا توجد إشعارات');
-                    return;
-                }
-                let html = '<div class="list-items">';
-                snap.forEach(doc => {
-                    const n = doc.data();
-                    html += `
-                        <div class="list-item" style="${n.read ? 'opacity:0.6;' : ''}">
-                            <div class="list-item-main">
-                                <strong>${n.title || 'إشعار'}</strong>
-                                <span>${n.body || ''}</span>
-                                <small>${formatDateTime(n.createdAt)}</small>
-                            </div>
-                            ${n.read ? '<span class="badge badge-secondary">مقروء</span>' : '<span class="badge badge-primary">جديد</span>'}
-                        </div>
-                    `;
-                });
-                html += '</div>';
-                $('#notificationsList').innerHTML = html;
-                // Update badge
-                const unread = snap.docs.filter(d => !d.data().read).length;
-                $('#notifBadge').textContent = unread;
-                $('#notifBadge').style.display = unread > 0 ? 'flex' : 'none';
-            } catch (err) {
-                console.error('loadNotifications error:', err);
-            }
-        }
-
-        // ---- PROFILE ----
-        async function saveProfile(e) {
-            e.preventDefault();
-            if (!currentUser) return;
-            const name = $('#profileName').value.trim();
-            if (!name) { showToast('الرجاء إدخال الاسم', 'error'); return; }
-
-            try {
-                const ref = doc(db, 'users', currentUser.uid);
-                const data = {
-                    name,
-                    phone: $('#profilePhone').value.trim(),
-                    updatedAt: serverTimestamp()
-                };
-                await updateDoc(ref, data);
-
-                // Update auth profile
-                if (auth.currentUser) {
-                    await updateProfile(auth.currentUser, { displayName: name });
-                }
-
-                showToast('تم تحديث الملف الشخصي', 'success');
-                await loadUserProfile(currentUser.uid);
-            } catch (err) {
-                showToast('خطأ: ' + err.message, 'error');
-            }
-        }
-
-        async function uploadProfileImage(file) {
-            if (!currentUser) return;
-            try {
-                const result = await uploadToCloudinary(file);
-                const ref = doc(db, 'users', currentUser.uid);
-                await updateDoc(ref, { photoURL: result.url });
-                if (auth.currentUser) {
-                    await updateProfile(auth.currentUser, { photoURL: result.url });
-                }
-                showToast('تم تحديث الصورة', 'success');
-                await loadUserProfile(currentUser.uid);
-            } catch (err) {
-                showToast('فشل رفع الصورة: ' + err.message, 'error');
-            }
-        }
-
-        // ---- INIT ----
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                try {
-                    const profile = await loadUserProfile(user.uid);
-                    if (profile?.role === 'shop_owner') {
-                        await loadShop(user.uid);
-                        // Show dashboard
-                        navigateTo('dashboard');
-                        // Set up real-time shop listener
-                        if (currentShopId) {
-                            const shopRef = doc(db, 'shops', currentShopId);
-                            onSnapshot(shopRef, (snap) => {
-                                if (snap.exists()) {
-                                    currentShop = { id: snap.id, ...snap.data() };
-                                    updateUIShop(currentShop);
-                                    // Refresh dashboard if on dashboard
-                                    if (currentPage === 'dashboard') loadDashboard();
-                                    if (currentPage === 'builder') loadBuilder();
-                                }
-                            });
-                        }
-                    } else {
-                        // Not shop_owner
-                        showToast('حسابك ليس لديه صلاحية الوصول إلى لوحة التحكم', 'error');
-                        await signOut(auth);
-                        window.location.href = 'login.html';
-                    }
-                } catch (err) {
-                    console.error('Auth init error:', err);
-                }
-            } else {
-                // Not logged in, redirect to login
-                if (!window.location.pathname.includes('login.html') && !window.location.pathname.includes('signup.html') &&
-                    !window.location.pathname.includes('s/')) {
-                    window.location.href = 'login.html';
-                }
-            }
+    <!-- ===== PAGES ===== -->
+
+    <!-- LOGIN -->
+    <div class="page active" id="page-login">
+      <div style="padding: 30px 0 10px; text-align:center;">
+        <h1 style="font-size:28px;">👋 مرحباً</h1>
+        <p class="text-muted">سجل الدخول لإدارة متجرك</p>
+      </div>
+      <form id="loginForm">
+        <div class="form-group">
+          <label>البريد الإلكتروني</label>
+          <input class="form-control" type="email" id="loginEmail" placeholder="example@mail.com" required>
+        </div>
+        <div class="form-group">
+          <label>كلمة المرور</label>
+          <input class="form-control" type="password" id="loginPassword" placeholder="••••••••" required>
+        </div>
+        <button class="btn btn-primary btn-block" type="submit" id="loginBtn">دخول</button>
+        <div class="text-center mt-16">
+          <span class="text-muted">ليس لديك حساب؟</span>
+          <a href="#" id="gotoSignup" style="color:#6c5ce7; font-weight:600;">إنشاء حساب</a>
+        </div>
+        <div class="text-center mt-8">
+          <a href="#" id="gotoForgot" style="color:#8a8a9a; font-size:14px;">نسيت كلمة المرور؟</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- SIGNUP -->
+    <div class="page" id="page-signup">
+      <div style="padding: 30px 0 10px; text-align:center;">
+        <h1 style="font-size:28px;">🚀 حساب جديد</h1>
+        <p class="text-muted">أنشئ حسابك وابدأ متجرك</p>
+      </div>
+      <form id="signupForm">
+        <div class="form-group">
+          <label>الاسم</label>
+          <input class="form-control" type="text" id="signupName" placeholder="أحمد الحلاق" required>
+        </div>
+        <div class="form-group">
+          <label>البريد الإلكتروني</label>
+          <input class="form-control" type="email" id="signupEmail" placeholder="example@mail.com" required>
+        </div>
+        <div class="form-group">
+          <label>رقم الهاتف</label>
+          <input class="form-control" type="tel" id="signupPhone" placeholder="01012345678" required>
+        </div>
+        <div class="form-group">
+          <label>كلمة المرور</label>
+          <input class="form-control" type="password" id="signupPassword" placeholder="••••••••" required>
+        </div>
+        <button class="btn btn-primary btn-block" type="submit" id="signupBtn">إنشاء حساب</button>
+        <div class="text-center mt-16">
+          <span class="text-muted">لديك حساب بالفعل؟</span>
+          <a href="#" id="gotoLogin" style="color:#6c5ce7; font-weight:600;">تسجيل الدخول</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- FORGOT PASSWORD -->
+    <div class="page" id="page-forgot">
+      <div style="padding: 30px 0 10px; text-align:center;">
+        <h1 style="font-size:28px;">🔐 استعادة</h1>
+        <p class="text-muted">سنرسل رابط إعادة تعيين إلى بريدك</p>
+      </div>
+      <form id="forgotForm">
+        <div class="form-group">
+          <label>البريد الإلكتروني</label>
+          <input class="form-control" type="email" id="forgotEmail" placeholder="example@mail.com" required>
+        </div>
+        <button class="btn btn-primary btn-block" type="submit">إرسال</button>
+        <div class="text-center mt-16">
+          <a href="#" id="gotoLoginFromForgot" style="color:#6c5ce7;">رجوع إلى تسجيل الدخول</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- ONBOARDING / CREATE SHOP -->
+    <div class="page" id="page-shop">
+      <div style="padding: 20px 0 10px; text-align:center;">
+        <h1 style="font-size:24px;">🏪 أنشئ متجرك</h1>
+        <p class="text-muted">أدخل بيانات متجر الحلاقة</p>
+      </div>
+      <form id="shopForm">
+        <div class="form-group">
+          <label>اسم المتجر *</label>
+          <input class="form-control" type="text" id="shopName" placeholder="محمد للحلاقة" required>
+        </div>
+        <div class="form-group">
+          <label>الوصف</label>
+          <textarea class="form-control" id="shopDesc" rows="2" placeholder="وصف قصير للمتجر"></textarea>
+        </div>
+        <div class="form-group">
+          <label>رقم الهاتف</label>
+          <input class="form-control" type="tel" id="shopPhone" placeholder="01012345678">
+        </div>
+        <div class="form-group">
+          <label>واتساب</label>
+          <input class="form-control" type="tel" id="shopWhatsapp" placeholder="01012345678">
+        </div>
+        <div class="form-group">
+          <label>الدولة</label>
+          <input class="form-control" type="text" id="shopCountry" value="مصر">
+        </div>
+        <div class="form-group">
+          <label>العملة</label>
+          <input class="form-control" type="text" id="shopCurrency" value="EGP">
+        </div>
+        <div class="form-group">
+          <label>المنطقة الزمنية</label>
+          <input class="form-control" type="text" id="shopTimezone" value="Africa/Cairo">
+        </div>
+        <div class="form-group">
+          <label>العنوان</label>
+          <input class="form-control" type="text" id="shopAddress" placeholder="القاهرة، مصر">
+        </div>
+        <div class="form-group">
+          <label>انستغرام</label>
+          <input class="form-control" type="text" id="shopInstagram" placeholder="username">
+        </div>
+        <div class="form-group">
+          <label>فيسبوك</label>
+          <input class="form-control" type="text" id="shopFacebook" placeholder="page">
+        </div>
+        <button class="btn btn-primary btn-block" type="submit" id="createShopBtn">إنشاء المتجر</button>
+      </form>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="page" id="page-dashboard">
+      <div class="flex-between mb-16">
+        <h2 style="font-size:22px;">📊 نظرة عامة</h2>
+        <span class="badge" id="shopStatusBadge">مسودة</span>
+      </div>
+      <div class="row">
+        <div class="col-6"><div class="stat-card"><div class="stat-label">حجوزات اليوم</div><div class="stat-number" id="statToday">0</div></div></div>
+        <div class="col-6"><div class="stat-card"><div class="stat-label">معلقة</div><div class="stat-number" id="statPending">0</div></div></div>
+        <div class="col-6"><div class="stat-card"><div class="stat-label">مؤكدة</div><div class="stat-number" id="statConfirmed">0</div></div></div>
+        <div class="col-6"><div class="stat-card"><div class="stat-label">مكتملة</div><div class="stat-number" id="statCompleted">0</div></div></div>
+        <div class="col-6"><div class="stat-card"><div class="stat-label">إجمالي الحجوزات</div><div class="stat-number" id="statTotalBookings">0</div></div></div>
+        <div class="col-6"><div class="stat-card"><div class="stat-label">العملاء</div><div class="stat-number" id="statCustomers">0</div></div></div>
+        <div class="col-6"><div class="stat-card"><div class="stat-label">الخدمات</div><div class="stat-number" id="statServices">0</div></div></div>
+        <div class="col-6"><div class="stat-card"><div class="stat-label">الاشتراك</div><div class="stat-number" id="statSubscription" style="font-size:16px;">غير مفعل</div></div></div>
+      </div>
+      <div class="bg-card mt-16">
+        <h3>📅 أحدث الحجوزات</h3>
+        <div id="recentBookingsList"><p class="text-muted">لا توجد حجوزات</p></div>
+      </div>
+    </div>
+
+    <!-- SERVICES -->
+    <div class="page" id="page-services">
+      <div class="flex-between mb-16">
+        <h2>✂️ الخدمات</h2>
+        <button class="btn btn-primary btn-sm" id="addServiceBtn">+ إضافة</button>
+      </div>
+      <div id="servicesList"><p class="text-muted">لا توجد خدمات</p></div>
+      <!-- Modal for add/edit service -->
+      <div id="serviceModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:999; align-items:center; justify-content:center; padding:20px;">
+        <div style="background:#1f1f30; border-radius:32px; padding:24px; max-width:400px; width:100%;">
+          <h3 id="serviceModalTitle">إضافة خدمة</h3>
+          <form id="serviceForm">
+            <input type="hidden" id="serviceEditId">
+            <div class="form-group"><label>الاسم</label><input class="form-control" id="serviceNameInput" required></div>
+            <div class="form-group"><label>الوصف</label><input class="form-control" id="serviceDescInput"></div>
+            <div class="form-group"><label>السعر</label><input class="form-control" type="number" id="servicePriceInput" step="0.01" required></div>
+            <div class="form-group"><label>المدة (دقائق)</label><input class="form-control" type="number" id="serviceDurationInput" value="30" required></div>
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-primary" type="submit" id="serviceSaveBtn">حفظ</button>
+              <button class="btn btn-outline" type="button" id="serviceCancelBtn">إلغاء</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- BARBERS -->
+    <div class="page" id="page-barbers">
+      <div class="flex-between mb-16">
+        <h2>💇 الحلاقون</h2>
+        <button class="btn btn-primary btn-sm" id="addBarberBtn">+ إضافة</button>
+      </div>
+      <div id="barbersList"><p class="text-muted">لا يوجد حلاقون</p></div>
+      <!-- Modal -->
+      <div id="barberModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:999; align-items:center; justify-content:center; padding:20px;">
+        <div style="background:#1f1f30; border-radius:32px; padding:24px; max-width:400px; width:100%;">
+          <h3 id="barberModalTitle">إضافة حلاق</h3>
+          <form id="barberForm">
+            <input type="hidden" id="barberEditId">
+            <div class="form-group"><label>الاسم</label><input class="form-control" id="barberNameInput" required></div>
+            <div class="form-group"><label>السيرة</label><input class="form-control" id="barberBioInput"></div>
+            <div class="form-group"><label>التخصصات</label><input class="form-control" id="barberSpecialtiesInput" placeholder="قص، لحية"></div>
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-primary" type="submit" id="barberSaveBtn">حفظ</button>
+              <button class="btn btn-outline" type="button" id="barberCancelBtn">إلغاء</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOOKINGS -->
+    <div class="page" id="page-bookings">
+      <div class="flex-between mb-16">
+        <h2>📅 الحجوزات</h2>
+        <button class="btn btn-primary btn-sm" id="addBookingBtn">+ حجز جديد</button>
+      </div>
+      <div id="bookingsList"><p class="text-muted">لا توجد حجوزات</p></div>
+      <!-- Booking Modal -->
+      <div id="bookingModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:999; align-items:center; justify-content:center; padding:20px;">
+        <div style="background:#1f1f30; border-radius:32px; padding:24px; max-width:400px; width:100%;">
+          <h3>حجز جديد</h3>
+          <form id="bookingForm">
+            <div class="form-group"><label>اسم العميل *</label><input class="form-control" id="bookingCustomerName" required></div>
+            <div class="form-group"><label>رقم الهاتف *</label><input class="form-control" id="bookingCustomerPhone" required></div>
+            <div class="form-group"><label>الدولة</label><input class="form-control" id="bookingCustomerCountry" value="مصر"></div>
+            <div class="form-group"><label>الخدمة *</label>
+              <select class="form-control" id="bookingService" required></select>
+            </div>
+            <div class="form-group"><label>الحلاق</label>
+              <select class="form-control" id="bookingBarber"></select>
+            </div>
+            <div class="form-group"><label>التاريخ *</label><input class="form-control" type="date" id="bookingDate" required></div>
+            <div class="form-group"><label>الوقت *</label><input class="form-control" type="time" id="bookingTime" required></div>
+            <div class="form-group"><label>ملاحظات</label><input class="form-control" id="bookingNotes"></div>
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-primary" type="submit" id="bookingSaveBtn">حجز</button>
+              <button class="btn btn-outline" type="button" id="bookingCancelBtn">إلغاء</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- CUSTOMERS -->
+    <div class="page" id="page-customers">
+      <h2 class="mb-16">👤 العملاء</h2>
+      <div id="customersList"><p class="text-muted">لا يوجد عملاء</p></div>
+    </div>
+
+    <!-- REVIEWS -->
+    <div class="page" id="page-reviews">
+      <h2 class="mb-16">⭐ التقييمات</h2>
+      <div id="reviewsList"><p class="text-muted">لا توجد تقييمات</p></div>
+    </div>
+
+    <!-- WORKING HOURS -->
+    <div class="page" id="page-hours">
+      <h2 class="mb-16">🕒 أوقات العمل</h2>
+      <div id="hoursContainer"></div>
+    </div>
+
+    <!-- HOLIDAYS -->
+    <div class="page" id="page-holidays">
+      <div class="flex-between mb-16">
+        <h2>📆 العطلات</h2>
+        <button class="btn btn-primary btn-sm" id="addHolidayBtn">+ إضافة</button>
+      </div>
+      <div id="holidaysList"><p class="text-muted">لا توجد عطلات</p></div>
+    </div>
+
+    <!-- GALLERY -->
+    <div class="page" id="page-gallery">
+      <div class="flex-between mb-16">
+        <h2>🖼️ المعرض</h2>
+        <button class="btn btn-primary btn-sm" id="addGalleryBtn">+ رفع</button>
+      </div>
+      <div id="galleryGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px;"></div>
+      <input type="file" id="galleryFileInput" accept="image/*" style="display:none" multiple>
+    </div>
+
+    <!-- SUBSCRIPTION -->
+    <div class="page" id="page-subscription">
+      <h2 class="mb-16">📦 الاشتراك</h2>
+      <div id="subscriptionInfo"></div>
+      <div id="plansList"></div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="page" id="page-profile">
+      <h2 class="mb-16">👤 الملف الشخصي</h2>
+      <form id="profileForm">
+        <div class="form-group"><label>الاسم</label><input class="form-control" id="profileName"></div>
+        <div class="form-group"><label>الهاتف</label><input class="form-control" id="profilePhone"></div>
+        <div class="form-group"><label>البريد</label><input class="form-control" id="profileEmail" disabled></div>
+        <button class="btn btn-primary btn-block" type="submit">تحديث</button>
+        <button class="btn btn-danger btn-block mt-8" type="button" id="logoutBtn">تسجيل الخروج</button>
+      </form>
+    </div>
+
+    <!-- PUBLIC SITE (s/) -->
+    <div class="page" id="page-public">
+      <div class="public-site" id="publicContent">
+        <!-- يتم تعبئته ديناميكياً -->
+      </div>
+    </div>
+
+  </div><!-- end #app -->
+
+  <script>
+    // ============================================================
+    //  FIREBASE INIT
+    // ============================================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyA0IWiY-tI30LX2PSG2T2gEiBAEd4GqzU",
+      authDomain: "salons-feee4.firebaseapp.com",
+      projectId: "salons-feee4",
+      storageBucket: "salons-feee4.firebasestorage.app",
+      messagingSenderId: "601094041409",
+      appId: "1:601094041409:web:d03a02de993fbb203cbbc0",
+      measurementId: "G-GP53GSCW0C"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    // السماح بقراءة/كتابة في وضع الاختبار (سنقوم بتطبيق القواعد لاحقاً)
+    // لكننا سنعتمد على قواعد الأمان المرفقة.
+
+    // ============================================================
+    //  GLOBALS
+    // ============================================================
+    const APP = document.getElementById('app');
+    const toastContainer = document.getElementById('toastContainer');
+    let currentUser = null;
+    let currentShop = null; // { id, ...data }
+    let currentPage = 'login';
+    let allServices = [];
+    let allBarbers = [];
+    let allBookings = [];
+    let allCustomers = [];
+    let allReviews = [];
+    let allHolidays = [];
+    let allGallery = [];
+    let workingHours = {};
+    let plans = [];
+    let unsubscribers = [];
+
+    // ============================================================
+    //  UTILITY FUNCTIONS
+    // ============================================================
+    function showToast(msg, type = 'info') {
+      const div = document.createElement('div');
+      div.className = `toast toast-${type}`;
+      div.textContent = msg;
+      toastContainer.appendChild(div);
+      setTimeout(() => div.remove(), 3500);
+    }
+
+    function generateSlug(text) {
+      return text.toString().toLowerCase().trim()
+        .replace(/\s+/g, '-')
+        .replace(/[^\w\-]+/g, '')
+        .replace(/\-\-+/g, '-')
+        .replace(/^-+/, '')
+        .replace(/-+$/, '');
+    }
+
+    function formatDate(ts) {
+      if (!ts) return '-';
+      const d = ts.toDate ? ts.toDate() : new Date(ts);
+      return d.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    function formatTime(str) {
+      if (!str) return '-';
+      const [h, m] = str.split(':');
+      const d = new Date();
+      d.setHours(parseInt(h), parseInt(m));
+      return d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function timeToMinutes(t) {
+      const [h, m] = t.split(':').map(Number);
+      return h * 60 + m;
+    }
+
+    function isSlotAvailable(existing, date, start, duration, barberId) {
+      const startM = timeToMinutes(start);
+      const endM = startM + duration;
+      for (const b of existing) {
+        if (b.barberId !== barberId) continue;
+        if (b.date !== date) continue;
+        if (['cancelled', 'no_show'].includes(b.status)) continue;
+        const bs = timeToMinutes(b.startTime);
+        const be = bs + (b.duration || 30);
+        if (startM < be && endM > bs) return false;
+      }
+      return true;
+    }
+
+    // ============================================================
+    //  NAVIGATION
+    // ============================================================
+    function navigate(page, params = {}) {
+      // إخفاء كل الصفحات
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      const target = document.getElementById(`page-${page}`);
+      if (target) target.classList.add('active');
+      currentPage = page;
+      // إغلاق الدرج
+      closeDrawer();
+      // تحديث شريط التنقل
+      updateNavActive(page);
+      // إذا كانت الصفحة تتطلب بيانات، نقوم بتحميلها
+      if (page === 'dashboard') loadDashboard();
+      else if (page === 'services') loadServices();
+      else if (page === 'barbers') loadBarbers();
+      else if (page === 'bookings') loadBookings();
+      else if (page === 'customers') loadCustomers();
+      else if (page === 'reviews') loadReviews();
+      else if (page === 'hours') loadWorkingHours();
+      else if (page === 'holidays') loadHolidays();
+      else if (page === 'gallery') loadGallery();
+      else if (page === 'subscription') loadSubscription();
+      else if (page === 'profile') loadProfile();
+      else if (page === 'public') loadPublicSite(params.slug);
+    }
+
+    function updateNavActive(page) {
+      document.querySelectorAll('.drawer .nav-item').forEach(el => el.classList.remove('active'));
+      const target = document.querySelector(`.drawer .nav-item[data-page="${page}"]`);
+      if (target) target.classList.add('active');
+    }
+
+    function openDrawer() {
+      document.getElementById('drawer').classList.add('open');
+      document.getElementById('drawerBackdrop').classList.add('show');
+    }
+
+    function closeDrawer() {
+      document.getElementById('drawer').classList.remove('open');
+      document.getElementById('drawerBackdrop').classList.remove('show');
+    }
+
+    // ============================================================
+    //  DRAWER BUILD
+    // ============================================================
+    function buildDrawer(shop) {
+      const container = document.getElementById('drawerNav');
+      const items = [
+        { page: 'dashboard', icon: '📊', label: 'نظرة عامة' },
+        { page: 'shop', icon: '🏪', label: 'المتجر' },
+        { page: 'services', icon: '✂️', label: 'الخدمات' },
+        { page: 'barbers', icon: '💇', label: 'الحلاقون' },
+        { page: 'bookings', icon: '📅', label: 'الحجوزات' },
+        { page: 'customers', icon: '👤', label: 'العملاء' },
+        { page: 'reviews', icon: '⭐', label: 'التقييمات' },
+        { page: 'hours', icon: '🕒', label: 'أوقات العمل' },
+        { page: 'holidays', icon: '📆', label: 'العطلات' },
+        { page: 'gallery', icon: '🖼️', label: 'المعرض' },
+        { page: 'subscription', icon: '📦', label: 'الاشتراك' },
+        { page: 'profile', icon: '👤', label: 'الملف الشخصي' },
+      ];
+      if (!shop) {
+        // إذا لم يكن هناك متجر، نعرض خيار إنشاء متجر
+        container.innerHTML = `
+          <div class="nav-item" data-page="shop" onclick="navigate('shop')">
+            <span class="icon">🏪</span> إنشاء متجر
+          </div>
+          <div class="nav-item" data-page="profile" onclick="navigate('profile')">
+            <span class="icon">👤</span> الملف الشخصي
+          </div>
+          <div class="nav-item" onclick="logout()">
+            <span class="icon">🚪</span> تسجيل الخروج
+          </div>
+        `;
+        return;
+      }
+      let html = '';
+      for (const item of items) {
+        html += `<div class="nav-item" data-page="${item.page}" onclick="navigate('${item.page}')">
+          <span class="icon">${item.icon}</span> ${item.label}
+        </div>`;
+      }
+      html += `<div class="nav-item" onclick="logout()"><span class="icon">🚪</span> تسجيل الخروج</div>`;
+      container.innerHTML = html;
+      updateNavActive(currentPage);
+    }
+
+    // ============================================================
+    //  AUTH
+    // ============================================================
+    function logout() {
+      auth.signOut();
+      showToast('تم تسجيل الخروج', 'info');
+      navigate('login');
+      currentUser = null;
+      currentShop = null;
+      // إلغاء الاشتراكات
+      unsubscribers.forEach(u => u());
+      unsubscribers = [];
+    }
+
+    // ============================================================
+    //  LOGIN / SIGNUP / FORGOT
+    // ============================================================
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const pass = document.getElementById('loginPassword').value;
+      try {
+        await auth.signInWithEmailAndPassword(email, pass);
+        showToast('تم الدخول بنجاح', 'success');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
+
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('signupName').value;
+      const email = document.getElementById('signupEmail').value;
+      const phone = document.getElementById('signupPhone').value;
+      const pass = document.getElementById('signupPassword').value;
+      try {
+        const cred = await auth.createUserWithEmailAndPassword(email, pass);
+        await cred.user.updateProfile({ displayName: name });
+        // إنشاء وثيقة المستخدم
+        await db.collection('users').doc(cred.user.uid).set({
+          name,
+          email,
+          phone,
+          photoURL: '',
+          role: 'shop_owner',
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
+        showToast('تم إنشاء الحساب', 'success');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
 
-        // ---- EVENT BINDINGS ----
-        // Menu toggle
-        menuToggle.addEventListener('click', openDrawer);
-        drawerClose.addEventListener('click', closeDrawer);
-        overlay.addEventListener('click', closeDrawer);
+    document.getElementById('gotoSignup').addEventListener('click', (e) => { e.preventDefault();
+      navigate('signup'); });
+    document.getElementById('gotoLogin').addEventListener('click', (e) => { e.preventDefault();
+      navigate('login'); });
+    document.getElementById('gotoForgot').addEventListener('click', (e) => { e.preventDefault();
+      navigate('forgot'); });
+    document.getElementById('gotoLoginFromForgot').addEventListener('click', (e) => { e.preventDefault();
+      navigate('login'); });
 
-        // Logout
-        $('#logoutBtn').addEventListener('click', (e) => {
-            e.preventDefault();
-            logoutUser();
-        });
+    document.getElementById('forgotForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('forgotEmail').value;
+      try {
+        await auth.sendPasswordResetEmail(email);
+        showToast('تم إرسال رابط إعادة التعيين', 'success');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
 
-        // Shop form
-        $('#shopForm').addEventListener('submit', saveShop);
-
-        // Builder
-        $('#builderTemplate').addEventListener('change', updatePreview);
-        $('#builderPrimary').addEventListener('input', updatePreview);
-        $('#builderSecondary').addEventListener('input', updatePreview);
-        $('#builderAccent').addEventListener('input', updatePreview);
-        $('#previewBtn').addEventListener('click', updatePreview);
-        $('#saveDraftBtn').addEventListener('click', saveDraft);
-        $('#publishBtn').addEventListener('click', publishWebsite);
-
-        // Services
-        $('#addServiceBtn').addEventListener('click', showAddServiceModal);
-
-        // Barbers
-        $('#addBarberBtn').addEventListener('click', showAddBarberModal);
-
-        // Holidays
-        $('#addHolidayBtn').addEventListener('click', showAddHolidayModal);
-
-        // Gallery
-        $('#uploadGalleryBtn').addEventListener('click', uploadGalleryImage);
-
-        // Profile
-        $('#profileForm').addEventListener('submit', saveProfile);
-        $('#profileImageInput').addEventListener('change', function() {
-            if (this.files.length) {
-                uploadProfileImage(this.files[0]);
-            }
-        });
-
-        // Notifications bell
-        $('#notifBtn').addEventListener('click', () => {
-            navigateTo('notifications');
-        });
-
-        // Modal close
-        modalClose.addEventListener('click', closeModal);
-        modalOverlay.addEventListener('click', closeModal);
-
-        // Booking search / filter
-        const bookingSearch = $('#bookingSearch');
-        const bookingFilter = $('#bookingStatusFilter');
-        if (bookingSearch) {
-            bookingSearch.addEventListener('input', () => {
-                // Simple client-side filtering
-                const term = bookingSearch.value.toLowerCase();
-                const items = document.querySelectorAll('#bookingsList .list-item');
-                items.forEach(el => {
-                    const text = el.textContent.toLowerCase();
-                    el.style.display = text.includes(term) ? 'flex' : 'none';
-                });
+    // ============================================================
+    //  AUTH STATE
+    // ============================================================
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        currentUser = user;
+        // تحميل بيانات المستخدم والمتجر
+        try {
+          const userDoc = await db.collection('users').doc(user.uid).get();
+          if (!userDoc.exists) {
+            // إنشاء وثيقة المستخدم إذا لم توجد (حالة نادرة)
+            await db.collection('users').doc(user.uid).set({
+              name: user.displayName || '',
+              email: user.email,
+              phone: user.phoneNumber || '',
+              role: 'shop_owner',
+              createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+              updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             });
+          }
+          // البحث عن متجر المالك
+          const shopsSnap = await db.collection('shops').where('ownerId', '==', user.uid).limit(1).get();
+          if (!shopsSnap.empty) {
+            const doc = shopsSnap.docs[0];
+            currentShop = { id: doc.id, ...doc.data() };
+            buildDrawer(currentShop);
+            // إعداد الاستماع للتحديثات
+            setupRealtimeListeners();
+            navigate('dashboard');
+          } else {
+            currentShop = null;
+            buildDrawer(null);
+            navigate('shop');
+          }
+        } catch (err) {
+          showToast('خطأ في تحميل البيانات', 'error');
+          console.error(err);
         }
-        if (bookingFilter) {
-            bookingFilter.addEventListener('change', () => {
-                const val = bookingFilter.value;
-                const items = document.querySelectorAll('#bookingsList .list-item');
-                items.forEach(el => {
-                    if (val === 'all') { el.style.display = 'flex'; return; }
-                    const statusEl = el.querySelector('.badge');
-                    if (statusEl) {
-                        const statusText = statusEl.textContent.trim();
-                        const statusMap = {
-                            'pending': 'معلقة',
-                            'confirmed': 'مؤكدة',
-                            'completed': 'مكتملة',
-                            'cancelled': 'ملغية',
-                            'no_show': 'لم يحضر'
-                        };
-                        el.style.display = statusMap[val] === statusText ? 'flex' : 'none';
-                    }
-                });
-            });
+      } else {
+        currentUser = null;
+        currentShop = null;
+        // التحقق مما إذا كنا في صفحة عامة
+        const path = window.location.pathname;
+        if (path.startsWith('/s/')) {
+          const slug = path.split('/s/')[1];
+          if (slug) {
+            navigate('public', { slug });
+            return;
+          }
         }
+        navigate('login');
+        buildDrawer(null);
+        unsubscribers.forEach(u => u());
+        unsubscribers = [];
+      }
+    });
 
-        // Customer search
-        const customerSearch = $('#customerSearch');
-        if (customerSearch) {
-            customerSearch.addEventListener('input', () => {
-                const term = customerSearch.value.toLowerCase();
-                const items = document.querySelectorAll('#customersList .list-item');
-                items.forEach(el => {
-                    el.style.display = el.textContent.toLowerCase().includes(term) ? 'flex' : 'none';
-                });
-            });
-        }
-
-        // ---- Keyboard shortcuts ----
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeModal();
-                closeDrawer();
-            }
+    // ============================================================
+    //  REALTIME LISTENERS (للحجوزات والإشعارات)
+    // ============================================================
+    function setupRealtimeListeners() {
+      if (!currentShop) return;
+      // الاستماع للحجوزات الجديدة
+      const bookingsRef = db.collection('shops').doc(currentShop.id).collection('bookings');
+      const unsub = bookingsRef.where('status', '==', 'pending').onSnapshot((snap) => {
+        snap.docChanges().forEach(change => {
+          if (change.type === 'added') {
+            const data = change.doc.data();
+            showToast(`📅 حجز جديد من ${data.customerName}`, 'info');
+            // تحديث لوحة التحكم إذا كانت مفتوحة
+            if (currentPage === 'dashboard') loadDashboard();
+          }
         });
+      });
+      unsubscribers.push(unsub);
+    }
 
-        // ---- Initial load ----
-        console.log('✂️ صالونات — Barber SaaS Platform loaded');
-        console.log('🔥 Firebase connected');
-        console.log('☁️ Cloudinary ready');
-        console.log('📦 Firestore: empty start supported');
+    // ============================================================
+    //  SHOP CREATION
+    // ============================================================
+    document.getElementById('shopForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentUser) { showToast('يجب تسجيل الدخول', 'error'); return; }
+      const name = document.getElementById('shopName').value.trim();
+      if (!name) { showToast('اسم المتجر مطلوب', 'error'); return; }
+      const slug = generateSlug(name);
+      // التحقق من تفرد slug
+      const existing = await db.collection('shops').where('slug', '==', slug).get();
+      if (!existing.empty) {
+        showToast('هذا الاسم مستخدم، اختر اسم آخر', 'error');
+        return;
+      }
+      const data = {
+        ownerId: currentUser.uid,
+        name,
+        slug,
+        description: document.getElementById('shopDesc').value,
+        phone: document.getElementById('shopPhone').value,
+        whatsapp: document.getElementById('shopWhatsapp').value,
+        country: document.getElementById('shopCountry').value || 'مصر',
+        currency: document.getElementById('shopCurrency').value || 'EGP',
+        timezone: document.getElementById('shopTimezone').value || 'Africa/Cairo',
+        address: document.getElementById('shopAddress').value,
+        instagram: document.getElementById('shopInstagram').value,
+        facebook: document.getElementById('shopFacebook').value,
+        logoUrl: '',
+        logoPublicId: '',
+        coverUrl: '',
+        coverPublicId: '',
+        theme: {
+          template: 'modern',
+          primaryColor: '#1a1a2e',
+          secondaryColor: '#16213e',
+          accentColor: '#e94560'
+        },
+        status: 'draft',
+        planId: null,
+        subscriptionStatus: 'pending',
+        paymentStatus: 'pending',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      try {
+        const docRef = await db.collection('shops').add(data);
+        currentShop = { id: docRef.id, ...data };
+        buildDrawer(currentShop);
+        setupRealtimeListeners();
+        showToast('تم إنشاء المتجر بنجاح', 'success');
+        navigate('dashboard');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
 
-        // Expose for debugging
-        window.__app = { auth, db, currentUser, currentShop, currentShopId };
-    </script>
+    // ============================================================
+    //  DASHBOARD
+    // ============================================================
+    async function loadDashboard() {
+      if (!currentShop) return;
+      const shopId = currentShop.id;
+      try {
+        // إحصائيات سريعة باستخدام limit لتجنب الفهارس المركبة
+        const bookingsRef = db.collection('shops').doc(shopId).collection('bookings');
+        const allSnap = await bookingsRef.limit(100).get();
+        const bookings = allSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        const today = new Date().toISOString().split('T')[0];
+        const todayBookings = bookings.filter(b => b.date === today);
+        const pending = bookings.filter(b => b.status === 'pending');
+        const confirmed = bookings.filter(b => b.status === 'confirmed');
+        const completed = bookings.filter(b => b.status === 'completed');
 
+        document.getElementById('statToday').textContent = todayBookings.length;
+        document.getElementById('statPending').textContent = pending.length;
+        document.getElementById('statConfirmed').textContent = confirmed.length;
+        document.getElementById('statCompleted').textContent = completed.length;
+        document.getElementById('statTotalBookings').textContent = bookings.length;
+
+        // العملاء
+        const custSnap = await db.collection('shops').doc(shopId).collection('customers').limit(100).get();
+        document.getElementById('statCustomers').textContent = custSnap.size;
+
+        // الخدمات
+        const servSnap = await db.collection('shops').doc(shopId).collection('services').where('status', '==', 'active')
+          .limit(100).get();
+        document.getElementById('statServices').textContent = servSnap.size;
+
+        // الاشتراك
+        const statusMap = { 'pending': 'قيد الانتظار', 'active': 'نشط', 'expired': 'منتهي', 'cancelled': 'ملغي' };
+        const subText = statusMap[currentShop.subscriptionStatus] || 'غير مفعل';
+        document.getElementById('statSubscription').textContent = subText;
+
+        // حالة المتجر
+        const badge = document.getElementById('shopStatusBadge');
+        badge.textContent = currentShop.status === 'active' ? 'نشط' : 'مسودة';
+        badge.className = `badge ${currentShop.status === 'active' ? 'badge-success' : 'badge-warning'}`;
+
+        // أحدث الحجوزات
+        const recent = bookings.slice(0, 5);
+        const container = document.getElementById('recentBookingsList');
+        if (recent.length === 0) {
+          container.innerHTML = '<p class="text-muted">لا توجد حجوزات</p>';
+        } else {
+          container.innerHTML = recent.map(b =>
+            `<div class="flex-between" style="border-bottom:1px solid #2a2a40; padding:8px 0;">
+              <span>${b.customerName} - ${b.serviceName}</span>
+              <span class="badge ${b.status === 'pending' ? 'badge-warning' : b.status === 'confirmed' ? 'badge-info' : 'badge-success'}">${b.status}</span>
+            </div>`
+          ).join('');
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // ============================================================
+    //  SERVICES
+    // ============================================================
+    async function loadServices() {
+      if (!currentShop) return;
+      const snap = await db.collection('shops').doc(currentShop.id).collection('services')
+        .where('status', '==', 'active').limit(100).get();
+      allServices = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderServices();
+    }
+
+    function renderServices() {
+      const container = document.getElementById('servicesList');
+      if (allServices.length === 0) {
+        container.innerHTML = '<p class="text-muted">لا توجد خدمات</p>';
+        return;
+      }
+      container.innerHTML = allServices.map(s =>
+        `<div class="flex-between bg-card" style="margin-bottom:8px;">
+          <div><strong>${s.name}</strong> <span class="text-muted">${s.price} ${currentShop?.currency || 'EGP'}</span><br><span class="text-muted">${s.duration} دقيقة</span></div>
+          <div>
+            <button class="btn btn-sm btn-outline" onclick="editService('${s.id}')">✏️</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteService('${s.id}')">🗑️</button>
+          </div>
+        </div>`
+      ).join('');
+    }
+
+    // Service modal
+    const serviceModal = document.getElementById('serviceModal');
+    document.getElementById('addServiceBtn').addEventListener('click', () => {
+      document.getElementById('serviceModalTitle').textContent = 'إضافة خدمة';
+      document.getElementById('serviceEditId').value = '';
+      document.getElementById('serviceNameInput').value = '';
+      document.getElementById('serviceDescInput').value = '';
+      document.getElementById('servicePriceInput').value = '';
+      document.getElementById('serviceDurationInput').value = '30';
+      serviceModal.style.display = 'flex';
+    });
+    document.getElementById('serviceCancelBtn').addEventListener('click', () => { serviceModal.style.display = 'none'; });
+
+    document.getElementById('serviceForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const editId = document.getElementById('serviceEditId').value;
+      const data = {
+        name: document.getElementById('serviceNameInput').value,
+        description: document.getElementById('serviceDescInput').value,
+        price: parseFloat(document.getElementById('servicePriceInput').value),
+        duration: parseInt(document.getElementById('serviceDurationInput').value),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      const shopId = currentShop.id;
+      try {
+        if (editId) {
+          await db.collection('shops').doc(shopId).collection('services').doc(editId).update(data);
+          showToast('تم التحديث', 'success');
+        } else {
+          data.status = 'active';
+          data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+          await db.collection('shops').doc(shopId).collection('services').add(data);
+          showToast('تم الإضافة', 'success');
+        }
+        serviceModal.style.display = 'none';
+        loadServices();
+      } catch (err) { showToast(err.message, 'error'); }
+    });
+
+    window.editService = function(id) {
+      const s = allServices.find(x => x.id === id);
+      if (!s) return;
+      document.getElementById('serviceModalTitle').textContent = 'تعديل خدمة';
+      document.getElementById('serviceEditId').value = id;
+      document.getElementById('serviceNameInput').value = s.name || '';
+      document.getElementById('serviceDescInput').value = s.description || '';
+      document.getElementById('servicePriceInput').value = s.price || '';
+      document.getElementById('serviceDurationInput').value = s.duration || 30;
+      serviceModal.style.display = 'flex';
+    };
+
+    window.deleteService = async function(id) {
+      if (!confirm('هل تريد تعطيل هذه الخدمة؟')) return;
+      try {
+        await db.collection('shops').doc(currentShop.id).collection('services').doc(id).update({ status: 'disabled' });
+        showToast('تم التعطيل', 'success');
+        loadServices();
+      } catch (err) { showToast(err.message, 'error'); }
+    };
+
+    // ============================================================
+    //  BARBERS
+    // ============================================================
+    async function loadBarbers() {
+      if (!currentShop) return;
+      const snap = await db.collection('shops').doc(currentShop.id).collection('barbers')
+        .where('status', '==', 'active').limit(100).get();
+      allBarbers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderBarbers();
+    }
+
+    function renderBarbers() {
+      const container = document.getElementById('barbersList');
+      if (allBarbers.length === 0) {
+        container.innerHTML = '<p class="text-muted">لا يوجد حلاقون</p>';
+        return;
+      }
+      container.innerHTML = allBarbers.map(b =>
+        `<div class="flex-between bg-card" style="margin-bottom:8px;">
+          <div><strong>${b.name}</strong> <span class="text-muted">${b.specialties || ''}</span></div>
+          <div>
+            <button class="btn btn-sm btn-outline" onclick="editBarber('${b.id}')">✏️</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteBarber('${b.id}')">🗑️</button>
+          </div>
+        </div>`
+      ).join('');
+    }
+
+    const barberModal = document.getElementById('barberModal');
+    document.getElementById('addBarberBtn').addEventListener('click', () => {
+      document.getElementById('barberModalTitle').textContent = 'إضافة حلاق';
+      document.getElementById('barberEditId').value = '';
+      document.getElementById('barberNameInput').value = '';
+      document.getElementById('barberBioInput').value = '';
+      document.getElementById('barberSpecialtiesInput').value = '';
+      barberModal.style.display = 'flex';
+    });
+    document.getElementById('barberCancelBtn').addEventListener('click', () => { barberModal.style.display = 'none'; });
+
+    document.getElementById('barberForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const editId = document.getElementById('barberEditId').value;
+      const data = {
+        name: document.getElementById('barberNameInput').value,
+        bio: document.getElementById('barberBioInput').value,
+        specialties: document.getElementById('barberSpecialtiesInput').value,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      const shopId = currentShop.id;
+      try {
+        if (editId) {
+          await db.collection('shops').doc(shopId).collection('barbers').doc(editId).update(data);
+          showToast('تم التحديث', 'success');
+        } else {
+          data.status = 'active';
+          data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+          await db.collection('shops').doc(shopId).collection('barbers').add(data);
+          showToast('تم الإضافة', 'success');
+        }
+        barberModal.style.display = 'none';
+        loadBarbers();
+      } catch (err) { showToast(err.message, 'error'); }
+    });
+
+    window.editBarber = function(id) {
+      const b = allBarbers.find(x => x.id === id);
+      if (!b) return;
+      document.getElementById('barberModalTitle').textContent = 'تعديل حلاق';
+      document.getElementById('barberEditId').value = id;
+      document.getElementById('barberNameInput').value = b.name || '';
+      document.getElementById('barberBioInput').value = b.bio || '';
+      document.getElementById('barberSpecialtiesInput').value = b.specialties || '';
+      barberModal.style.display = 'flex';
+    };
+
+    window.deleteBarber = async function(id) {
+      if (!confirm('هل تريد تعطيل هذا الحلاق؟')) return;
+      try {
+        await db.collection('shops').doc(currentShop.id).collection('barbers').doc(id).update({ status: 'disabled' });
+        showToast('تم التعطيل', 'success');
+        loadBarbers();
+      } catch (err) { showToast(err.message, 'error'); }
+    };
+
+    // ============================================================
+    //  BOOKINGS
+    // ============================================================
+    async function loadBookings() {
+      if (!currentShop) return;
+      const snap = await db.collection('shops').doc(currentShop.id).collection('bookings')
+        .limit(100).get();
+      allBookings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderBookings();
+      // تعبئة خيارات الخدمات والحلاقين في نموذج الحجز
+      populateBookingSelects();
+    }
+
+    function renderBookings() {
+      const container = document.getElementById('bookingsList');
+      if (allBookings.length === 0) {
+        container.innerHTML = '<p class="text-muted">لا توجد حجوزات</p>';
+        return;
+      }
+      container.innerHTML = allBookings.map(b =>
+        `<div class="bg-card" style="margin-bottom:8px;">
+          <div class="flex-between">
+            <div><strong>${b.customerName}</strong> - ${b.serviceName}</div>
+            <span class="badge ${b.status === 'pending' ? 'badge-warning' : b.status === 'confirmed' ? 'badge-info' : b.status === 'completed' ? 'badge-success' : 'badge-danger'}">${b.status}</span>
+          </div>
+          <div class="text-muted" style="font-size:14px;">${b.date} ${formatTime(b.startTime)} | ${b.barberName || 'بدون حلاق'}</div>
+          <div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;">
+            ${b.status === 'pending' ? `<button class="btn btn-sm btn-success" onclick="updateBooking('${b.id}','confirmed')">تأكيد</button>` : ''}
+            ${b.status === 'confirmed' ? `<button class="btn btn-sm btn-success" onclick="updateBooking('${b.id}','completed')">إكمال</button>` : ''}
+            ${['pending','confirmed'].includes(b.status) ? `<button class="btn btn-sm btn-danger" onclick="updateBooking('${b.id}','cancelled')">إلغاء</button>` : ''}
+            ${b.status === 'confirmed' ? `<button class="btn btn-sm btn-outline" onclick="updateBooking('${b.id}','no_show')">لم يحضر</button>` : ''}
+          </div>
+        </div>`
+      ).join('');
+    }
+
+    window.updateBooking = async function(id, status) {
+      try {
+        await db.collection('shops').doc(currentShop.id).collection('bookings').doc(id).update({
+          status,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        showToast(`تم تغيير الحالة إلى ${status}`, 'success');
+        loadBookings();
+        if (currentPage === 'dashboard') loadDashboard();
+      } catch (err) { showToast(err.message, 'error'); }
+    };
+
+    // Booking Modal
+    const bookingModal = document.getElementById('bookingModal');
+    document.getElementById('addBookingBtn').addEventListener('click', () => {
+      bookingModal.style.display = 'flex';
+      // تعبئة التواريخ والخدمات
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('bookingDate').value = today;
+      populateBookingSelects();
+    });
+    document.getElementById('bookingCancelBtn').addEventListener('click', () => { bookingModal.style.display = 'none'; });
+
+    async function populateBookingSelects() {
+      if (!currentShop) return;
+      // خدمات
+      const servSnap = await db.collection('shops').doc(currentShop.id).collection('services')
+        .where('status', '==', 'active').limit(100).get();
+      const services = servSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const servSelect = document.getElementById('bookingService');
+      servSelect.innerHTML = services.map(s => `<option value="${s.id}" data-price="${s.price}" data-duration="${s.duration}">${s.name} (${s.price})</option>`).join('');
+
+      // حلاقين
+      const barberSnap = await db.collection('shops').doc(currentShop.id).collection('barbers')
+        .where('status', '==', 'active').limit(100).get();
+      const barbers = barberSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const barberSelect = document.getElementById('bookingBarber');
+      barberSelect.innerHTML = `<option value="">أي حلاق</option>` + barbers.map(b =>
+        `<option value="${b.id}">${b.name}</option>`).join('');
+    }
+
+    document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const shopId = currentShop.id;
+      const customerName = document.getElementById('bookingCustomerName').value.trim();
+      const customerPhone = document.getElementById('bookingCustomerPhone').value.trim();
+      const country = document.getElementById('bookingCustomerCountry').value || 'مصر';
+      const serviceId = document.getElementById('bookingService').value;
+      const barberId = document.getElementById('bookingBarber').value;
+      const date = document.getElementById('bookingDate').value;
+      const startTime = document.getElementById('bookingTime').value;
+      const notes = document.getElementById('bookingNotes').value;
+
+      if (!customerName || !customerPhone || !serviceId || !date || !startTime) {
+        showToast('يرجى ملء جميع الحقول المطلوبة', 'error');
+        return;
+      }
+
+      // جلب بيانات الخدمة
+      const serviceDoc = await db.collection('shops').doc(shopId).collection('services').doc(serviceId).get();
+      if (!serviceDoc.exists) { showToast('الخدمة غير موجودة', 'error'); return; }
+      const svc = serviceDoc.data();
+      const duration = svc.duration || 30;
+      const price = svc.price || 0;
+
+      // جلب بيانات الحلاق إن وجد
+      let barberName = '';
+      if (barberId) {
+        const barberDoc = await db.collection('shops').doc(shopId).collection('barbers').doc(barberId).get();
+        if (barberDoc.exists) barberName = barberDoc.data().name || '';
+      }
+
+      // التحقق من التزاحم باستخدام transaction
+      try {
+        await db.runTransaction(async (transaction) => {
+          // قراءة الحجوزات الموجودة في نفس اليوم ونفس الحلاق
+          const bookingsRef = db.collection('shops').doc(shopId).collection('bookings');
+          const q = bookingsRef.where('date', '==', date);
+          const snap = await transaction.get(q);
+          const existing = snap.docs.map(d => d.data());
+          // التحقق من التزاحم
+          const available = isSlotAvailable(existing, date, startTime, duration, barberId || '');
+          if (!available) {
+            throw new Error('الموعد غير متاح، يرجى اختيار وقت آخر');
+          }
+          // إنشاء الحجز
+          const newRef = bookingsRef.doc();
+          transaction.set(newRef, {
+            customerId: null,
+            customerName,
+            customerPhone,
+            customerCountry: country,
+            serviceId,
+            serviceName: svc.name || '',
+            servicePrice: price,
+            duration,
+            barberId: barberId || '',
+            barberName,
+            date,
+            startTime,
+            endTime: (() => {
+              const [h, m] = startTime.split(':').map(Number);
+              const end = h * 60 + m + duration;
+              return `${String(Math.floor(end/60)).padStart(2,'0')}:${String(end%60).padStart(2,'0')}`;
+            })(),
+            status: 'pending',
+            notes,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          // تحديث/إنشاء العميل
+          const customersRef = db.collection('shops').doc(shopId).collection('customers');
+          const custQuery = customersRef.where('phone', '==', customerPhone).limit(1);
+          const custSnap = await transaction.get(custQuery);
+          if (custSnap.empty) {
+            const newCust = customersRef.doc();
+            transaction.set(newCust, {
+              name: customerName,
+              phone: customerPhone,
+              whatsapp: customerPhone,
+              country: country,
+              bookingCount: 1,
+              lastBookingAt: firebase.firestore.FieldValue.serverTimestamp(),
+              createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+              updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+          } else {
+            const doc = custSnap.docs[0];
+            transaction.update(doc.ref, {
+              bookingCount: firebase.firestore.FieldValue.increment(1),
+              lastBookingAt: firebase.firestore.FieldValue.serverTimestamp(),
+              updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+          }
+        });
+        showToast('تم الحجز بنجاح', 'success');
+        bookingModal.style.display = 'none';
+        loadBookings();
+        if (currentPage === 'dashboard') loadDashboard();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    });
+
+    // ============================================================
+    //  CUSTOMERS
+    // ============================================================
+    async function loadCustomers() {
+      if (!currentShop) return;
+      const snap = await db.collection('shops').doc(currentShop.id).collection('customers')
+        .limit(100).get();
+      allCustomers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const container = document.getElementById('customersList');
+      if (allCustomers.length === 0) {
+        container.innerHTML = '<p class="text-muted">لا يوجد عملاء</p>';
+        return;
+      }
+      container.innerHTML = allCustomers.map(c =>
+        `<div class="bg-card" style="margin-bottom:8px;">
+          <div><strong>${c.name}</strong> - ${c.phone}</div>
+          <div class="text-muted">عدد الحجوزات: ${c.bookingCount || 0}</div>
+        </div>`
+      ).join('');
+    }
+
+    // ============================================================
+    //  REVIEWS
+    // ============================================================
+    async function loadReviews() {
+      if (!currentShop) return;
+      const snap = await db.collection('shops').doc(currentShop.id).collection('reviews')
+        .limit(100).get();
+      allReviews = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const container = document.getElementById('reviewsList');
+      if (allReviews.length === 0) {
+        container.innerHTML = '<p class="text-muted">لا توجد تقييمات</p>';
+        return;
+      }
+      container.innerHTML = allReviews.map(r =>
+        `<div class="bg-card" style="margin-bottom:8px;">
+          <div class="flex-between"><strong>${r.customerName}</strong> <span>⭐ ${r.rating}</span></div>
+          <div>${r.review || ''}</div>
+          <div class="text-muted">الحالة: ${r.status || 'pending'}</div>
+        </div>`
+      ).join('');
+    }
+
+    // ============================================================
+    //  WORKING HOURS
+    // ============================================================
+    async function loadWorkingHours() {
+      if (!currentShop) return;
+      const snap = await db.collection('shops').doc(currentShop.id).collection('workingHours').get();
+      const data = {};
+      snap.docs.forEach(d => { data[d.id] = d.data(); });
+      workingHours = data;
+      renderHours();
+    }
+
+    function renderHours() {
+      const container = document.getElementById('hoursContainer');
+      const days = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+      if (Object.keys(workingHours).length === 0) {
+        container.innerHTML = '<p class="text-muted">لم يتم تعيين أوقات العمل بعد</p>';
+        return;
+      }
+      container.innerHTML = days.map(day => {
+        const h = workingHours[day] || { isOpen: false, openTime: '09:00', closeTime: '21:00' };
+        return `<div class="flex-between bg-card" style="margin-bottom:6px;">
+          <span>${day}</span>
+          <span>${h.isOpen ? `${formatTime(h.openTime)} - ${formatTime(h.closeTime)}` : 'مغلق'}</span>
+          <button class="btn btn-sm btn-outline" onclick="editHour('${day}')">✏️</button>
+        </div>`;
+      }).join('');
+    }
+
+    window.editHour = function(day) {
+      const h = workingHours[day] || { isOpen: true, openTime: '09:00', closeTime: '21:00' };
+      const newOpen = prompt(`أدخل وقت الفتح (HH:MM) لـ ${day}`, h.openTime);
+      if (newOpen === null) return;
+      const newClose = prompt(`أدخل وقت الإغلاق (HH:MM) لـ ${day}`, h.closeTime);
+      if (newClose === null) return;
+      const isOpen = confirm(`هل هذا اليوم مفتوح؟ اضغط OK نعم، Cancel لا`);
+      db.collection('shops').doc(currentShop.id).collection('workingHours').doc(day).set({
+        day,
+        isOpen,
+        openTime: newOpen,
+        closeTime: newClose,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true }).then(() => {
+        showToast('تم التحديث', 'success');
+        loadWorkingHours();
+      }).catch(err => showToast(err.message, 'error'));
+    };
+
+    // ============================================================
+    //  HOLIDAYS
+    // ============================================================
+    async function loadHolidays() {
+      if (!currentShop) return;
+      const snap = await db.collection('shops').doc(currentShop.id).collection('holidays')
+        .limit(100).get();
+      allHolidays = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderHolidays();
+    }
+
+    function renderHolidays() {
+      const container = document.getElementById('holidaysList');
+      if (allHolidays.length === 0) {
+        container.innerHTML = '<p class="text-muted">لا توجد عطلات</p>';
+        return;
+      }
+      container.innerHTML = allHolidays.map(h =>
+        `<div class="flex-between bg-card" style="margin-bottom:6px;">
+          <span>${formatDate(h.date)} - ${h.reason || 'عطلة'}</span>
+          <button class="btn btn-sm btn-danger" onclick="deleteHoliday('${h.id}')">🗑️</button>
+        </div>`
+      ).join('');
+    }
+
+    document.getElementById('addHolidayBtn').addEventListener('click', async () => {
+      const date = prompt('أدخل تاريخ العطلة (YYYY-MM-DD)');
+      if (!date) return;
+      const reason = prompt('السبب (اختياري)');
+      try {
+        await db.collection('shops').doc(currentShop.id).collection('holidays').add({
+          date,
+          reason: reason || 'عطلة',
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        showToast('تم إضافة العطلة', 'success');
+        loadHolidays();
+      } catch (err) { showToast(err.message, 'error'); }
+    });
+
+    window.deleteHoliday = async function(id) {
+      if (!confirm('حذف العطلة؟')) return;
+      try {
+        await db.collection('shops').doc(currentShop.id).collection('holidays').doc(id).delete();
+        showToast('تم الحذف', 'success');
+        loadHolidays();
+      } catch (err) { showToast(err.message, 'error'); }
+    };
+
+    // ============================================================
+    //  GALLERY
+    // ============================================================
+    async function loadGallery() {
+      if (!currentShop) return;
+      const snap = await db.collection('shops').doc(currentShop.id).collection('gallery')
+        .where('status', '==', 'active').orderBy('sortOrder', 'asc').limit(50).get();
+      allGallery = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderGallery();
+    }
+
+    function renderGallery() {
+      const container = document.getElementById('galleryGrid');
+      if (allGallery.length === 0) {
+        container.innerHTML = '<p class="text-muted" style="grid-column:span 3;text-align:center;">لا توجد صور</p>';
+        return;
+      }
+      container.innerHTML = allGallery.map(img =>
+        `<div style="position:relative;">
+          <img src="${img.imageUrl}" alt="${img.title}" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;border:1px solid #2a2a40;">
+          <button class="btn btn-sm btn-danger" style="position:absolute;top:4px;left:4px;width:auto;padding:4px 10px;" onclick="deleteGalleryImage('${img.id}')">✕</button>
+        </div>`
+      ).join('');
+    }
+
+    document.getElementById('addGalleryBtn').addEventListener('click', () => {
+      document.getElementById('galleryFileInput').click();
+    });
+
+    document.getElementById('galleryFileInput').addEventListener('change', async (e) => {
+      const files = e.target.files;
+      if (!files.length) return;
+      for (const file of files) {
+        try {
+          // رفع إلى Cloudinary
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('upload_preset', 'salons1');
+          formData.append('folder', `shops/${currentShop.id}/gallery`);
+          const res = await fetch('https://api.cloudinary.com/v1_1/deaevfmvm/image/upload', {
+            method: 'POST',
+            body: formData
+          });
+          const data = await res.json();
+          if (data.secure_url) {
+            await db.collection('shops').doc(currentShop.id).collection('gallery').add({
+              imageUrl: data.secure_url,
+              publicId: data.public_id,
+              title: file.name,
+              sortOrder: 0,
+              status: 'active',
+              createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            showToast('تم رفع الصورة', 'success');
+          } else {
+            showToast('فشل الرفع', 'error');
+          }
+        } catch (err) {
+          showToast(err.message, 'error');
+        }
+      }
+      document.getElementById('galleryFileInput').value = '';
+      loadGallery();
+    });
+
+    window.deleteGalleryImage = async function(id) {
+      if (!confirm('حذف الصورة؟')) return;
+      try {
+        await db.collection('shops').doc(currentShop.id).collection('gallery').doc(id).update({ status: 'disabled' });
+        showToast('تم الحذف', 'success');
+        loadGallery();
+      } catch (err) { showToast(err.message, 'error'); }
+    };
+
+    // ============================================================
+    //  SUBSCRIPTION
+    // ============================================================
+    async function loadSubscription() {
+      if (!currentShop) return;
+      // تحميل الخطط
+      const plansSnap = await db.collection('plans').limit(10).get();
+      if (plansSnap.empty) {
+        // إنشاء خطط افتراضية
+        const defaultPlans = [
+          { name: 'أساسي', price: 50, currency: 'USD', features: ['موقع عام', 'حجوزات غير محدودة', 'دعم بريد'], status: 'active' },
+          { name: 'متقدم', price: 100, currency: 'USD', features: ['كل ما في الأساسي', 'تحليلات', 'دعم واتساب'],
+            status: 'active' },
+          { name: 'احترافي', price: 200, currency: 'USD', features: ['كل ما في المتقدم', 'تكامل سوشيال', 'أولوية الدعم'],
+            status: 'active' }
+        ];
+        for (const p of defaultPlans) {
+          await db.collection('plans').add({ ...p, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+        }
+        // إعادة التحميل
+        const newSnap = await db.collection('plans').limit(10).get();
+        plans = newSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      } else {
+        plans = plansSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      }
+      renderSubscription();
+    }
+
+    function renderSubscription() {
+      const info = document.getElementById('subscriptionInfo');
+      const statusMap = { 'pending': 'قيد الانتظار', 'active': 'نشط', 'expired': 'منتهي', 'cancelled': 'ملغي' };
+      info.innerHTML = `
+        <div class="bg-card">
+          <p><strong>الحالة:</strong> ${statusMap[currentShop.subscriptionStatus] || 'غير مفعل'}</p>
+          <p><strong>الخطة:</strong> ${currentShop.planId || 'غير محددة'}</p>
+          <p class="text-muted">لتفعيل الاشتراك، تواصل مع الدعم عبر واتساب</p>
+        </div>
+      `;
+      const list = document.getElementById('plansList');
+      if (plans.length === 0) {
+        list.innerHTML = '<p class="text-muted">لا توجد خطط متاحة</p>';
+        return;
+      }
+      list.innerHTML = plans.map(p =>
+        `<div class="bg-card">
+          <h3>${p.name}</h3>
+          <p>${p.price} ${p.currency}</p>
+          <ul>${p.features ? p.features.map(f => `<li>${f}</li>`).join('') : ''}</ul>
+          <button class="btn btn-primary btn-sm" onclick="requestSubscription('${p.id}','${p.name}',${p.price},'${p.currency}')">طلب الاشتراك</button>
+        </div>`
+      ).join('');
+    }
+
+    window.requestSubscription = async function(planId, planName, price, currency) {
+      if (!currentShop) return;
+      try {
+        const reqRef = await db.collection('subscriptionRequests').add({
+          userId: currentUser.uid,
+          shopId: currentShop.id,
+          shopName: currentShop.name,
+          planId,
+          planName,
+          price,
+          currency,
+          message: '',
+          status: 'pending',
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        showToast('تم إرسال طلب الاشتراك', 'success');
+        // إنشاء رابط واتساب
+        const msg =
+          `مرحباً، أرغب في الاشتراك في باقة ${planName} بسعر ${price} ${currency} لمتجر ${currentShop.name}. رقم الطلب: ${reqRef.id}`;
+        const wa = `https://wa.me/201234567890?text=${encodeURIComponent(msg)}`;
+        if (confirm('تم إرسال الطلب. هل تريد التواصل عبر واتساب؟')) {
+          window.open(wa, '_blank');
+        }
+      } catch (err) { showToast(err.message, 'error'); }
+    };
+
+    // ============================================================
+    //  PROFILE
+    // ============================================================
+    async function loadProfile() {
+      if (!currentUser) return;
+      const doc = await db.collection('users').doc(currentUser.uid).get();
+      if (doc.exists) {
+        const data = doc.data();
+        document.getElementById('profileName').value = data.name || '';
+        document.getElementById('profilePhone').value = data.phone || '';
+        document.getElementById('profileEmail').value = currentUser.email || '';
+      }
+    }
+
+    document.getElementById('profileForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('profileName').value;
+      const phone = document.getElementById('profilePhone').value;
+      try {
+        await db.collection('users').doc(currentUser.uid).update({
+          name,
+          phone,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        if (currentUser) {
+          await currentUser.updateProfile({ displayName: name });
+        }
+        showToast('تم تحديث الملف الشخصي', 'success');
+      } catch (err) { showToast(err.message, 'error'); }
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+
+    // ============================================================
+    //  PUBLIC SITE (/s/:slug)
+    // ============================================================
+    async function loadPublicSite(slug) {
+      const container = document.getElementById('publicContent');
+      if (!slug) {
+        container.innerHTML = '<p class="text-muted">رابط غير صحيح</p>';
+        return;
+      }
+      try {
+        const shopsSnap = await db.collection('shops').where('slug', '==', slug).limit(1).get();
+        if (shopsSnap.empty) {
+          container.innerHTML = '<p class="text-muted">المتجر غير موجود</p>';
+          return;
+        }
+        const shopDoc = shopsSnap.docs[0];
+        const shop = shopDoc.data();
+        if (shop.status !== 'active' || shop.subscriptionStatus !== 'active') {
+          container.innerHTML = '<div class="bg-card"><p>⛔ هذا المتجر غير متاح حالياً</p></div>';
+          return;
+        }
+        // تحميل البيانات العامة
+        const shopId = shopDoc.id;
+        const servicesSnap = await db.collection('shops').doc(shopId).collection('services')
+          .where('status', '==', 'active').limit(20).get();
+        const services = servicesSnap.docs.map(d => d.data());
+        const barbersSnap = await db.collection('shops').doc(shopId).collection('barbers')
+          .where('status', '==', 'active').limit(20).get();
+        const barbers = barbersSnap.docs.map(d => d.data());
+        const gallerySnap = await db.collection('shops').doc(shopId).collection('gallery')
+          .where('status', '==', 'active').orderBy('sortOrder', 'asc').limit(30).get();
+        const gallery = gallerySnap.docs.map(d => d.data());
+        const hoursSnap = await db.collection('shops').doc(shopId).collection('workingHours').get();
+        const hours = {};
+        hoursSnap.docs.forEach(d => { hours[d.id] = d.data(); });
+
+        let html = `
+          <div class="hero">
+            ${shop.logoUrl ? `<img src="${shop.logoUrl}" alt="logo">` : ''}
+            <h1>${shop.name}</h1>
+            <p>${shop.description || ''}</p>
+            ${shop.whatsapp ? `<a href="https://wa.me/${shop.whatsapp}" target="_blank" class="btn btn-success btn-sm">📱 تواصل واتساب</a>` : ''}
+          </div>
+          <h2>✂️ خدماتنا</h2>
+          ${services.map(s => `<div class="service-item"><span>${s.name}</span><span>${s.price} ${shop.currency || 'EGP'} - ${s.duration} د</span></div>`).join('')}
+          <h2>💇 الحلاقون</h2>
+          ${barbers.map(b => `<div class="barber-item"><span>${b.name}</span><span>${b.specialties || ''}</span></div>`).join('')}
+          <h2>🕒 أوقات العمل</h2>
+          ${Object.keys(hours).map(d => `<div class="flex-between"><span>${d}</span><span>${hours[d].isOpen ? `${hours[d].openTime} - ${hours[d].closeTime}` : 'مغلق'}</span></div>`).join('')}
+          <h2>🖼️ المعرض</h2>
+          <div class="gallery-grid">${gallery.map(img => `<img src="${img.imageUrl}" alt="${img.title}">`).join('')}</div>
+          <div style="margin-top:20px;text-align:center;">
+            <button class="btn btn-primary" onclick="alert('للحجز يرجى الاتصال على واتساب')">📅 احجز الآن</button>
+          </div>
+        `;
+        container.innerHTML = html;
+      } catch (err) {
+        container.innerHTML = `<p class="text-muted">خطأ: ${err.message}</p>`;
+      }
+    }
+
+    // ============================================================
+    //  DRAWER EVENTS
+    // ============================================================
+    document.getElementById('openDrawerBtn').addEventListener('click', openDrawer);
+    document.getElementById('closeDrawerBtn').addEventListener('click', closeDrawer);
+    document.getElementById('drawerBackdrop').addEventListener('click', closeDrawer);
+
+    // ============================================================
+    //  ROUTING BASED ON URL (للصفحات العامة)
+    // ============================================================
+    // سنقوم بفحص المسار عند التحميل
+    window.addEventListener('load', () => {
+      const path = window.location.pathname;
+      if (path.startsWith('/s/')) {
+        const slug = path.split('/s/')[1];
+        if (slug) {
+          // تأكد من أن المستخدم غير مسجل، أو سجل لكننا نعرض الصفحة العامة
+          // سنسمح بالعرض حتى لو كان مسجلاً
+          navigate('public', { slug });
+        }
+      } else {
+        // الباقي يعتمد على حالة المصادقة
+      }
+    });
+
+    // ============================================================
+    //  INIT
+    // ============================================================
+    console.log('💈 SalonHub SaaS loaded.');
+    // سيتم التعامل مع التنقل بواسطة onAuthStateChanged
+  </script>
 </body>
 </html>
