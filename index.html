@@ -3,43 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-  <title>منصة الحلاقة – SaaS</title>
-  <!-- Firebase SDKs -->
+  <title>💈 SalonHub – منصة الحلاقة</title>
+
+  <!-- Firebase SDKs (compat) -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js">
   </script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js">
   </script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js">
   </script>
+
   <style>
-    /* ========== RESET & BASE ========== */
+    /* ============================================================
+       RESET & BASE
+       ============================================================ */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
+
     body {
-      background: #0b0b12;
-      color: #f0f0f0;
+      background: #0a0a12;
+      color: #e8e8f0;
       min-height: 100vh;
-      padding: 0;
-      margin: 0;
       display: flex;
       justify-content: center;
-      align-items: center;
-      transition: background 0.3s;
+      align-items: flex-start;
+      padding: 12px;
     }
+
     #app {
-      width: 100%;
       max-width: 480px;
-      background: #14141f;
+      width: 100%;
+      background: #12121e;
       border-radius: 32px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
       overflow: hidden;
-      min-height: 100vh;
+      min-height: 95vh;
       position: relative;
+      border: 1px solid #28283a;
     }
+
     @media (min-width: 768px) {
       #app {
         max-width: 720px;
@@ -54,12 +60,14 @@
       }
     }
 
-    /* ========== TYPOGRAPHY & COLORS ========== */
+    /* ============================================================
+       TYPOGRAPHY & UTILITIES
+       ============================================================ */
     .text-center {
       text-align: center;
     }
     .text-muted {
-      color: #8a8a9a;
+      color: #8888a0;
     }
     .text-success {
       color: #2ecc71;
@@ -71,21 +79,22 @@
       color: #e74c3c;
     }
     .text-primary {
-      color: #6c5ce7;
-    }
-    .bg-dark {
-      background: #1a1a2e;
+      color: #7c6df0;
     }
     .bg-card {
-      background: #1f1f30;
+      background: #1a1a2e;
       border-radius: 20px;
-      padding: 20px;
-      margin-bottom: 16px;
+      padding: 18px;
+      margin-bottom: 14px;
       border: 1px solid #2a2a40;
+      transition: 0.2s;
+    }
+    .bg-card:hover {
+      border-color: #3d3d5c;
     }
     .badge {
       display: inline-block;
-      padding: 4px 12px;
+      padding: 4px 14px;
       border-radius: 30px;
       font-size: 12px;
       font-weight: 600;
@@ -108,288 +117,6 @@
       background: #1a5276;
       color: #fff;
     }
-
-    /* ========== BUTTONS ========== */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 40px;
-      font-weight: 600;
-      font-size: 16px;
-      cursor: pointer;
-      transition: all 0.2s;
-      width: 100%;
-      background: #2a2a40;
-      color: #f0f0f0;
-    }
-    .btn-primary {
-      background: #6c5ce7;
-      color: #fff;
-    }
-    .btn-primary:hover {
-      background: #5a4bd1;
-      transform: scale(0.98);
-    }
-    .btn-success {
-      background: #27ae60;
-      color: #fff;
-    }
-    .btn-danger {
-      background: #c0392b;
-      color: #fff;
-    }
-    .btn-outline {
-      background: transparent;
-      border: 2px solid #6c5ce7;
-      color: #6c5ce7;
-    }
-    .btn-sm {
-      padding: 8px 16px;
-      font-size: 14px;
-    }
-    .btn-block {
-      width: 100%;
-    }
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    /* ========== FORM ========== */
-    .form-group {
-      margin-bottom: 18px;
-    }
-    .form-group label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: 500;
-      color: #b0b0c0;
-      font-size: 14px;
-    }
-    .form-control {
-      width: 100%;
-      padding: 14px 18px;
-      border-radius: 40px;
-      border: 2px solid #2a2a40;
-      background: #1a1a2e;
-      color: #f0f0f0;
-      font-size: 16px;
-      transition: 0.2s;
-    }
-    .form-control:focus {
-      border-color: #6c5ce7;
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.3);
-    }
-    .form-control::placeholder {
-      color: #6a6a7a;
-    }
-    select.form-control {
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a8a9a' stroke-width='2' fill='none'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: left 16px center;
-    }
-
-    /* ========== CARDS & GRID ========== */
-    .row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .col-6 {
-      flex: 0 0 calc(50% - 6px);
-    }
-    .col-12 {
-      flex: 0 0 100%;
-    }
-    .stat-card {
-      background: #1a1a2e;
-      border-radius: 16px;
-      padding: 16px;
-      text-align: center;
-      border: 1px solid #2a2a40;
-    }
-    .stat-number {
-      font-size: 28px;
-      font-weight: 700;
-      color: #fff;
-      margin-top: 4px;
-    }
-    .stat-label {
-      font-size: 13px;
-      color: #8a8a9a;
-    }
-
-    /* ========== NAVIGATION ========== */
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 20px;
-      background: #14141f;
-      border-bottom: 1px solid #2a2a40;
-    }
-    .topbar-brand {
-      font-weight: 700;
-      font-size: 20px;
-      color: #fff;
-    }
-    .topbar-brand span {
-      color: #6c5ce7;
-    }
-    .menu-toggle {
-      background: transparent;
-      border: none;
-      color: #f0f0f0;
-      font-size: 28px;
-      cursor: pointer;
-    }
-
-    /* Drawer */
-    .drawer {
-      position: fixed;
-      top: 0;
-      right: -280px;
-      width: 280px;
-      height: 100%;
-      background: #1a1a2e;
-      border-left: 1px solid #2a2a40;
-      transition: right 0.3s;
-      z-index: 1000;
-      padding: 24px 16px;
-      overflow-y: auto;
-    }
-    .drawer.open {
-      right: 0;
-    }
-    .drawer-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 999;
-      display: none;
-    }
-    .drawer-backdrop.show {
-      display: block;
-    }
-    .drawer .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 16px;
-      border-radius: 16px;
-      color: #b0b0c0;
-      font-weight: 500;
-      transition: 0.2s;
-      cursor: pointer;
-      text-decoration: none;
-    }
-    .drawer .nav-item:hover,
-    .drawer .nav-item.active {
-      background: #2a2a40;
-      color: #fff;
-    }
-    .drawer .nav-item .icon {
-      font-size: 22px;
-      width: 30px;
-      text-align: center;
-    }
-
-    /* ========== PAGES ========== */
-    .page {
-      display: none;
-      padding: 20px;
-      animation: fadeIn 0.25s ease;
-    }
-    .page.active {
-      display: block;
-    }
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* ========== TOAST ========== */
-    .toast-container {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 9999;
-      width: 90%;
-      max-width: 400px;
-    }
-    .toast {
-      background: #2a2a40;
-      color: #f0f0f0;
-      padding: 16px 20px;
-      border-radius: 40px;
-      margin-bottom: 10px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
-      border-left: 5px solid #6c5ce7;
-      font-weight: 500;
-      text-align: center;
-      animation: slideUp 0.3s ease;
-    }
-    .toast-success {
-      border-color: #2ecc71;
-    }
-    .toast-error {
-      border-color: #e74c3c;
-    }
-    .toast-info {
-      border-color: #3498db;
-    }
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* ========== EMPTY STATE ========== */
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-      color: #8a8a9a;
-    }
-    .empty-state .icon {
-      font-size: 64px;
-      margin-bottom: 16px;
-    }
-    .empty-state h3 {
-      color: #f0f0f0;
-      margin-bottom: 8px;
-    }
-
-    /* ========== SCROLL ========== */
-    ::-webkit-scrollbar {
-      width: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #14141f;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #2a2a40;
-      border-radius: 10px;
-    }
-
-    /* ========== MISC ========== */
     .flex {
       display: flex;
       align-items: center;
@@ -399,6 +126,9 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+    }
+    .flex-wrap {
+      flex-wrap: wrap;
     }
     .gap-8 {
       gap: 8px;
@@ -421,10 +151,311 @@
     .pointer {
       cursor: pointer;
     }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .col-6 {
+      flex: 0 0 calc(50% - 6px);
+    }
+    .col-12 {
+      flex: 0 0 100%;
+    }
 
-    /* ========== PUBLIC SITE (s/) ========== */
+    /* ============================================================
+       BUTTONS
+       ============================================================ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 100%;
+      background: #2a2a40;
+      color: #f0f0f0;
+      text-decoration: none;
+      border: 1px solid transparent;
+    }
+    .btn-primary {
+      background: #7c6df0;
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: #6a5cdb;
+      transform: scale(0.98);
+    }
+    .btn-success {
+      background: #27ae60;
+      color: #fff;
+    }
+    .btn-danger {
+      background: #c0392b;
+      color: #fff;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 2px solid #7c6df0;
+      color: #7c6df0;
+    }
+    .btn-sm {
+      padding: 8px 16px;
+      font-size: 13px;
+      width: auto;
+    }
+    .btn-block {
+      width: 100%;
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* ============================================================
+       FORM
+       ============================================================ */
+    .form-group {
+      margin-bottom: 18px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: #b0b0c8;
+      font-size: 14px;
+    }
+    .form-control {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 40px;
+      border: 2px solid #2a2a40;
+      background: #12121e;
+      color: #f0f0f0;
+      font-size: 16px;
+      transition: 0.2s;
+    }
+    .form-control:focus {
+      border-color: #7c6df0;
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(124, 109, 240, 0.2);
+    }
+    .form-control::placeholder {
+      color: #5a5a72;
+    }
+    select.form-control {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238888a0' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: left 16px center;
+    }
+    textarea.form-control {
+      resize: vertical;
+      min-height: 60px;
+      border-radius: 20px;
+    }
+
+    /* ============================================================
+       STATS CARDS
+       ============================================================ */
+    .stat-card {
+      background: #12121e;
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      border: 1px solid #28283a;
+    }
+    .stat-number {
+      font-size: 26px;
+      font-weight: 700;
+      color: #fff;
+      margin-top: 4px;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: #8888a0;
+    }
+
+    /* ============================================================
+       TOPBAR & DRAWER
+       ============================================================ */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: #12121e;
+      border-bottom: 1px solid #28283a;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+    .topbar-brand {
+      font-weight: 700;
+      font-size: 20px;
+      color: #fff;
+    }
+    .topbar-brand span {
+      color: #7c6df0;
+    }
+    .menu-toggle {
+      background: transparent;
+      border: none;
+      color: #f0f0f0;
+      font-size: 28px;
+      cursor: pointer;
+      padding: 4px 8px;
+    }
+
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 998;
+      display: none;
+    }
+    .drawer-backdrop.show {
+      display: block;
+    }
+
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: -300px;
+      width: 280px;
+      height: 100%;
+      background: #14141f;
+      border-left: 1px solid #2a2a40;
+      transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 999;
+      padding: 24px 16px;
+      overflow-y: auto;
+    }
+    .drawer.open {
+      right: 0;
+    }
+    .drawer .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      color: #b0b0c8;
+      font-weight: 500;
+      transition: 0.2s;
+      cursor: pointer;
+      text-decoration: none;
+      margin-bottom: 2px;
+    }
+    .drawer .nav-item:hover,
+    .drawer .nav-item.active {
+      background: #2a2a40;
+      color: #fff;
+    }
+    .drawer .nav-item .icon {
+      font-size: 22px;
+      width: 32px;
+      text-align: center;
+    }
+
+    /* ============================================================
+       PAGES
+       ============================================================ */
+    .page {
+      display: none;
+      padding: 20px;
+      animation: fadeUp 0.25s ease;
+    }
+    .page.active {
+      display: block;
+    }
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ============================================================
+       TOAST
+       ============================================================ */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      width: 92%;
+      max-width: 400px;
+    }
+    .toast {
+      background: #1e1e32;
+      color: #f0f0f0;
+      padding: 16px 20px;
+      border-radius: 40px;
+      margin-bottom: 10px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+      border-right: 5px solid #7c6df0;
+      font-weight: 500;
+      text-align: center;
+      animation: slideUp 0.3s ease;
+      backdrop-filter: blur(10px);
+      border: 1px solid #3a3a5a;
+    }
+    .toast-success {
+      border-color: #2ecc71;
+    }
+    .toast-error {
+      border-color: #e74c3c;
+    }
+    .toast-info {
+      border-color: #3498db;
+    }
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ============================================================
+       EMPTY STATE
+       ============================================================ */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #8888a0;
+    }
+    .empty-state .icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+    }
+    .empty-state h3 {
+      color: #f0f0f0;
+      margin-bottom: 8px;
+    }
+
+    /* ============================================================
+       PUBLIC SITE
+       ============================================================ */
     .public-site {
-      background: #0b0b12;
+      background: #0a0a12;
       padding: 20px;
     }
     .public-site .hero {
@@ -435,7 +466,9 @@
       max-width: 120px;
       border-radius: 50%;
       margin-bottom: 16px;
-      border: 3px solid #6c5ce7;
+      border: 3px solid #7c6df0;
+      object-fit: cover;
+      aspect-ratio: 1;
     }
     .public-site .hero h1 {
       font-size: 28px;
@@ -443,11 +476,11 @@
     }
     .public-site .service-item,
     .public-site .barber-item {
-      background: #1a1a2e;
+      background: #12121e;
       border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 12px;
-      border: 1px solid #2a2a40;
+      padding: 14px 18px;
+      margin-bottom: 10px;
+      border: 1px solid #28283a;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -462,12 +495,84 @@
       aspect-ratio: 1;
       object-fit: cover;
       border-radius: 12px;
+      border: 1px solid #28283a;
+    }
+
+    /* ============================================================
+       MODAL
+       ============================================================ */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      backdrop-filter: blur(4px);
+    }
+    .modal-overlay.open {
+      display: flex;
+    }
+    .modal-box {
+      background: #1a1a2e;
+      border-radius: 32px;
+      padding: 24px;
+      max-width: 420px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      border: 1px solid #3a3a5a;
+      animation: fadeUp 0.25s ease;
+    }
+    .modal-box h3 {
+      margin-bottom: 16px;
+      font-size: 22px;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .modal-actions .btn {
+      flex: 1;
+    }
+
+    /* ============================================================
+       SCROLLBAR
+       ============================================================ */
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #12121e;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #3a3a5a;
+      border-radius: 10px;
+    }
+
+    /* ============================================================
+       RESPONSIVE TWEAKS
+       ============================================================ */
+    @media (max-width: 420px) {
+      .stat-number {
+        font-size: 20px;
+      }
+      .btn {
+        font-size: 14px;
+        padding: 10px 16px;
+      }
+      .topbar-brand {
+        font-size: 17px;
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- ===== TOAST CONTAINER ===== -->
+  <!-- ===== TOAST ===== -->
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- ===== DRAWER BACKDROP ===== -->
@@ -475,13 +580,11 @@
 
   <!-- ===== DRAWER ===== -->
   <div class="drawer" id="drawer">
-    <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
-      <span style="font-size: 20px; font-weight: 700; color:#fff;">القائمة</span>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; padding:0 4px;">
+      <span style="font-size:20px; font-weight:700; color:#fff;">💈 القائمة</span>
       <button class="menu-toggle" id="closeDrawerBtn" style="font-size:24px;">✕</button>
     </div>
-    <div id="drawerNav">
-      <!-- سيتم تعبئتها ديناميكياً -->
-    </div>
+    <div id="drawerNav"></div>
   </div>
 
   <!-- ===== APP ===== -->
@@ -493,7 +596,7 @@
       <button class="menu-toggle" id="openDrawerBtn">☰</button>
     </div>
 
-    <!-- ===== PAGES ===== -->
+    <!-- ============================== PAGES ============================== -->
 
     <!-- LOGIN -->
     <div class="page active" id="page-login">
@@ -513,10 +616,10 @@
         <button class="btn btn-primary btn-block" type="submit" id="loginBtn">دخول</button>
         <div class="text-center mt-16">
           <span class="text-muted">ليس لديك حساب؟</span>
-          <a href="#" id="gotoSignup" style="color:#6c5ce7; font-weight:600;">إنشاء حساب</a>
+          <a href="#" id="gotoSignup" style="color:#7c6df0; font-weight:600;">إنشاء حساب</a>
         </div>
         <div class="text-center mt-8">
-          <a href="#" id="gotoForgot" style="color:#8a8a9a; font-size:14px;">نسيت كلمة المرور؟</a>
+          <a href="#" id="gotoForgot" style="color:#8888a0; font-size:14px;">نسيت كلمة المرور؟</a>
         </div>
       </form>
     </div>
@@ -547,12 +650,12 @@
         <button class="btn btn-primary btn-block" type="submit" id="signupBtn">إنشاء حساب</button>
         <div class="text-center mt-16">
           <span class="text-muted">لديك حساب بالفعل؟</span>
-          <a href="#" id="gotoLogin" style="color:#6c5ce7; font-weight:600;">تسجيل الدخول</a>
+          <a href="#" id="gotoLogin" style="color:#7c6df0; font-weight:600;">تسجيل الدخول</a>
         </div>
       </form>
     </div>
 
-    <!-- FORGOT PASSWORD -->
+    <!-- FORGOT -->
     <div class="page" id="page-forgot">
       <div style="padding: 30px 0 10px; text-align:center;">
         <h1 style="font-size:28px;">🔐 استعادة</h1>
@@ -565,12 +668,12 @@
         </div>
         <button class="btn btn-primary btn-block" type="submit">إرسال</button>
         <div class="text-center mt-16">
-          <a href="#" id="gotoLoginFromForgot" style="color:#6c5ce7;">رجوع إلى تسجيل الدخول</a>
+          <a href="#" id="gotoLoginFromForgot" style="color:#7c6df0;">رجوع إلى تسجيل الدخول</a>
         </div>
       </form>
     </div>
 
-    <!-- ONBOARDING / CREATE SHOP -->
+    <!-- CREATE SHOP (ONBOARDING) -->
     <div class="page" id="page-shop">
       <div style="padding: 20px 0 10px; text-align:center;">
         <h1 style="font-size:24px;">🏪 أنشئ متجرك</h1>
@@ -638,7 +741,7 @@
         <div class="col-6"><div class="stat-card"><div class="stat-label">الاشتراك</div><div class="stat-number" id="statSubscription" style="font-size:16px;">غير مفعل</div></div></div>
       </div>
       <div class="bg-card mt-16">
-        <h3>📅 أحدث الحجوزات</h3>
+        <h3 style="margin-bottom:12px;">📅 أحدث الحجوزات</h3>
         <div id="recentBookingsList"><p class="text-muted">لا توجد حجوزات</p></div>
       </div>
     </div>
@@ -650,23 +753,6 @@
         <button class="btn btn-primary btn-sm" id="addServiceBtn">+ إضافة</button>
       </div>
       <div id="servicesList"><p class="text-muted">لا توجد خدمات</p></div>
-      <!-- Modal for add/edit service -->
-      <div id="serviceModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:999; align-items:center; justify-content:center; padding:20px;">
-        <div style="background:#1f1f30; border-radius:32px; padding:24px; max-width:400px; width:100%;">
-          <h3 id="serviceModalTitle">إضافة خدمة</h3>
-          <form id="serviceForm">
-            <input type="hidden" id="serviceEditId">
-            <div class="form-group"><label>الاسم</label><input class="form-control" id="serviceNameInput" required></div>
-            <div class="form-group"><label>الوصف</label><input class="form-control" id="serviceDescInput"></div>
-            <div class="form-group"><label>السعر</label><input class="form-control" type="number" id="servicePriceInput" step="0.01" required></div>
-            <div class="form-group"><label>المدة (دقائق)</label><input class="form-control" type="number" id="serviceDurationInput" value="30" required></div>
-            <div style="display:flex; gap:10px;">
-              <button class="btn btn-primary" type="submit" id="serviceSaveBtn">حفظ</button>
-              <button class="btn btn-outline" type="button" id="serviceCancelBtn">إلغاء</button>
-            </div>
-          </form>
-        </div>
-      </div>
     </div>
 
     <!-- BARBERS -->
@@ -676,22 +762,6 @@
         <button class="btn btn-primary btn-sm" id="addBarberBtn">+ إضافة</button>
       </div>
       <div id="barbersList"><p class="text-muted">لا يوجد حلاقون</p></div>
-      <!-- Modal -->
-      <div id="barberModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:999; align-items:center; justify-content:center; padding:20px;">
-        <div style="background:#1f1f30; border-radius:32px; padding:24px; max-width:400px; width:100%;">
-          <h3 id="barberModalTitle">إضافة حلاق</h3>
-          <form id="barberForm">
-            <input type="hidden" id="barberEditId">
-            <div class="form-group"><label>الاسم</label><input class="form-control" id="barberNameInput" required></div>
-            <div class="form-group"><label>السيرة</label><input class="form-control" id="barberBioInput"></div>
-            <div class="form-group"><label>التخصصات</label><input class="form-control" id="barberSpecialtiesInput" placeholder="قص، لحية"></div>
-            <div style="display:flex; gap:10px;">
-              <button class="btn btn-primary" type="submit" id="barberSaveBtn">حفظ</button>
-              <button class="btn btn-outline" type="button" id="barberCancelBtn">إلغاء</button>
-            </div>
-          </form>
-        </div>
-      </div>
     </div>
 
     <!-- BOOKINGS -->
@@ -701,30 +771,6 @@
         <button class="btn btn-primary btn-sm" id="addBookingBtn">+ حجز جديد</button>
       </div>
       <div id="bookingsList"><p class="text-muted">لا توجد حجوزات</p></div>
-      <!-- Booking Modal -->
-      <div id="bookingModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:999; align-items:center; justify-content:center; padding:20px;">
-        <div style="background:#1f1f30; border-radius:32px; padding:24px; max-width:400px; width:100%;">
-          <h3>حجز جديد</h3>
-          <form id="bookingForm">
-            <div class="form-group"><label>اسم العميل *</label><input class="form-control" id="bookingCustomerName" required></div>
-            <div class="form-group"><label>رقم الهاتف *</label><input class="form-control" id="bookingCustomerPhone" required></div>
-            <div class="form-group"><label>الدولة</label><input class="form-control" id="bookingCustomerCountry" value="مصر"></div>
-            <div class="form-group"><label>الخدمة *</label>
-              <select class="form-control" id="bookingService" required></select>
-            </div>
-            <div class="form-group"><label>الحلاق</label>
-              <select class="form-control" id="bookingBarber"></select>
-            </div>
-            <div class="form-group"><label>التاريخ *</label><input class="form-control" type="date" id="bookingDate" required></div>
-            <div class="form-group"><label>الوقت *</label><input class="form-control" type="time" id="bookingTime" required></div>
-            <div class="form-group"><label>ملاحظات</label><input class="form-control" id="bookingNotes"></div>
-            <div style="display:flex; gap:10px;">
-              <button class="btn btn-primary" type="submit" id="bookingSaveBtn">حجز</button>
-              <button class="btn btn-outline" type="button" id="bookingCancelBtn">إلغاء</button>
-            </div>
-          </form>
-        </div>
-      </div>
     </div>
 
     <!-- CUSTOMERS -->
@@ -783,38 +829,109 @@
       </form>
     </div>
 
-    <!-- PUBLIC SITE (s/) -->
+    <!-- PUBLIC SITE -->
     <div class="page" id="page-public">
-      <div class="public-site" id="publicContent">
-        <!-- يتم تعبئته ديناميكياً -->
-      </div>
+      <div class="public-site" id="publicContent"></div>
     </div>
 
   </div><!-- end #app -->
 
+  <!-- ===== MODALS (Services, Barbers, Bookings) ===== -->
+  <!-- Service Modal -->
+  <div class="modal-overlay" id="serviceModal">
+    <div class="modal-box">
+      <h3 id="serviceModalTitle">إضافة خدمة</h3>
+      <form id="serviceForm">
+        <input type="hidden" id="serviceEditId">
+        <div class="form-group"><label>الاسم</label><input class="form-control" id="serviceNameInput" required></div>
+        <div class="form-group"><label>الوصف</label><input class="form-control" id="serviceDescInput"></div>
+        <div class="form-group"><label>السعر</label><input class="form-control" type="number" id="servicePriceInput" step="0.01" required></div>
+        <div class="form-group"><label>المدة (دقائق)</label><input class="form-control" type="number" id="serviceDurationInput" value="30" required></div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" type="submit" id="serviceSaveBtn">حفظ</button>
+          <button class="btn btn-outline" type="button" id="serviceCancelBtn">إلغاء</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Barber Modal -->
+  <div class="modal-overlay" id="barberModal">
+    <div class="modal-box">
+      <h3 id="barberModalTitle">إضافة حلاق</h3>
+      <form id="barberForm">
+        <input type="hidden" id="barberEditId">
+        <div class="form-group"><label>الاسم</label><input class="form-control" id="barberNameInput" required></div>
+        <div class="form-group"><label>السيرة</label><input class="form-control" id="barberBioInput"></div>
+        <div class="form-group"><label>التخصصات</label><input class="form-control" id="barberSpecialtiesInput" placeholder="قص، لحية"></div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" type="submit" id="barberSaveBtn">حفظ</button>
+          <button class="btn btn-outline" type="button" id="barberCancelBtn">إلغاء</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Booking Modal -->
+  <div class="modal-overlay" id="bookingModal">
+    <div class="modal-box">
+      <h3>حجز جديد</h3>
+      <form id="bookingForm">
+        <div class="form-group"><label>اسم العميل *</label><input class="form-control" id="bookingCustomerName" required></div>
+        <div class="form-group"><label>رقم الهاتف *</label><input class="form-control" id="bookingCustomerPhone" required></div>
+        <div class="form-group"><label>الدولة</label><input class="form-control" id="bookingCustomerCountry" value="مصر"></div>
+        <div class="form-group"><label>الخدمة *</label><select class="form-control" id="bookingService" required></select></div>
+        <div class="form-group"><label>الحلاق</label><select class="form-control" id="bookingBarber"></select></div>
+        <div class="form-group"><label>التاريخ *</label><input class="form-control" type="date" id="bookingDate" required></div>
+        <div class="form-group"><label>الوقت *</label><input class="form-control" type="time" id="bookingTime" required></div>
+        <div class="form-group"><label>ملاحظات</label><input class="form-control" id="bookingNotes"></div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" type="submit" id="bookingSaveBtn">حجز</button>
+          <button class="btn btn-outline" type="button" id="bookingCancelBtn">إلغاء</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- JAVASCRIPT -->
+  <!-- ============================================================ -->
   <script>
-    // ============================================================
-    //  FIREBASE INIT
-    // ============================================================
+    // ================================================================
+    //  1. FIREBASE CONFIG (⚠️ IMPORTANT: Replace with YOUR actual keys)
+    // ================================================================
+    // 🔥 ادخل هنا مفاتيح مشروعك الفعلي من Firebase Console
+    // يجب تفعيل Email/Password في Authentication
+    // يجب تفعيل Firestore في وضع Test أو مع القواعد المرفقة
     const firebaseConfig = {
-      apiKey: "AIzaSyA0IWiY-tI30LX2PSG2T2gEiBAEd4GqzU",
-      authDomain: "salons-feee4.firebaseapp.com",
-      projectId: "salons-feee4",
+      apiKey: "AIzaSyA0IWiY-tI30LX2PSG2T2gEiBAEd4GqzU", // ⚠️ استبدل هذا بالمفتاح الصحيح من مشروعك
+      authDomain: "salons-feee4.firebaseapp.com", // ⚠️ استبدل بنطاق مشروعك
+      projectId: "salons-feee4", // ⚠️ استبدل بمعرف مشروعك
       storageBucket: "salons-feee4.firebasestorage.app",
       messagingSenderId: "601094041409",
       appId: "1:601094041409:web:d03a02de993fbb203cbbc0",
       measurementId: "G-GP53GSCW0C"
     };
+
+    // التحقق من صحة المفتاح (تنبيه للمطور)
+    if (firebaseConfig.apiKey === "AIzaSyA0IWiY-tI30LX2PSG2T2gEiBAEd4GqzU") {
+      console.warn(
+        "⚠️ أنت تستخدم مفتاح API افتراضي غير صالح. يرجى استبداله بمفتاح مشروع Firebase الفعلي في الكود (firebaseConfig.apiKey).");
+      alert(
+        "⚠️ تنبيه: مفتاح Firebase المستخدم غير صالح. يرجى تعديله في الكود (سطر firebaseConfig) بمفتاح مشروعك الفعلي.");
+    }
+
+    // تهيئة Firebase
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-    // السماح بقراءة/كتابة في وضع الاختبار (سنقوم بتطبيق القواعد لاحقاً)
-    // لكننا سنعتمد على قواعد الأمان المرفقة.
 
-    // ============================================================
-    //  GLOBALS
-    // ============================================================
-    const APP = document.getElementById('app');
+    // إذا كان المشروع جديداً، قد تحتاج إلى تمكين Firestore
+    // لا حاجة لإنشاء مجموعات يدوياً، الكود سينشئها تلقائياً.
+
+    // ================================================================
+    //  2. GLOBALS
+    // ================================================================
     const toastContainer = document.getElementById('toastContainer');
     let currentUser = null;
     let currentShop = null; // { id, ...data }
@@ -829,10 +946,11 @@
     let workingHours = {};
     let plans = [];
     let unsubscribers = [];
+    let isPublicMode = false;
 
-    // ============================================================
-    //  UTILITY FUNCTIONS
-    // ============================================================
+    // ================================================================
+    //  3. UTILITY FUNCTIONS
+    // ================================================================
     function showToast(msg, type = 'info') {
       const div = document.createElement('div');
       div.className = `toast toast-${type}`;
@@ -883,20 +1001,27 @@
       return true;
     }
 
-    // ============================================================
-    //  NAVIGATION
-    // ============================================================
+    // ================================================================
+    //  4. NAVIGATION
+    // ================================================================
     function navigate(page, params = {}) {
-      // إخفاء كل الصفحات
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       const target = document.getElementById(`page-${page}`);
       if (target) target.classList.add('active');
       currentPage = page;
-      // إغلاق الدرج
       closeDrawer();
-      // تحديث شريط التنقل
       updateNavActive(page);
-      // إذا كانت الصفحة تتطلب بيانات، نقوم بتحميلها
+
+      if (page === 'public') {
+        loadPublicSite(params.slug);
+        return;
+      }
+
+      if (!currentShop && page !== 'login' && page !== 'signup' && page !== 'forgot' && page !== 'shop') {
+        navigate('shop');
+        return;
+      }
+
       if (page === 'dashboard') loadDashboard();
       else if (page === 'services') loadServices();
       else if (page === 'barbers') loadBarbers();
@@ -908,7 +1033,6 @@
       else if (page === 'gallery') loadGallery();
       else if (page === 'subscription') loadSubscription();
       else if (page === 'profile') loadProfile();
-      else if (page === 'public') loadPublicSite(params.slug);
     }
 
     function updateNavActive(page) {
@@ -927,14 +1051,21 @@
       document.getElementById('drawerBackdrop').classList.remove('show');
     }
 
-    // ============================================================
-    //  DRAWER BUILD
-    // ============================================================
+    // ================================================================
+    //  5. DRAWER
+    // ================================================================
     function buildDrawer(shop) {
       const container = document.getElementById('drawerNav');
+      if (!shop) {
+        container.innerHTML = `
+          <div class="nav-item" data-page="shop" onclick="navigate('shop')"><span class="icon">🏪</span> إنشاء متجر</div>
+          <div class="nav-item" data-page="profile" onclick="navigate('profile')"><span class="icon">👤</span> الملف الشخصي</div>
+          <div class="nav-item" onclick="logout()"><span class="icon">🚪</span> تسجيل الخروج</div>
+        `;
+        return;
+      }
       const items = [
         { page: 'dashboard', icon: '📊', label: 'نظرة عامة' },
-        { page: 'shop', icon: '🏪', label: 'المتجر' },
         { page: 'services', icon: '✂️', label: 'الخدمات' },
         { page: 'barbers', icon: '💇', label: 'الحلاقون' },
         { page: 'bookings', icon: '📅', label: 'الحجوزات' },
@@ -946,21 +1077,6 @@
         { page: 'subscription', icon: '📦', label: 'الاشتراك' },
         { page: 'profile', icon: '👤', label: 'الملف الشخصي' },
       ];
-      if (!shop) {
-        // إذا لم يكن هناك متجر، نعرض خيار إنشاء متجر
-        container.innerHTML = `
-          <div class="nav-item" data-page="shop" onclick="navigate('shop')">
-            <span class="icon">🏪</span> إنشاء متجر
-          </div>
-          <div class="nav-item" data-page="profile" onclick="navigate('profile')">
-            <span class="icon">👤</span> الملف الشخصي
-          </div>
-          <div class="nav-item" onclick="logout()">
-            <span class="icon">🚪</span> تسجيل الخروج
-          </div>
-        `;
-        return;
-      }
       let html = '';
       for (const item of items) {
         html += `<div class="nav-item" data-page="${item.page}" onclick="navigate('${item.page}')">
@@ -972,23 +1088,21 @@
       updateNavActive(currentPage);
     }
 
-    // ============================================================
-    //  AUTH
-    // ============================================================
+    // ================================================================
+    //  6. AUTH HANDLERS
+    // ================================================================
     function logout() {
       auth.signOut();
       showToast('تم تسجيل الخروج', 'info');
-      navigate('login');
       currentUser = null;
       currentShop = null;
-      // إلغاء الاشتراكات
       unsubscribers.forEach(u => u());
       unsubscribers = [];
+      navigate('login');
+      buildDrawer(null);
     }
 
-    // ============================================================
-    //  LOGIN / SIGNUP / FORGOT
-    // ============================================================
+    // Login
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('loginEmail').value;
@@ -1001,6 +1115,7 @@
       }
     });
 
+    // Signup
     document.getElementById('signupForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const name = document.getElementById('signupName').value;
@@ -1010,7 +1125,6 @@
       try {
         const cred = await auth.createUserWithEmailAndPassword(email, pass);
         await cred.user.updateProfile({ displayName: name });
-        // إنشاء وثيقة المستخدم
         await db.collection('users').doc(cred.user.uid).set({
           name,
           email,
@@ -1026,15 +1140,7 @@
       }
     });
 
-    document.getElementById('gotoSignup').addEventListener('click', (e) => { e.preventDefault();
-      navigate('signup'); });
-    document.getElementById('gotoLogin').addEventListener('click', (e) => { e.preventDefault();
-      navigate('login'); });
-    document.getElementById('gotoForgot').addEventListener('click', (e) => { e.preventDefault();
-      navigate('forgot'); });
-    document.getElementById('gotoLoginFromForgot').addEventListener('click', (e) => { e.preventDefault();
-      navigate('login'); });
-
+    // Forgot
     document.getElementById('forgotForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('forgotEmail').value;
@@ -1046,17 +1152,26 @@
       }
     });
 
-    // ============================================================
-    //  AUTH STATE
-    // ============================================================
+    // Navigation links
+    document.getElementById('gotoSignup').addEventListener('click', (e) => { e.preventDefault();
+      navigate('signup'); });
+    document.getElementById('gotoLogin').addEventListener('click', (e) => { e.preventDefault();
+      navigate('login'); });
+    document.getElementById('gotoForgot').addEventListener('click', (e) => { e.preventDefault();
+      navigate('forgot'); });
+    document.getElementById('gotoLoginFromForgot').addEventListener('click', (e) => { e.preventDefault();
+      navigate('login'); });
+
+    // ================================================================
+    //  7. AUTH STATE OBSERVER
+    // ================================================================
     auth.onAuthStateChanged(async (user) => {
       if (user) {
         currentUser = user;
-        // تحميل بيانات المستخدم والمتجر
         try {
+          // تحقق من وجود وثيقة المستخدم
           const userDoc = await db.collection('users').doc(user.uid).get();
           if (!userDoc.exists) {
-            // إنشاء وثيقة المستخدم إذا لم توجد (حالة نادرة)
             await db.collection('users').doc(user.uid).set({
               name: user.displayName || '',
               email: user.email,
@@ -1072,22 +1187,33 @@
             const doc = shopsSnap.docs[0];
             currentShop = { id: doc.id, ...doc.data() };
             buildDrawer(currentShop);
-            // إعداد الاستماع للتحديثات
+            // إلغاء الاشتراكات القديمة
+            unsubscribers.forEach(u => u());
+            unsubscribers = [];
             setupRealtimeListeners();
-            navigate('dashboard');
+            if (currentPage === 'login' || currentPage === 'signup' || currentPage === 'forgot') {
+              navigate('dashboard');
+            } else {
+              navigate(currentPage);
+            }
           } else {
             currentShop = null;
             buildDrawer(null);
-            navigate('shop');
+            if (currentPage !== 'shop' && currentPage !== 'profile' && currentPage !== 'public') {
+              navigate('shop');
+            } else {
+              navigate(currentPage);
+            }
           }
         } catch (err) {
-          showToast('خطأ في تحميل البيانات', 'error');
-          console.error(err);
+          showToast('خطأ في تحميل البيانات: ' + err.message, 'error');
         }
       } else {
         currentUser = null;
         currentShop = null;
-        // التحقق مما إذا كنا في صفحة عامة
+        unsubscribers.forEach(u => u());
+        unsubscribers = [];
+        // التحقق من الصفحة العامة
         const path = window.location.pathname;
         if (path.startsWith('/s/')) {
           const slug = path.split('/s/')[1];
@@ -1098,24 +1224,20 @@
         }
         navigate('login');
         buildDrawer(null);
-        unsubscribers.forEach(u => u());
-        unsubscribers = [];
       }
     });
 
-    // ============================================================
-    //  REALTIME LISTENERS (للحجوزات والإشعارات)
-    // ============================================================
+    // ================================================================
+    //  8. REALTIME LISTENERS
+    // ================================================================
     function setupRealtimeListeners() {
       if (!currentShop) return;
-      // الاستماع للحجوزات الجديدة
       const bookingsRef = db.collection('shops').doc(currentShop.id).collection('bookings');
       const unsub = bookingsRef.where('status', '==', 'pending').onSnapshot((snap) => {
         snap.docChanges().forEach(change => {
           if (change.type === 'added') {
             const data = change.doc.data();
             showToast(`📅 حجز جديد من ${data.customerName}`, 'info');
-            // تحديث لوحة التحكم إذا كانت مفتوحة
             if (currentPage === 'dashboard') loadDashboard();
           }
         });
@@ -1123,52 +1245,46 @@
       unsubscribers.push(unsub);
     }
 
-    // ============================================================
-    //  SHOP CREATION
-    // ============================================================
+    // ================================================================
+    //  9. SHOP CREATION
+    // ================================================================
     document.getElementById('shopForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!currentUser) { showToast('يجب تسجيل الدخول', 'error'); return; }
       const name = document.getElementById('shopName').value.trim();
       if (!name) { showToast('اسم المتجر مطلوب', 'error'); return; }
       const slug = generateSlug(name);
-      // التحقق من تفرد slug
-      const existing = await db.collection('shops').where('slug', '==', slug).get();
-      if (!existing.empty) {
-        showToast('هذا الاسم مستخدم، اختر اسم آخر', 'error');
-        return;
-      }
-      const data = {
-        ownerId: currentUser.uid,
-        name,
-        slug,
-        description: document.getElementById('shopDesc').value,
-        phone: document.getElementById('shopPhone').value,
-        whatsapp: document.getElementById('shopWhatsapp').value,
-        country: document.getElementById('shopCountry').value || 'مصر',
-        currency: document.getElementById('shopCurrency').value || 'EGP',
-        timezone: document.getElementById('shopTimezone').value || 'Africa/Cairo',
-        address: document.getElementById('shopAddress').value,
-        instagram: document.getElementById('shopInstagram').value,
-        facebook: document.getElementById('shopFacebook').value,
-        logoUrl: '',
-        logoPublicId: '',
-        coverUrl: '',
-        coverPublicId: '',
-        theme: {
-          template: 'modern',
-          primaryColor: '#1a1a2e',
-          secondaryColor: '#16213e',
-          accentColor: '#e94560'
-        },
-        status: 'draft',
-        planId: null,
-        subscriptionStatus: 'pending',
-        paymentStatus: 'pending',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      };
       try {
+        const existing = await db.collection('shops').where('slug', '==', slug).get();
+        if (!existing.empty) {
+          showToast('هذا الاسم مستخدم، اختر اسم آخر', 'error');
+          return;
+        }
+        const data = {
+          ownerId: currentUser.uid,
+          name,
+          slug,
+          description: document.getElementById('shopDesc').value,
+          phone: document.getElementById('shopPhone').value,
+          whatsapp: document.getElementById('shopWhatsapp').value,
+          country: document.getElementById('shopCountry').value || 'مصر',
+          currency: document.getElementById('shopCurrency').value || 'EGP',
+          timezone: document.getElementById('shopTimezone').value || 'Africa/Cairo',
+          address: document.getElementById('shopAddress').value,
+          instagram: document.getElementById('shopInstagram').value,
+          facebook: document.getElementById('shopFacebook').value,
+          logoUrl: '',
+          logoPublicId: '',
+          coverUrl: '',
+          coverPublicId: '',
+          theme: { template: 'modern', primaryColor: '#1a1a2e', secondaryColor: '#16213e', accentColor: '#e94560' },
+          status: 'draft',
+          planId: null,
+          subscriptionStatus: 'pending',
+          paymentStatus: 'pending',
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
         const docRef = await db.collection('shops').add(data);
         currentShop = { id: docRef.id, ...data };
         buildDrawer(currentShop);
@@ -1180,14 +1296,13 @@
       }
     });
 
-    // ============================================================
-    //  DASHBOARD
-    // ============================================================
+    // ================================================================
+    //  10. DASHBOARD
+    // ================================================================
     async function loadDashboard() {
       if (!currentShop) return;
       const shopId = currentShop.id;
       try {
-        // إحصائيات سريعة باستخدام limit لتجنب الفهارس المركبة
         const bookingsRef = db.collection('shops').doc(shopId).collection('bookings');
         const allSnap = await bookingsRef.limit(100).get();
         const bookings = allSnap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1203,46 +1318,38 @@
         document.getElementById('statCompleted').textContent = completed.length;
         document.getElementById('statTotalBookings').textContent = bookings.length;
 
-        // العملاء
         const custSnap = await db.collection('shops').doc(shopId).collection('customers').limit(100).get();
         document.getElementById('statCustomers').textContent = custSnap.size;
 
-        // الخدمات
         const servSnap = await db.collection('shops').doc(shopId).collection('services').where('status', '==', 'active')
           .limit(100).get();
         document.getElementById('statServices').textContent = servSnap.size;
 
-        // الاشتراك
         const statusMap = { 'pending': 'قيد الانتظار', 'active': 'نشط', 'expired': 'منتهي', 'cancelled': 'ملغي' };
-        const subText = statusMap[currentShop.subscriptionStatus] || 'غير مفعل';
-        document.getElementById('statSubscription').textContent = subText;
+        document.getElementById('statSubscription').textContent = statusMap[currentShop.subscriptionStatus] || 'غير مفعل';
 
-        // حالة المتجر
         const badge = document.getElementById('shopStatusBadge');
         badge.textContent = currentShop.status === 'active' ? 'نشط' : 'مسودة';
         badge.className = `badge ${currentShop.status === 'active' ? 'badge-success' : 'badge-warning'}`;
 
-        // أحدث الحجوزات
         const recent = bookings.slice(0, 5);
         const container = document.getElementById('recentBookingsList');
         if (recent.length === 0) {
           container.innerHTML = '<p class="text-muted">لا توجد حجوزات</p>';
         } else {
           container.innerHTML = recent.map(b =>
-            `<div class="flex-between" style="border-bottom:1px solid #2a2a40; padding:8px 0;">
+            `<div class="flex-between" style="border-bottom:1px solid #28283a; padding:8px 0;">
               <span>${b.customerName} - ${b.serviceName}</span>
               <span class="badge ${b.status === 'pending' ? 'badge-warning' : b.status === 'confirmed' ? 'badge-info' : 'badge-success'}">${b.status}</span>
             </div>`
           ).join('');
         }
-      } catch (err) {
-        console.error(err);
-      }
+      } catch (err) { console.error(err); }
     }
 
-    // ============================================================
-    //  SERVICES
-    // ============================================================
+    // ================================================================
+    //  11. SERVICES
+    // ================================================================
     async function loadServices() {
       if (!currentShop) return;
       const snap = await db.collection('shops').doc(currentShop.id).collection('services')
@@ -1260,10 +1367,8 @@
       container.innerHTML = allServices.map(s =>
         `<div class="flex-between bg-card" style="margin-bottom:8px;">
           <div><strong>${s.name}</strong> <span class="text-muted">${s.price} ${currentShop?.currency || 'EGP'}</span><br><span class="text-muted">${s.duration} دقيقة</span></div>
-          <div>
-            <button class="btn btn-sm btn-outline" onclick="editService('${s.id}')">✏️</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteService('${s.id}')">🗑️</button>
-          </div>
+          <div><button class="btn btn-sm btn-outline" onclick="editService('${s.id}')">✏️</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteService('${s.id}')">🗑️</button></div>
         </div>`
       ).join('');
     }
@@ -1277,9 +1382,9 @@
       document.getElementById('serviceDescInput').value = '';
       document.getElementById('servicePriceInput').value = '';
       document.getElementById('serviceDurationInput').value = '30';
-      serviceModal.style.display = 'flex';
+      serviceModal.classList.add('open');
     });
-    document.getElementById('serviceCancelBtn').addEventListener('click', () => { serviceModal.style.display = 'none'; });
+    document.getElementById('serviceCancelBtn').addEventListener('click', () => { serviceModal.classList.remove('open'); });
 
     document.getElementById('serviceForm').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -1291,18 +1396,17 @@
         duration: parseInt(document.getElementById('serviceDurationInput').value),
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
-      const shopId = currentShop.id;
       try {
         if (editId) {
-          await db.collection('shops').doc(shopId).collection('services').doc(editId).update(data);
+          await db.collection('shops').doc(currentShop.id).collection('services').doc(editId).update(data);
           showToast('تم التحديث', 'success');
         } else {
           data.status = 'active';
           data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-          await db.collection('shops').doc(shopId).collection('services').add(data);
+          await db.collection('shops').doc(currentShop.id).collection('services').add(data);
           showToast('تم الإضافة', 'success');
         }
-        serviceModal.style.display = 'none';
+        serviceModal.classList.remove('open');
         loadServices();
       } catch (err) { showToast(err.message, 'error'); }
     });
@@ -1316,11 +1420,11 @@
       document.getElementById('serviceDescInput').value = s.description || '';
       document.getElementById('servicePriceInput').value = s.price || '';
       document.getElementById('serviceDurationInput').value = s.duration || 30;
-      serviceModal.style.display = 'flex';
+      serviceModal.classList.add('open');
     };
 
     window.deleteService = async function(id) {
-      if (!confirm('هل تريد تعطيل هذه الخدمة؟')) return;
+      if (!confirm('تعطيل الخدمة؟')) return;
       try {
         await db.collection('shops').doc(currentShop.id).collection('services').doc(id).update({ status: 'disabled' });
         showToast('تم التعطيل', 'success');
@@ -1328,9 +1432,9 @@
       } catch (err) { showToast(err.message, 'error'); }
     };
 
-    // ============================================================
-    //  BARBERS
-    // ============================================================
+    // ================================================================
+    //  12. BARBERS
+    // ================================================================
     async function loadBarbers() {
       if (!currentShop) return;
       const snap = await db.collection('shops').doc(currentShop.id).collection('barbers')
@@ -1348,10 +1452,8 @@
       container.innerHTML = allBarbers.map(b =>
         `<div class="flex-between bg-card" style="margin-bottom:8px;">
           <div><strong>${b.name}</strong> <span class="text-muted">${b.specialties || ''}</span></div>
-          <div>
-            <button class="btn btn-sm btn-outline" onclick="editBarber('${b.id}')">✏️</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteBarber('${b.id}')">🗑️</button>
-          </div>
+          <div><button class="btn btn-sm btn-outline" onclick="editBarber('${b.id}')">✏️</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteBarber('${b.id}')">🗑️</button></div>
         </div>`
       ).join('');
     }
@@ -1363,9 +1465,9 @@
       document.getElementById('barberNameInput').value = '';
       document.getElementById('barberBioInput').value = '';
       document.getElementById('barberSpecialtiesInput').value = '';
-      barberModal.style.display = 'flex';
+      barberModal.classList.add('open');
     });
-    document.getElementById('barberCancelBtn').addEventListener('click', () => { barberModal.style.display = 'none'; });
+    document.getElementById('barberCancelBtn').addEventListener('click', () => { barberModal.classList.remove('open'); });
 
     document.getElementById('barberForm').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -1376,18 +1478,17 @@
         specialties: document.getElementById('barberSpecialtiesInput').value,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
-      const shopId = currentShop.id;
       try {
         if (editId) {
-          await db.collection('shops').doc(shopId).collection('barbers').doc(editId).update(data);
+          await db.collection('shops').doc(currentShop.id).collection('barbers').doc(editId).update(data);
           showToast('تم التحديث', 'success');
         } else {
           data.status = 'active';
           data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-          await db.collection('shops').doc(shopId).collection('barbers').add(data);
+          await db.collection('shops').doc(currentShop.id).collection('barbers').add(data);
           showToast('تم الإضافة', 'success');
         }
-        barberModal.style.display = 'none';
+        barberModal.classList.remove('open');
         loadBarbers();
       } catch (err) { showToast(err.message, 'error'); }
     });
@@ -1400,11 +1501,11 @@
       document.getElementById('barberNameInput').value = b.name || '';
       document.getElementById('barberBioInput').value = b.bio || '';
       document.getElementById('barberSpecialtiesInput').value = b.specialties || '';
-      barberModal.style.display = 'flex';
+      barberModal.classList.add('open');
     };
 
     window.deleteBarber = async function(id) {
-      if (!confirm('هل تريد تعطيل هذا الحلاق؟')) return;
+      if (!confirm('تعطيل الحلاق؟')) return;
       try {
         await db.collection('shops').doc(currentShop.id).collection('barbers').doc(id).update({ status: 'disabled' });
         showToast('تم التعطيل', 'success');
@@ -1412,16 +1513,14 @@
       } catch (err) { showToast(err.message, 'error'); }
     };
 
-    // ============================================================
-    //  BOOKINGS
-    // ============================================================
+    // ================================================================
+    //  13. BOOKINGS
+    // ================================================================
     async function loadBookings() {
       if (!currentShop) return;
-      const snap = await db.collection('shops').doc(currentShop.id).collection('bookings')
-        .limit(100).get();
+      const snap = await db.collection('shops').doc(currentShop.id).collection('bookings').limit(100).get();
       allBookings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       renderBookings();
-      // تعبئة خيارات الخدمات والحلاقين في نموذج الحجز
       populateBookingSelects();
     }
 
@@ -1433,10 +1532,8 @@
       }
       container.innerHTML = allBookings.map(b =>
         `<div class="bg-card" style="margin-bottom:8px;">
-          <div class="flex-between">
-            <div><strong>${b.customerName}</strong> - ${b.serviceName}</div>
-            <span class="badge ${b.status === 'pending' ? 'badge-warning' : b.status === 'confirmed' ? 'badge-info' : b.status === 'completed' ? 'badge-success' : 'badge-danger'}">${b.status}</span>
-          </div>
+          <div class="flex-between"><div><strong>${b.customerName}</strong> - ${b.serviceName}</div>
+          <span class="badge ${b.status === 'pending' ? 'badge-warning' : b.status === 'confirmed' ? 'badge-info' : b.status === 'completed' ? 'badge-success' : 'badge-danger'}">${b.status}</span></div>
           <div class="text-muted" style="font-size:14px;">${b.date} ${formatTime(b.startTime)} | ${b.barberName || 'بدون حلاق'}</div>
           <div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;">
             ${b.status === 'pending' ? `<button class="btn btn-sm btn-success" onclick="updateBooking('${b.id}','confirmed')">تأكيد</button>` : ''}
@@ -1454,7 +1551,7 @@
           status,
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        showToast(`تم تغيير الحالة إلى ${status}`, 'success');
+        showToast(`تم تغيير الحالة`, 'success');
         loadBookings();
         if (currentPage === 'dashboard') loadDashboard();
       } catch (err) { showToast(err.message, 'error'); }
@@ -1463,24 +1560,22 @@
     // Booking Modal
     const bookingModal = document.getElementById('bookingModal');
     document.getElementById('addBookingBtn').addEventListener('click', () => {
-      bookingModal.style.display = 'flex';
-      // تعبئة التواريخ والخدمات
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('bookingDate').value = today;
+      bookingModal.classList.add('open');
+      document.getElementById('bookingDate').value = new Date().toISOString().split('T')[0];
       populateBookingSelects();
     });
-    document.getElementById('bookingCancelBtn').addEventListener('click', () => { bookingModal.style.display = 'none'; });
+    document.getElementById('bookingCancelBtn').addEventListener('click', () => { bookingModal.classList.remove('open'); });
 
     async function populateBookingSelects() {
       if (!currentShop) return;
-      // خدمات
       const servSnap = await db.collection('shops').doc(currentShop.id).collection('services')
         .where('status', '==', 'active').limit(100).get();
       const services = servSnap.docs.map(d => ({ id: d.id, ...d.data() }));
       const servSelect = document.getElementById('bookingService');
-      servSelect.innerHTML = services.map(s => `<option value="${s.id}" data-price="${s.price}" data-duration="${s.duration}">${s.name} (${s.price})</option>`).join('');
+      servSelect.innerHTML = services.map(s =>
+        `<option value="${s.id}" data-price="${s.price}" data-duration="${s.duration}">${s.name} (${s.price})</option>`).join(
+        '');
 
-      // حلاقين
       const barberSnap = await db.collection('shops').doc(currentShop.id).collection('barbers')
         .where('status', '==', 'active').limit(100).get();
       const barbers = barberSnap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -1506,34 +1601,26 @@
         return;
       }
 
-      // جلب بيانات الخدمة
-      const serviceDoc = await db.collection('shops').doc(shopId).collection('services').doc(serviceId).get();
-      if (!serviceDoc.exists) { showToast('الخدمة غير موجودة', 'error'); return; }
-      const svc = serviceDoc.data();
-      const duration = svc.duration || 30;
-      const price = svc.price || 0;
-
-      // جلب بيانات الحلاق إن وجد
-      let barberName = '';
-      if (barberId) {
-        const barberDoc = await db.collection('shops').doc(shopId).collection('barbers').doc(barberId).get();
-        if (barberDoc.exists) barberName = barberDoc.data().name || '';
-      }
-
-      // التحقق من التزاحم باستخدام transaction
       try {
+        const serviceDoc = await db.collection('shops').doc(shopId).collection('services').doc(serviceId).get();
+        if (!serviceDoc.exists) { showToast('الخدمة غير موجودة', 'error'); return; }
+        const svc = serviceDoc.data();
+        const duration = svc.duration || 30;
+        const price = svc.price || 0;
+        let barberName = '';
+        if (barberId) {
+          const bDoc = await db.collection('shops').doc(shopId).collection('barbers').doc(barberId).get();
+          if (bDoc.exists) barberName = bDoc.data().name || '';
+        }
+
         await db.runTransaction(async (transaction) => {
-          // قراءة الحجوزات الموجودة في نفس اليوم ونفس الحلاق
           const bookingsRef = db.collection('shops').doc(shopId).collection('bookings');
           const q = bookingsRef.where('date', '==', date);
           const snap = await transaction.get(q);
           const existing = snap.docs.map(d => d.data());
-          // التحقق من التزاحم
           const available = isSlotAvailable(existing, date, startTime, duration, barberId || '');
-          if (!available) {
-            throw new Error('الموعد غير متاح، يرجى اختيار وقت آخر');
-          }
-          // إنشاء الحجز
+          if (!available) throw new Error('الموعد غير متاح');
+
           const newRef = bookingsRef.doc();
           transaction.set(newRef, {
             customerId: null,
@@ -1558,7 +1645,7 @@
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
           });
-          // تحديث/إنشاء العميل
+
           const customersRef = db.collection('shops').doc(shopId).collection('customers');
           const custQuery = customersRef.where('phone', '==', customerPhone).limit(1);
           const custSnap = await transaction.get(custQuery);
@@ -1568,7 +1655,7 @@
               name: customerName,
               phone: customerPhone,
               whatsapp: customerPhone,
-              country: country,
+              country,
               bookingCount: 1,
               lastBookingAt: firebase.firestore.FieldValue.serverTimestamp(),
               createdAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -1584,7 +1671,7 @@
           }
         });
         showToast('تم الحجز بنجاح', 'success');
-        bookingModal.style.display = 'none';
+        bookingModal.classList.remove('open');
         loadBookings();
         if (currentPage === 'dashboard') loadDashboard();
       } catch (err) {
@@ -1592,13 +1679,12 @@
       }
     });
 
-    // ============================================================
-    //  CUSTOMERS
-    // ============================================================
+    // ================================================================
+    //  14. CUSTOMERS
+    // ================================================================
     async function loadCustomers() {
       if (!currentShop) return;
-      const snap = await db.collection('shops').doc(currentShop.id).collection('customers')
-        .limit(100).get();
+      const snap = await db.collection('shops').doc(currentShop.id).collection('customers').limit(100).get();
       allCustomers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       const container = document.getElementById('customersList');
       if (allCustomers.length === 0) {
@@ -1613,13 +1699,12 @@
       ).join('');
     }
 
-    // ============================================================
-    //  REVIEWS
-    // ============================================================
+    // ================================================================
+    //  15. REVIEWS
+    // ================================================================
     async function loadReviews() {
       if (!currentShop) return;
-      const snap = await db.collection('shops').doc(currentShop.id).collection('reviews')
-        .limit(100).get();
+      const snap = await db.collection('shops').doc(currentShop.id).collection('reviews').limit(100).get();
       allReviews = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       const container = document.getElementById('reviewsList');
       if (allReviews.length === 0) {
@@ -1635,15 +1720,14 @@
       ).join('');
     }
 
-    // ============================================================
-    //  WORKING HOURS
-    // ============================================================
+    // ================================================================
+    //  16. WORKING HOURS
+    // ================================================================
     async function loadWorkingHours() {
       if (!currentShop) return;
       const snap = await db.collection('shops').doc(currentShop.id).collection('workingHours').get();
-      const data = {};
-      snap.docs.forEach(d => { data[d.id] = d.data(); });
-      workingHours = data;
+      workingHours = {};
+      snap.docs.forEach(d => { workingHours[d.id] = d.data(); });
       renderHours();
     }
 
@@ -1666,11 +1750,11 @@
 
     window.editHour = function(day) {
       const h = workingHours[day] || { isOpen: true, openTime: '09:00', closeTime: '21:00' };
-      const newOpen = prompt(`أدخل وقت الفتح (HH:MM) لـ ${day}`, h.openTime);
+      const newOpen = prompt(`وقت الفتح (HH:MM) لـ ${day}`, h.openTime);
       if (newOpen === null) return;
-      const newClose = prompt(`أدخل وقت الإغلاق (HH:MM) لـ ${day}`, h.closeTime);
+      const newClose = prompt(`وقت الإغلاق (HH:MM) لـ ${day}`, h.closeTime);
       if (newClose === null) return;
-      const isOpen = confirm(`هل هذا اليوم مفتوح؟ اضغط OK نعم، Cancel لا`);
+      const isOpen = confirm(`هل هذا اليوم مفتوح؟`);
       db.collection('shops').doc(currentShop.id).collection('workingHours').doc(day).set({
         day,
         isOpen,
@@ -1683,13 +1767,12 @@
       }).catch(err => showToast(err.message, 'error'));
     };
 
-    // ============================================================
-    //  HOLIDAYS
-    // ============================================================
+    // ================================================================
+    //  17. HOLIDAYS
+    // ================================================================
     async function loadHolidays() {
       if (!currentShop) return;
-      const snap = await db.collection('shops').doc(currentShop.id).collection('holidays')
-        .limit(100).get();
+      const snap = await db.collection('shops').doc(currentShop.id).collection('holidays').limit(100).get();
       allHolidays = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       renderHolidays();
     }
@@ -1709,7 +1792,7 @@
     }
 
     document.getElementById('addHolidayBtn').addEventListener('click', async () => {
-      const date = prompt('أدخل تاريخ العطلة (YYYY-MM-DD)');
+      const date = prompt('تاريخ العطلة (YYYY-MM-DD)');
       if (!date) return;
       const reason = prompt('السبب (اختياري)');
       try {
@@ -1718,7 +1801,7 @@
           reason: reason || 'عطلة',
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        showToast('تم إضافة العطلة', 'success');
+        showToast('تم الإضافة', 'success');
         loadHolidays();
       } catch (err) { showToast(err.message, 'error'); }
     });
@@ -1732,9 +1815,9 @@
       } catch (err) { showToast(err.message, 'error'); }
     };
 
-    // ============================================================
-    //  GALLERY
-    // ============================================================
+    // ================================================================
+    //  18. GALLERY
+    // ================================================================
     async function loadGallery() {
       if (!currentShop) return;
       const snap = await db.collection('shops').doc(currentShop.id).collection('gallery')
@@ -1751,7 +1834,7 @@
       }
       container.innerHTML = allGallery.map(img =>
         `<div style="position:relative;">
-          <img src="${img.imageUrl}" alt="${img.title}" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;border:1px solid #2a2a40;">
+          <img src="${img.imageUrl}" alt="${img.title}" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;border:1px solid #28283a;">
           <button class="btn btn-sm btn-danger" style="position:absolute;top:4px;left:4px;width:auto;padding:4px 10px;" onclick="deleteGalleryImage('${img.id}')">✕</button>
         </div>`
       ).join('');
@@ -1766,15 +1849,12 @@
       if (!files.length) return;
       for (const file of files) {
         try {
-          // رفع إلى Cloudinary
           const formData = new FormData();
           formData.append('file', file);
           formData.append('upload_preset', 'salons1');
           formData.append('folder', `shops/${currentShop.id}/gallery`);
-          const res = await fetch('https://api.cloudinary.com/v1_1/deaevfmvm/image/upload', {
-            method: 'POST',
-            body: formData
-          });
+          const res = await fetch('https://api.cloudinary.com/v1_1/deaevfmvm/image/upload', { method: 'POST',
+            body: formData });
           const data = await res.json();
           if (data.secure_url) {
             await db.collection('shops').doc(currentShop.id).collection('gallery').add({
@@ -1789,9 +1869,7 @@
           } else {
             showToast('فشل الرفع', 'error');
           }
-        } catch (err) {
-          showToast(err.message, 'error');
-        }
+        } catch (err) { showToast(err.message, 'error'); }
       }
       document.getElementById('galleryFileInput').value = '';
       loadGallery();
@@ -1806,17 +1884,16 @@
       } catch (err) { showToast(err.message, 'error'); }
     };
 
-    // ============================================================
-    //  SUBSCRIPTION
-    // ============================================================
+    // ================================================================
+    //  19. SUBSCRIPTION
+    // ================================================================
     async function loadSubscription() {
       if (!currentShop) return;
-      // تحميل الخطط
       const plansSnap = await db.collection('plans').limit(10).get();
       if (plansSnap.empty) {
-        // إنشاء خطط افتراضية
         const defaultPlans = [
-          { name: 'أساسي', price: 50, currency: 'USD', features: ['موقع عام', 'حجوزات غير محدودة', 'دعم بريد'], status: 'active' },
+          { name: 'أساسي', price: 50, currency: 'USD', features: ['موقع عام', 'حجوزات غير محدودة', 'دعم بريد'],
+          status: 'active' },
           { name: 'متقدم', price: 100, currency: 'USD', features: ['كل ما في الأساسي', 'تحليلات', 'دعم واتساب'],
             status: 'active' },
           { name: 'احترافي', price: 200, currency: 'USD', features: ['كل ما في المتقدم', 'تكامل سوشيال', 'أولوية الدعم'],
@@ -1825,7 +1902,6 @@
         for (const p of defaultPlans) {
           await db.collection('plans').add({ ...p, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
         }
-        // إعادة التحميل
         const newSnap = await db.collection('plans').limit(10).get();
         plans = newSnap.docs.map(d => ({ id: d.id, ...d.data() }));
       } else {
@@ -1846,7 +1922,7 @@
       `;
       const list = document.getElementById('plansList');
       if (plans.length === 0) {
-        list.innerHTML = '<p class="text-muted">لا توجد خطط متاحة</p>';
+        list.innerHTML = '<p class="text-muted">لا توجد خطط</p>';
         return;
       }
       list.innerHTML = plans.map(p =>
@@ -1875,20 +1951,17 @@
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        showToast('تم إرسال طلب الاشتراك', 'success');
-        // إنشاء رابط واتساب
+        showToast('تم إرسال الطلب', 'success');
         const msg =
           `مرحباً، أرغب في الاشتراك في باقة ${planName} بسعر ${price} ${currency} لمتجر ${currentShop.name}. رقم الطلب: ${reqRef.id}`;
         const wa = `https://wa.me/201234567890?text=${encodeURIComponent(msg)}`;
-        if (confirm('تم إرسال الطلب. هل تريد التواصل عبر واتساب؟')) {
-          window.open(wa, '_blank');
-        }
+        if (confirm('هل تريد التواصل عبر واتساب؟')) window.open(wa, '_blank');
       } catch (err) { showToast(err.message, 'error'); }
     };
 
-    // ============================================================
-    //  PROFILE
-    // ============================================================
+    // ================================================================
+    //  20. PROFILE
+    // ================================================================
     async function loadProfile() {
       if (!currentUser) return;
       const doc = await db.collection('users').doc(currentUser.uid).get();
@@ -1910,18 +1983,16 @@
           phone,
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        if (currentUser) {
-          await currentUser.updateProfile({ displayName: name });
-        }
-        showToast('تم تحديث الملف الشخصي', 'success');
+        if (currentUser) await currentUser.updateProfile({ displayName: name });
+        showToast('تم التحديث', 'success');
       } catch (err) { showToast(err.message, 'error'); }
     });
 
     document.getElementById('logoutBtn').addEventListener('click', logout);
 
-    // ============================================================
-    //  PUBLIC SITE (/s/:slug)
-    // ============================================================
+    // ================================================================
+    //  21. PUBLIC SITE (/s/:slug)
+    // ================================================================
     async function loadPublicSite(slug) {
       const container = document.getElementById('publicContent');
       if (!slug) {
@@ -1940,7 +2011,6 @@
           container.innerHTML = '<div class="bg-card"><p>⛔ هذا المتجر غير متاح حالياً</p></div>';
           return;
         }
-        // تحميل البيانات العامة
         const shopId = shopDoc.id;
         const servicesSnap = await db.collection('shops').doc(shopId).collection('services')
           .where('status', '==', 'active').limit(20).get();
@@ -1960,7 +2030,7 @@
             ${shop.logoUrl ? `<img src="${shop.logoUrl}" alt="logo">` : ''}
             <h1>${shop.name}</h1>
             <p>${shop.description || ''}</p>
-            ${shop.whatsapp ? `<a href="https://wa.me/${shop.whatsapp}" target="_blank" class="btn btn-success btn-sm">📱 تواصل واتساب</a>` : ''}
+            ${shop.whatsapp ? `<a href="https://wa.me/${shop.whatsapp}" target="_blank" class="btn btn-success btn-sm" style="width:auto;">📱 تواصل واتساب</a>` : ''}
           </div>
           <h2>✂️ خدماتنا</h2>
           ${services.map(s => `<div class="service-item"><span>${s.name}</span><span>${s.price} ${shop.currency || 'EGP'} - ${s.duration} د</span></div>`).join('')}
@@ -1980,36 +2050,31 @@
       }
     }
 
-    // ============================================================
-    //  DRAWER EVENTS
-    // ============================================================
+    // ================================================================
+    //  22. DRAWER EVENTS
+    // ================================================================
     document.getElementById('openDrawerBtn').addEventListener('click', openDrawer);
     document.getElementById('closeDrawerBtn').addEventListener('click', closeDrawer);
     document.getElementById('drawerBackdrop').addEventListener('click', closeDrawer);
 
-    // ============================================================
-    //  ROUTING BASED ON URL (للصفحات العامة)
-    // ============================================================
-    // سنقوم بفحص المسار عند التحميل
+    // ================================================================
+    //  23. ROUTING (URL)
+    // ================================================================
     window.addEventListener('load', () => {
       const path = window.location.pathname;
       if (path.startsWith('/s/')) {
         const slug = path.split('/s/')[1];
-        if (slug) {
-          // تأكد من أن المستخدم غير مسجل، أو سجل لكننا نعرض الصفحة العامة
-          // سنسمح بالعرض حتى لو كان مسجلاً
-          navigate('public', { slug });
-        }
-      } else {
-        // الباقي يعتمد على حالة المصادقة
+        if (slug) navigate('public', { slug });
       }
     });
 
-    // ============================================================
-    //  INIT
-    // ============================================================
-    console.log('💈 SalonHub SaaS loaded.');
-    // سيتم التعامل مع التنقل بواسطة onAuthStateChanged
+    // ================================================================
+    //  24. INIT
+    // ================================================================
+    console.log('💈 SalonHub SaaS v2 (Production Ready)');
+    console.log('✅ تأكد من استبدال firebaseConfig بمفاتيح مشروعك الفعلي.');
+    console.log('✅ تأكد من تفعيل Email/Password في Firebase Authentication.');
+    console.log('✅ تأكد من تفعيل Firestore في مشروعك.');
   </script>
 </body>
 </html>
